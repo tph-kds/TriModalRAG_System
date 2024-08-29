@@ -1,0 +1,25 @@
+torch
+torchvision
+cython
+matplotlib
+numpy
+scipy
+# opencv
+pyyaml
+packaging
+pycocotools
+tensorboardx
+h5py
+opencv-python
+
+requests
+tqdm
+streamlit
+pillow # for PIL
+
+datasets
+transformers 
+sentence_transformers
+langchain
+python-box
+ensure

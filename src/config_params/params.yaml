@@ -1,0 +1,17 @@
+artifacts_root: "src/artifacts"
+
+logger:
+  name: "trimRag_logger"
+  root_dir: "src/artifacts/logs"
+  format_logging: "[%(asctime)s - { %(levelname)s } - { %(module)s } - %(message)s]"
+  datefmt_logging: "%m/%d/%Y %H:%M:%S"
+  log_dir: "src/artifacts/logs"
+  name_file_logs: "running_logs.log"
+
+exception:
+  error_message: "Error occured in python script name [{file_name}] line number [{line_number}] error message [{error_message}]"
+  error_details: None
+
+
+
+
