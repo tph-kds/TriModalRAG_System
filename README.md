@@ -1,8 +1,8 @@
-<h1 align="center">VISUAL QUESTION ANSWERING - LLM</h1>
+<h1 align="center">TriModal Ritrieval Augmented Generation - TriModalRAG</h1>
 
 ![]()
 
-# TriModal Ritrieval Augmented Generation ( TriModalRAG)  : Find and support data scientists in providing solutions for weather data
+# Tripple Model + Langchain  : Find and support data scientists in providing solutions for weather data
 
 ...
 
