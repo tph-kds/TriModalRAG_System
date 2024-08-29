@@ -1,0 +1,1 @@
+from src.trim_rag.data.images.image_ingestion import ImageIngestion

@@ -12,6 +12,28 @@ exception:
   error_message: "Error occured in python script name [{file_name}] line number [{line_number}] error message [{error_message}]"
   error_details: None
 
+data_ingestion:
+  root_dir: "data"
+  text_data:
+      text_dir: "data/text"
+      query: "machine learning weather prediction"
+      max_results: 50
+      destination: "data/text"
+  audio_data: 
+      audio_dir: "data/audio"
+      url: "https://freesound.org/apiv2/search/text/" 
+      query: "weather"
+      max_results: 100
+      destination: "data/audio"
+  image_data:
+      image_dir: "data/image"
+      url: "https://api.unsplash.com/search/photos"
+      query: "weather"
+      max_results: 100
+      destination: "data/image"
+
+
+
 
 
 

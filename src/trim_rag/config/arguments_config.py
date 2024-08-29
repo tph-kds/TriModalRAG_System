@@ -41,9 +41,83 @@ class ExceptionArgumentsConfig():
         metadata={"help": "Error details for exception."}
     )
 
+@dataclass(frozen=True)
+class AudioDataIngestionArgumentsConfig():
+    audio_dir: str  = field(
+        default="data/audio",
+        metadata={"help": "Directory to save audio data."}
+    )
+    query: str = field(
+        default="weather",
+        metadata={"help": "Query for calling api from freesound.org website for images."}
+    )
+    max_results: int = field(
+        default=50,
+        metadata={"help": "Maximum number of audio to return."}
+    )
+    destination: str = field(
+        default="data/audio",
+        metadata={"help": "Destination directory to save audio data."}
+    )   
+    url: str = field(
+        default="https://freesound.org/apiv2/search/text/",
+        metadata={"help": "Url for calling api from freesound.org website for audio."}
+    )
+@dataclass(frozen=True)
+class ImageDataIngestionArgumentsConfig():
+    image_dir: str  = field(
+        default="data/image",
+        metadata={"help": "Directory to save image data."}
+    )
+    url: str = field(
+        default="https://api.unsplash.com/search/photos",
+        metadata={"help": "Url for calling api from unsplash.com website for images."}
+    )
+    query: str = field(
+        default="weather",
+        metadata={"help": "Query for calling api from unsplash.com website for images."}
+    )
+    max_results: int = field(
+        default=50,
+        metadata={"help": "Maximum number of image to return."}
+    ) 
+    destination : str = field(
+        default="data/image",
+        metadata={"help": "Destination directory to save image data."}
+    )
 
+@dataclass(frozen=True)
+class TextDataIngestionArgumentsConfig():
+    text_dir: str  = field(
+        default="data/text",
+        metadata={"help": "Directory to save text data."}
+    )
+    query: str = field(
+        default="machine learning weather prediction",
+        metadata={"help": "Query for calling api from openweathermap.org."}
+    )
+    max_results: int = field(
+        default=50,
+        metadata={"help": "Maximum number of pdf file to return."}
+    )
+    destination: str = field(
+        default="data/text",
+        metadata={"help": "Destination directory to save text data."}
+    )
+
+
+@dataclass(frozen=True)
+class DataIngestionArgumentsConfig():
+    root_dir: str  = field(
+        default="data",
+        metadata={"help": "Root directory to save data."}
+    )
+    textdata :TextDataIngestionArgumentsConfig
+    audiodata :AudioDataIngestionArgumentsConfig
+    imagedata :ImageDataIngestionArgumentsConfig
 
 @dataclass(frozen=True)
 class ArgumentsConfig():
     logger: LoggerArgumentsConfig
     exception: ExceptionArgumentsConfig
+    data_ingestion: DataIngestionArgumentsConfig

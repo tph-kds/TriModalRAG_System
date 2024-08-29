@@ -165,3 +165,4 @@ tests/unit/manual.md
 note.md
 rag_env/*
 artifacts/*
+.env
