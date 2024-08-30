@@ -1,5 +1,4 @@
 import sys
-from src.trim_rag.config import ConfiguarationManager
 
 class MyException(Exception):
 

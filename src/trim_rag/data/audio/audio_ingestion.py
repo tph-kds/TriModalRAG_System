@@ -59,8 +59,8 @@ class AudioIngestion:
             logger.log_message("info", "Start downloading audio files...")
             for sound_id, sound_item in self.sounds_dict.items():
                 # print(sound_item)
-                link_download = self._download_audio("abc.mp3", self.access_key, sound_item["id"])
-                print(link_download)
+                link_download = self._download_audio(sound_item["id"])
+                # print(link_download)
                 # break
                 # print( link_download['previews']["preview-hq-mp3"])
                 audio_url = link_download['previews']['preview-hq-mp3']  # URL for high-quality preview
@@ -77,7 +77,7 @@ class AudioIngestion:
                 # Download the audio file
                     # Open the destination file in binary write mode
                 get_sound = requests.get(audio_url, stream=True)
-                sound_name = os.path.join(self.destination, f"/audio_{sound_id}.mp3")
+                sound_name = os.path.join(self.destination, f"/{self.query}_audio_{sound_id}.mp3")
                 with open(sound_name, 'wb') as file:
                     # Write the content in chunks
                     for chunk in get_sound.iter_content(chunk_size=8192):
@@ -85,6 +85,10 @@ class AudioIngestion:
 
                 # print(f"Sound downloaded successfully and saved to audio_{sound_id}")
                 logger.log_message("info", f"Sound downloaded successfully and saved to audio_{sound_id}")
+            
+
+            logger.log_message("info", "Downloaded audio: " + str(len(self.sounds_dict)) + " audio files successfully.")
+            return self.sounds_dict
 
         except Exception as e:
             logger.log_message("warning", "Failed to download audio: " + str(e))

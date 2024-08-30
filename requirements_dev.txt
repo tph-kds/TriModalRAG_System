@@ -23,3 +23,6 @@ sentence_transformers
 langchain
 python-box
 ensure
+wget
+
+pytest

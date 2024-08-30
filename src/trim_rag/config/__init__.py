@@ -4,7 +4,6 @@ from src.trim_rag.config.arguments_config import (  LoggerArgumentsConfig,
                                                     TextDataIngestionArgumentsConfig,
                                                     ImageDataIngestionArgumentsConfig,
                                                     AudioDataIngestionArgumentsConfig,
-                                                    DataIngestionArgumentsConfig,
-                                                    ArgumentsConfig
+                                                    # ArgumentsConfig
                                                 )
 from src.trim_rag.config.manager_config import ConfiguarationManager

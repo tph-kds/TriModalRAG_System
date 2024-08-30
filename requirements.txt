@@ -27,3 +27,4 @@ pypdf
 streamlit
 python-box
 ensure
+wget

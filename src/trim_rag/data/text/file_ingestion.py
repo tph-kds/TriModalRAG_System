@@ -24,9 +24,9 @@ class TextIngestion:
         self.url = f"http://export.arxiv.org/api/query?search_query={self.query}&max_results={self.max_results}"
         
         self.papers, self.response = self._text_ingestion()
-        self.infos = {}
+        self.infos: Dict[str, Any] = {}
 
-    def _text_ingestion(self) -> Optional[None, [ET.Element, Any]]:
+    def _text_ingestion(self) -> Optional[Dict[str, Any]]:
         """
         This function performs text ingestion
 
@@ -43,11 +43,11 @@ class TextIngestion:
         else:
             return None
     
-    def get_infos(self, papers) -> Optional[Dict[str, Any]]:
+    def _get_infos(self, papers) -> Optional[Dict[str, Any]]:
         if papers is None:
             logger.log_message("info", "Empty response. No papers found. Please check your query.")
             return None
-    # Extract paper titles and authors
+        # Extract paper titles and authors
         for idx, entry in enumerate(papers.findall('{http://www.w3.org/2005/Atom}entry')):
             title = entry.find('{http://www.w3.org/2005/Atom}title').text.strip()
             authors = [author.find('{http://www.w3.org/2005/Atom}name').text.strip() for author in entry.findall('{http://www.w3.org/2005/Atom}author')]
@@ -66,17 +66,26 @@ class TextIngestion:
     
     def download_file(self) -> None:
         try:
-            logger.log_message("info", f"Downloading pdf file from: {url}.")
+            self.infos = self._get_infos(self.papers)
+            logger.log_message("info", f"Downloading pdf file from: {self.url}.")
             for idx, info in self.infos.items():
-                url = info['links']
-                url = url.replace("abs", "pdf")
-                dir_name = os.path.join(self.destination, f"/{idx}.")
-                name_file = os.path.join(dir_name, (info['title'].replace(" ", "_")).lower() + ".pdf")
-                wget.download(url, name_file)
+                links_url = info['links'][0].replace("abs", "pdf")
+                title = f"/{idx}_" + info['links'][0].split("/")[-1].replace(".", "_")
+                # name_file = os.path.join(self.destination, title)  
+                dir_root = os.path.dirname(os.getcwd()).replace("\\", "/") + "/" + os.path.basename(os.getcwd()).split("/")[0] + "/" + self.destination
+                file_name =  f"{title}.pdf"
+                dir_path = (dir_root+file_name).replace("\\", "/")
+                # Download the PDF using requests
+                logger.log_message("info", f"Downloading pdf file from: {links_url} at {dir_path}.")
+                response = requests.get(links_url)
+
+                # Save the file with the desired extension
+                with open(dir_path, 'wb') as file:
+                    file.write(response.content)
+                
+                # logger.log_message("info", f"Downloaded pdf file to {dir_path} successfully.")
 
             logger.log_message("info", f"Downloaded pdf file to {self.destination} successfully with {len(self.infos)} files.")
-            
-            return None
 
         except Exception as e:
             logger.log_message("warning", f"Error downloading pdf file to {self.destination}.")

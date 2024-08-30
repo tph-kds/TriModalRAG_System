@@ -81,6 +81,10 @@ class ImageDataIngestionArgumentsConfig():
         default=50,
         metadata={"help": "Maximum number of image to return."}
     ) 
+    max_pages: int = field(
+        default=10,
+        metadata={"help": "Maximum number of pages to return."}
+    )
     destination : str = field(
         default="data/image",
         metadata={"help": "Destination directory to save image data."}
@@ -112,12 +116,26 @@ class DataIngestionArgumentsConfig():
         default="data",
         metadata={"help": "Root directory to save data."}
     )
-    textdata :TextDataIngestionArgumentsConfig
-    audiodata :AudioDataIngestionArgumentsConfig
-    imagedata :ImageDataIngestionArgumentsConfig
+    image_access_key: str = field(
+        default="API_IMAGE_DATA",
+        metadata={"help": "Access key for calling api from unsplash.com website for images."}
+    )
+    audio_access_key: str = field(  
+        default="API_AUDIO_DATA",
+        metadata={"help": "Access key for calling api from freesound.org website for audio."}
+    )
+    textdata :TextDataIngestionArgumentsConfig = field(
+        default_factory=TextDataIngestionArgumentsConfig
+    )
+    audiodata :AudioDataIngestionArgumentsConfig = field(
+        default_factory=AudioDataIngestionArgumentsConfig
+    )
+    imagedata :ImageDataIngestionArgumentsConfig = field(
+        default_factory=ImageDataIngestionArgumentsConfig
+    )
 
-@dataclass(frozen=True)
-class ArgumentsConfig():
-    logger: LoggerArgumentsConfig
-    exception: ExceptionArgumentsConfig
-    data_ingestion: DataIngestionArgumentsConfig
+# @dataclass(frozen=True)
+# class ArgumentsConfig():
+#     logger: LoggerArgumentsConfig
+#     exception: ExceptionArgumentsConfig
+#     data_ingestion: DataIngestionArgumentsConfig

@@ -14,6 +14,8 @@ exception:
 
 data_ingestion:
   root_dir: "data"
+  image_access_key: ""
+  audio_access_key: ""
   text_data:
       text_dir: "data/text"
       query: "machine learning weather prediction"
@@ -23,13 +25,14 @@ data_ingestion:
       audio_dir: "data/audio"
       url: "https://freesound.org/apiv2/search/text/" 
       query: "weather"
-      max_results: 100
+      max_results: 5
       destination: "data/audio"
   image_data:
       image_dir: "data/image"
       url: "https://api.unsplash.com/search/photos"
       query: "weather"
-      max_results: 100
+      max_results: 50
+      max_pages: 10
       destination: "data/image"
 
 

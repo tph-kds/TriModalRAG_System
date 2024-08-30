@@ -166,3 +166,4 @@ note.md
 rag_env/*
 artifacts/*
 .env
+data/*

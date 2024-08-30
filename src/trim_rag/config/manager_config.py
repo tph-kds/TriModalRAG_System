@@ -8,13 +8,20 @@ from src.trim_rag.config import (LoggerArgumentsConfig,
                                  ImageDataIngestionArgumentsConfig,
                                  AudioDataIngestionArgumentsConfig
                                 )
+from src.config_params.constants import image_access_key, audio_access_key
 
 class ConfiguarationManager:
-    def __init__(self, config_filepath = CONFIG_FILE_PATH):
+    def __init__(self, 
+                 config_filepath = CONFIG_FILE_PATH,
+                 image_access_key = image_access_key,
+                 audio_access_key = audio_access_key 
+                 ):
         
         super(ConfiguarationManager, self).__init__()
 
         self.config = read_yaml(config_filepath)
+        self.image_access_key = image_access_key
+        self.audio_access_key = audio_access_key
         create_directories([self.config.artifacts_root])
 
     
@@ -70,6 +77,7 @@ class ConfiguarationManager:
             url = config.url,
             query = config.query,
             max_results = config.max_results,
+            max_pages = config.max_pages,
             destination = config.destination,
         )
 
@@ -92,11 +100,15 @@ class ConfiguarationManager:
     
     def get_data_ingestion_arguments_config(self) -> DataIngestionArgumentsConfig:
         config = self.config.data_ingestion
+        config.image_access_key = self.image_access_key
+        config.audio_access_key = self.audio_access_key
 
         create_directories([config.root_dir])
 
         data_ingestion_config = DataIngestionArgumentsConfig(
             root_dir = config.root_dir,
+            image_access_key = config.image_access_key,
+            audio_access_key = config.audio_access_key,
             textdata = self._get_textdata_arguments_config(),
             audiodata = self._get_audiodata_arguments_config(),
             imagedata = self._get_imagedata_arguments_config()
