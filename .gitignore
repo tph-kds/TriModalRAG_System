@@ -167,3 +167,4 @@ rag_env/*
 artifacts/*
 .env
 data/*
+requirements_dev.txt
