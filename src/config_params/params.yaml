@@ -35,6 +35,33 @@ data_ingestion:
       max_pages: 10
       destination: "data/image"
 
+data_processing:
+  root_dir: "src/artifacts/data"
+  processed_dir: "processed_data"
+  text_data:
+      text_dir: "data/text" # Dictionary containing text data
+      processed_dir: "processed_data/text"
+
+  audio_data:
+      audio_dir: "data/audio" # Dictionary containing audio data
+      processed_dir: "processed_data/audio"
+  image_data:
+      image_dir: "data/image" # Dictionary containing image data
+      processed_dir: "processed_data/image"
+      image_path: ""
+      size: 224
+      rotate: 10
+      horizontal_flip: False
+      rotation: 10
+      brightness: 0.2
+      contrast: 0.2
+      scale: 0.8
+      ratio: 0.8
+      saturation: 0.2
+      hue: 0.1
+      format: "JPEG"
+
+
 
 
 

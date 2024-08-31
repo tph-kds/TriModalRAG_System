@@ -6,7 +6,11 @@ from src.trim_rag.config import (LoggerArgumentsConfig,
                                  DataIngestionArgumentsConfig, 
                                  TextDataIngestionArgumentsConfig,
                                  ImageDataIngestionArgumentsConfig,
-                                 AudioDataIngestionArgumentsConfig
+                                 AudioDataIngestionArgumentsConfig,
+                                 TextDataTransformArgumentsConfig,
+                                 AudioDataTransformArgumentsConfig,
+                                 ImageDataTransformArgumentsConfig,
+                                 DataTransformationArgumentsConfig,
                                 )
 from src.config_params.constants import image_access_key, audio_access_key
 
@@ -53,6 +57,7 @@ class ConfiguarationManager:
 
         return data_exception_config
     
+    ### GETTING ALL DATA INGESTION PARAMS  ###  
     def _get_textdata_arguments_config(self) -> TextDataIngestionArgumentsConfig:
         config = self.config.data_ingestion.text_data
 
@@ -115,3 +120,65 @@ class ConfiguarationManager:
         )
 
         return data_ingestion_config
+    
+    ### GETTING ALL DATA TRANSFORMATION PARAMS  ###  
+    def _get_textdata_transform_arguments_config(self) -> TextDataTransformArgumentsConfig:
+        config = self.config.data_processing.text_data
+
+        create_directories([config.processed_dir])
+
+        text_data_processing_config = TextDataTransformArgumentsConfig(
+            processed_dir = config.processed_dir,
+            text_dir= config.text_dir
+        )
+
+        return text_data_processing_config
+    
+    def _get_imagedata_transform_arguments_config(self) -> ImageDataTransformArgumentsConfig:
+        config = self.config.data_processing.image_data
+
+        create_directories([config.processed_dir])
+
+        image_data_processing_config = ImageDataTransformArgumentsConfig(
+            processed_dir = config.processed_dir,
+            image_dir = config.image_dir,
+            image_path = config.image_path,
+            size = config.size,
+            rotate = config.rotate,
+            horizontal_flip = config.horizontal_flip,
+            rotation = config.rotation,
+            brightness = config.brightness,
+            contrast = config.contrast,
+            scale = config.scale,
+            ratio = config.ratio,
+            saturation = config.saturation,
+            hue = config.hue,
+            format = config.format,
+        )
+
+        return image_data_processing_config
+    def _get_audiodata_transform_arguments_config(self) -> AudioDataTransformArgumentsConfig:
+        config = self.config.data_processing.audio_data
+
+        create_directories([config.processed_dir])
+
+        audio_data_processing_config = AudioDataTransformArgumentsConfig(
+            processed_dir = config.processed_dir,
+            audio_dir = config.audio_dir
+        )
+        return audio_data_processing_config
+    
+    def get_data_processing_arguments_config(self) -> DataTransformationArgumentsConfig:
+        config = self.config.data_processing
+
+        create_directories([config.root_dir])
+
+        data_processing_config = DataTransformationArgumentsConfig(
+            root_dir = config.root_dir,
+            processed_dir = config.processed_dir,
+            text_data = self._get_textdata_transform_arguments_config(),
+            audio_data = self._get_audiodata_transform_arguments_config(),
+            image_data = self._get_imagedata_transform_arguments_config()
+        )
+
+        return data_processing_config

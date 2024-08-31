@@ -2,6 +2,8 @@ import sys
 from pathlib import Path
 from dataclasses import dataclass, field
 
+
+# LOGGER PARAMS | EXCEPTION PARAMS
 @dataclass(frozen=True)
 class LoggerArgumentsConfig():
     """
@@ -40,6 +42,8 @@ class ExceptionArgumentsConfig():
         default=None,
         metadata={"help": "Error details for exception."}
     )
+
+# # DATA INGESTION PARAMS
 
 @dataclass(frozen=True)
 class AudioDataIngestionArgumentsConfig():
@@ -139,3 +143,110 @@ class DataIngestionArgumentsConfig():
 #     logger: LoggerArgumentsConfig
 #     exception: ExceptionArgumentsConfig
 #     data_ingestion: DataIngestionArgumentsConfig
+
+# DATA TRANSFORMATION PARAMS
+
+
+@dataclass(frozen=True)
+class TextDataTransformArgumentsConfig():
+    processed_dir: str  = field(
+        default="processed_data/text",
+        metadata={"help": "Root directory to save data."}
+    )
+    
+    text_dir: str  = field(
+        default="data/text",
+        metadata={"help": "Root directory to save data."}
+    )
+
+
+
+@dataclass(frozen=True)
+class AudioDataTransformArgumentsConfig():
+    processed_dir: str  = field(
+        default="processed_data/audio",
+        metadata={"help": "Root directory to save data."}
+    )
+    audio_dir: str  = field(
+        default="data/audio",
+        metadata={"help": "Root directory to save data."}
+    )
+
+@dataclass(frozen=True)
+class ImageDataTransformArgumentsConfig():
+    processed_dir: str  = field(
+        default="processed_data/image",
+        metadata={"help": "Root directory to save data."}
+    )
+    image_dir: str  = field(
+        default="data/image",
+        metadata={"help": "Root directory to save data."}
+    )
+    image_path : str = field(
+        default="",
+        metadata={"help": "Root directory to save data."}
+    )
+    size: int = field(
+        default=224,
+        metadata={"help": "Size of the image."}
+    )
+    rotate: int = field(
+        default=10,
+        metadata={"help": "Rotation of the image."}
+    )
+    horizontal_flip: bool = field(
+        default=True,   
+        metadata={"help": "Horizontal flip of the image."}
+    )
+    rotation: int = field(
+        default=10,
+        metadata={"help": "Rotation of the image."}
+    )
+    brightness: float = field(
+        default=0.2,
+        metadata={"help": "Brightness of the image."}
+    )
+    contrast: float = field(
+        default=0.2,
+        metadata={"help": "Contrast of the image."}
+    )
+    scale: float = field(
+        default=0.8,
+        metadata={"help": "Scale of the image."}
+    )
+    ratio: float = field(
+        default=0.8,
+        metadata={"help": "Ratio of the image."}
+    )
+    saturation: float = field(
+        default=0.2,
+        metadata={"help": "Saturation of the image."}
+    )
+    hue: float = field(
+        default=0.1,
+        metadata={"help": "Hue of the image."}
+    )
+    format: str = field(
+        default="JPEG",
+        metadata={"help": "Format of the image."}
+    )   
+
+@dataclass(frozen=True)
+class DataTransformationArgumentsConfig():
+    root_dir: str  = field(
+        default="src/artifacts/data",
+        metadata={"help": "Root directory to save data."}
+    )
+    processed_dir: str  = field(
+        default="processed_data",
+        metadata={"help": "Root directory to save data."}
+    )
+    text_data :TextDataTransformArgumentsConfig = field(
+        default_factory=TextDataTransformArgumentsConfig
+    )
+    audio_data :AudioDataTransformArgumentsConfig = field(
+        default_factory=AudioDataTransformArgumentsConfig
+    )
+    image_data :ImageDataTransformArgumentsConfig = field(
+        default_factory=ImageDataTransformArgumentsConfig
+    )

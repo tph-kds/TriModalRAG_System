@@ -28,3 +28,6 @@ streamlit
 python-box
 ensure
 wget
+
+nltk
+PyPDF2
