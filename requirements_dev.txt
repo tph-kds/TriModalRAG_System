@@ -4,13 +4,13 @@ cython
 matplotlib
 numpy
 scipy
-# opencv
 pyyaml
 packaging
 pycocotools
 tensorboardx
 h5py
 opencv-python
+
 
 requests
 tqdm
@@ -21,8 +21,15 @@ datasets
 transformers 
 sentence_transformers
 langchain
+python-dotenv
+gradio
+pypdf
+streamlit
 python-box
 ensure
 wget
+
+nltk
+PyPDF2
 
 pytest
