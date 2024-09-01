@@ -158,6 +158,10 @@ class TextDataTransformArgumentsConfig():
         default="data/text",
         metadata={"help": "Root directory to save data."}
     )
+    text_path: str = field(
+        default="",
+        metadata={"help": "Root directory to save data."}
+    )   
 
 
 
@@ -170,6 +174,64 @@ class AudioDataTransformArgumentsConfig():
     audio_dir: str  = field(
         default="data/audio",
         metadata={"help": "Root directory to save data."}
+    )
+    audio_path: str = field(
+        default="",
+        metadata={"help": "Root directory to save data."}
+    )
+    target_sr: int = field(
+        default=16000,
+        metadata={"help": "Target sampling rate."}
+    )
+    top_db: int = field(
+        default=80,
+        metadata={"help": "Top db for mel spectrogram"}
+    )
+    scale: int = field(
+        default=1,
+        metadata={"help": "Scale for mel spectrogram"}
+    )
+    fix: bool = field(
+        default=True,
+        metadata={"help": "Fix for mel spectrogram"}
+    )
+    mono: bool = field(
+        default=True,
+        metadata={"help": "Mono for mel spectrogram"}
+    )
+    pad_mode: str = field(
+        default="reflect",
+        metadata={"help": "Pad mode for mel spectrogram"}
+    )
+
+    frame_length: int = field(
+        default=1024,
+        metadata={"help": "Frame length for mel spectrogram"}
+    )
+    hop_length: int = field(    
+        default=512,
+        metadata={"help": "Hop length for mel spectrogram"}
+    )
+
+    n_steps: int = field(
+        default=128,
+        metadata={"help": "N steps for mel spectrogram"}
+    )
+    bins_per_octave: int = field(
+        default=12,
+        metadata={"help": "Bins per octave for mel spectrogram"}
+    )
+    res_type: str = field(
+        default="kaiser_fast",
+        metadata={"help": "Res type for mel spectrogram"}
+    )
+    rate: int = field(
+        default=12,
+        metadata={"help": "Rate for mel spectrogram"}
+    )
+    noise: float = field(
+        default=0.005,
+        metadata={"help": "Noise for mel spectrogram"}
     )
 
 @dataclass(frozen=True)
@@ -249,4 +311,146 @@ class DataTransformationArgumentsConfig():
     )
     image_data :ImageDataTransformArgumentsConfig = field(
         default_factory=ImageDataTransformArgumentsConfig
+    )
+
+
+@dataclass(frozen=True)
+class TextEmbeddingArgumentsConfig():
+    embedding_dir: str  = field(
+        default="src/artifacts/data",
+        metadata={"help": "Root directory to save data."}
+    )
+    pretrained_model_name: str = field(
+        default="bert_base_cased",
+        metadata={"help": "Pretrained model name."}
+    )
+    device: str = field(
+        default="cpu",
+        metadata={"help": "Device to use."}
+    )
+    return_dict: bool = field(
+        default=True,
+        metadata={"help": "Return dictionary."}
+    )
+    max_length: int = field(
+        default=512,
+        metadata={"help": "Max length."}
+    )
+    return_hidden_states: bool = field(
+        default=True,
+        metadata={"help": "Return hidden states."}
+    )
+    do_lower_case: bool = field(
+        default=True,
+        metadata={"help": "Lower case."}
+    )
+    truncation: bool = field(
+        default=True,
+        metadata={"help": "Truncation for tokenization."}
+    )
+    return_tensor: bool = field(
+        default=True,
+        metadata={"help": "Return tensor."}
+    )
+    padding: bool = field(
+        default=True,
+        metadata={"help": "Padding for tokenization."}
+    )
+    add_special_tokens: bool = field(
+        default=True,
+        metadata={"help": "Add special tokens for tokenization."}
+    )
+    return_token_type_ids: bool = field(
+        default=False,
+        metadata={"help": "Return token type ids."}
+    )
+    return_attention_mask: bool = field(
+        default=False,
+        metadata={"help": "Return attention mask."}
+    )
+    return_overflowing_tokens: bool = field(
+        default=False,
+        metadata={"help": "Return overflowing tokens ."}
+    )
+    return_special_tokens_mask: bool = field(
+        default=False,
+        metadata={"help": "Return special tokens mask ."}
+    )
+
+@dataclass(frozen=True)
+class ImageEmbeddingArgumentsConfig():
+    embedding_dir: str  = field(
+        default="src/artifacts/data",
+        metadata={"help": "Root directory to save data."}
+    )
+    pretrained_model_name: str = field(
+        default="",
+        metadata={"help": "Pretrained model name."}
+    )
+    device: str = field(
+        default="cpu",
+        metadata={"help": "Device to use."}
+    )
+    output_hidden_states: bool = field(
+        default=True,
+        metadata={"help": "Output hidden states."}
+    )
+    output_attentions: bool = field(
+        default=True,
+        metadata={"help": "Output attention."}
+    )
+    return_dict:  bool = field(
+        default=True,   
+        metadata={"help": "Return dictionary."}
+    ) 
+    revision: str = field(
+        default="",
+        metadata={"help": "Revision."}
+    )
+    use_safetensors: bool = field(
+        default=False,
+        metadata={"help": "Use safetensors."}
+    )
+    ignore_mismatched_sizes: bool = field(
+        default=False,
+        metadata={"help": "Ignore mismatched sizes."}
+    )
+    return_tensors: str = field(
+        default="pt",
+        metadata={"help": "Return tensors."}
+    )
+    return_overflowing_tokens: bool = field(
+        default=False,
+        metadata={"help": "Return overflowing tokens ."}
+    )
+    return_special_tokens_mask: bool = field(
+        default=False,
+        metadata={"help": "Return special tokens mask ."}
+    )
+
+@dataclass(frozen=True)
+class AudioEmbeddingArgumentsConfig():
+    embedding_dir: str  = field(
+        default="src/artifacts/data",
+        metadata={"help": "Root directory to save data."}
+    )
+
+@dataclass(frozen=True)
+class EmbeddingArgumentsConfig():
+    root_dir: str  = field(
+        default="src/artifacts/data",
+        metadata={"help": "Root directory to save data."}
+    )
+    embedding_dir: str  = field(
+        default="embeddings",
+        metadata={"help": "Root directory to save data."}
+    )
+    text_data :TextEmbeddingArgumentsConfig = field(
+        default_factory=TextEmbeddingArgumentsConfig
+    )
+    audio_data :AudioEmbeddingArgumentsConfig = field(
+        default_factory=AudioEmbeddingArgumentsConfig
+    )
+    image_data :ImageEmbeddingArgumentsConfig = field(
+        default_factory=ImageEmbeddingArgumentsConfig
     )

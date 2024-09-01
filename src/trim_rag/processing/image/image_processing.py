@@ -10,22 +10,27 @@ from typing import Optional
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 from src.trim_rag.config import ImageDataTransformArgumentsConfig
-
-from transformers import (
-    Compose,
+from torchvision.transforms import (
+    ToTensor,
     RandomHorizontalFlip,
     RandomRotation,
     RandomResizedCrop,
-    ColorJitter
+    ColorJitter,
+    Compose, 
+
 )
 
 
 class ImageTransform:
-    def __init__(self, config: ImageDataTransformArgumentsConfig):
+    def __init__(self, 
+                 config: ImageDataTransformArgumentsConfig, 
+                 image_path: str= None
+                 ):
+        
         super(ImageTransform, self).__init__()
         self.config = config
-        self.image_data = self.config.image_data
-        self.image_path = self.image_data.image_path
+        self.image_data = self.config
+        self.image_path = image_path
         self.size = self.image_data.size
         self.rotate = self.image_data.rotate
         self.horizontal_flip = self.image_data.horizontal_flip
@@ -55,7 +60,7 @@ class ImageTransform:
             )
             print(my_exception)
 
-    def _normalize_image(self, image) -> Optional[np.ndarray]:
+    def _normalize_image(self, image) -> Optional[Image.Image]:
         try:
             image_array = np.array(image) / 255.0  # Normalize pixel values to [0, 1]
 
@@ -94,7 +99,7 @@ class ImageTransform:
             )
             print(my_exception)
 
-    def convert_format(self, image) -> Optional[Image.Image]:
+    def _convert_format(self, image) -> Optional[Image.Image]:
         try:
             converted_image = image.convert('RGB')  # Ensure RGB format
             image_bytes = io.BytesIO()
@@ -111,7 +116,21 @@ class ImageTransform:
             print(my_exception)
 
     def image_processing(self) -> None:
-        pass
+        try: 
+            resized_image = self._resize_image()
+            augmented_image = self._augment_image(resized_image)
+            converted_image = self._convert_format(augmented_image)
+            normalized_image = self._normalize_image(converted_image)
+
+            return normalized_image
+
+        except Exception as e:
+            logger.log_message("warning", "Failed to process image: " + str(e))
+            my_exception = MyException(
+                error_message = "Failed to process image: " + str(e),
+                error_details = sys,
+            )
+            print(my_exception)
 
 
 

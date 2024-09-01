@@ -1,1 +1,2 @@
 from src.trim_rag.pipeline.data_ingestion import DataIngestionPipeline
+from src.trim_rag.pipeline.data_processing import DataTransformPipeline

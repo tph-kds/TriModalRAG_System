@@ -21,10 +21,16 @@ from src.trim_rag.config import TextDataTransformArgumentsConfig
 
 
 class TextTransform:
-    def __init__(self, config: TextDataTransformArgumentsConfig):
+    def __init__(self, 
+                 config: TextDataTransformArgumentsConfig, 
+                 text_path: str= None
+                 ):
+        
         super(TextTransform, self).__init__()
         self.config = config
-        self.text_data = self.config.text_data
+        self.text_data = self.config
+        # self.text_path = self.text_data.text_path
+        self.text_path = text_path
 
         self.stop_words = set(stopwords.words('english'))
         self.lemmatizer = WordNetLemmatizer()
@@ -66,7 +72,7 @@ class TextTransform:
             print(my_exception)
     
 
-    def _remove_stopwords(self, text):
+    def _remove_stopwords(self, text) -> Optional[str]:
         try:
             tokens = text.split()
             filtered_tokens = [token for token in tokens if token not in self.stop_words]
@@ -94,15 +100,17 @@ class TextTransform:
             )
             print(my_exception)
 
-    def text_processing(self) -> None:
+    def text_processing(self) -> Optional[str]:
         try:
             logger.log_message("info", "Data processing pipeline started.")
-            text = self._extract_text_from_pdf(self.text_data)
+            text = self._extract_text_from_pdf(self.text_path)
             text = self._normalize_text(text)
             text = self._remove_stopwords(text)
             text = self._lemmatize_text(text)
-
+            
             logger.log_message("info", "Data processing pipeline completed successfully.")
+            return text
+
 
         except Exception as e:
             logger.log_message("warning", "Failed to run data processing pipeline: " + str(e))

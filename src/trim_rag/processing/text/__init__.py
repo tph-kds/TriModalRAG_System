@@ -1,1 +1,1 @@
-from src.trim_rag.processing.text.text_processing import TextProcessing
+from src.trim_rag.processing.text.text_processing import TextTransform

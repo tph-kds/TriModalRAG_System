@@ -11,6 +11,10 @@ from src.trim_rag.config import (LoggerArgumentsConfig,
                                  AudioDataTransformArgumentsConfig,
                                  ImageDataTransformArgumentsConfig,
                                  DataTransformationArgumentsConfig,
+                                 TextEmbeddingArgumentsConfig,
+                                 ImageEmbeddingArgumentsConfig,
+                                 AudioEmbeddingArgumentsConfig,
+                                 EmbeddingArgumentsConfig
                                 )
 from src.config_params.constants import image_access_key, audio_access_key
 
@@ -129,7 +133,8 @@ class ConfiguarationManager:
 
         text_data_processing_config = TextDataTransformArgumentsConfig(
             processed_dir = config.processed_dir,
-            text_dir= config.text_dir
+            text_dir= config.text_dir,
+            text_path = config.text_path
         )
 
         return text_data_processing_config
@@ -164,7 +169,21 @@ class ConfiguarationManager:
 
         audio_data_processing_config = AudioDataTransformArgumentsConfig(
             processed_dir = config.processed_dir,
-            audio_dir = config.audio_dir
+            audio_dir = config.audio_dir,
+            audio_path = config.audio_path,
+            target_sr = config.target_sr,
+            top_db = config.top_db,
+            scale = config.scale,
+            fix = config.fix,
+            mono = config.mono,
+            pad_mode = config.pad_mode,
+            frame_length = config.frame_length,
+            hop_length = config.hop_length,
+            n_steps = config.n_steps,
+            bins_per_octave = config.bins_per_octave,
+            res_type = config.res_type,
+            rate = config.rate,
+            noise = config.noise
         )
         return audio_data_processing_config
     
@@ -182,3 +201,81 @@ class ConfiguarationManager:
         )
 
         return data_processing_config
+    
+    def _get_textdata_embedding_arguments_config(self) -> TextEmbeddingArgumentsConfig:
+        config = self.config.embedding.text_data
+
+        create_directories([config.embedding_dir])
+
+        text_data_processing_config = TextEmbeddingArgumentsConfig(
+            embedding_dir = config.embedding_dir,
+            pretrained_model_name = config.pretrained_model_name,
+            device = config.device,
+            return_dict = config.return_dict,
+            max_length = config.max_length,
+            return_hidden_states = config.return_hidden_states,
+            do_lower_case = config.do_lower_case,
+            truncation = config.truncation,
+            return_tensor = config.return_tensor,
+            padding = config.padding,
+            max_length = config.max_length,
+            add_special_tokens = config.add_special_tokens,
+            return_token_type_ids = config.return_token_type_ids,
+            return_attention_mask = config.return_attention_mask,
+            return_overflowing_tokens = config.return_overflowing_tokens,
+            return_special_tokens_mask = config.return_special_tokens_mask,
+        )
+        return text_data_processing_config
+    
+    def _get_imagedata_embedding_arguments_config(self) -> ImageEmbeddingArgumentsConfig:
+        config = self.config.embedding.image_data
+
+        create_directories([config.embedding_dir])
+
+        image_data_processing_config = ImageEmbeddingArgumentsConfig(
+            embedding_dir = config.embedding_dir,
+            pretrained_model_name = config.pretrained_model_name,
+            device = config.device,
+            output_hidden_states = config.output_hidden_states,
+            output_attentions = config.output_attentions,
+            return_dict = config.return_dict,
+            revision = config.revision,
+            use_safetensors = config.use_safetensors,
+            ignore_mismatched_sizes = config.ignore_mismatched_sizes,
+            return_tensors = config.return_tensors,
+            return_overflowing_tokens = config.return_overflowing_tokens,
+            return_special_tokens_mask = config.return_special_tokens_mask,
+        )
+        return image_data_processing_config
+    
+    def _get_audiodata_embedding_arguments_config(self) -> AudioEmbeddingArgumentsConfig:
+        config = self.config.embedding.audio_data
+
+        create_directories([config.embedding_dir])
+
+        audio_data_processing_config = AudioEmbeddingArgumentsConfig(
+            embedding_dir = config.embedding_dir,
+            pretrained_model_name = config.pretrained_model_name,
+            device = config.device,
+            revision = config.revision,
+            ignore_mismatched_sizes = config.ignore_mismatched_sizes,
+            return_tensors = config.return_tensors,
+            trust_remote_code = config.trust_remote_code,
+            n_components = config.n_components,
+        )
+        return audio_data_processing_config
+    
+    def get_data_embedding_arguments_config(self) -> EmbeddingArgumentsConfig:
+        config = self.config.embedding
+
+        create_directories([config.root_dir])
+
+        data_embedding_config = EmbeddingArgumentsConfig(
+            root_dir = config.root_dir,
+            embedding_dir = config.embedding_dir,
+            text_data = self._get_textdata_embedding_arguments_config(),
+            audio_data = self._get_audiodata_embedding_arguments_config(),
+            image_data = self._get_imagedata_embedding_arguments_config()
+        )
+
+        return data_embedding_config

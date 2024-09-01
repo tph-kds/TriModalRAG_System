@@ -1,1 +1,1 @@
-from src.trim_rag.processing.audio.audio_processing import AudioProcessing
+from src.trim_rag.processing.audio.audio_processing import AudioTransform

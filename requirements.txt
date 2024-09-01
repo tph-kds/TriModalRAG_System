@@ -31,3 +31,5 @@ wget
 
 nltk
 PyPDF2
+librosa
+resampy

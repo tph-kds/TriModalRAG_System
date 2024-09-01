@@ -1,1 +1,1 @@
-from src.trim_rag.processing.image.image_processing import ImageProcessing
+from src.trim_rag.processing.image.image_processing import ImageTransform
