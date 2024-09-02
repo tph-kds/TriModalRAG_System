@@ -121,6 +121,35 @@ embedding:
     trust_remote_code: False
     n_components: 512
 
+multimodal_embedding:
+  root_dir: "src/artifacts/data"
+  embedding_dir: "embeddings"
+  dropout: 0.1
+  num_layers: 3
+  
+  crossmodal_embedding:  
+      dim_hidden: 512
+      num_heads: 8
+      device: "cpu"
+      dropout: 0.1
+      batch_first: False
+      eps: 1e-6
+      bias:  True
+      num_layers: 3
+      training: True
+      inplace:   True
+
+  sharedspace_embedding:
+      dim_text: 512
+      dim_image:  512
+      dim_sound: 512
+      dim_shared:  512
+      device:  "cpu" 
+      eps:  1e-6
+      bias:  True
+
+
+
 
 
 

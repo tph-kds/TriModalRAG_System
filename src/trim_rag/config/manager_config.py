@@ -14,7 +14,10 @@ from src.trim_rag.config import (LoggerArgumentsConfig,
                                  TextEmbeddingArgumentsConfig,
                                  ImageEmbeddingArgumentsConfig,
                                  AudioEmbeddingArgumentsConfig,
-                                 EmbeddingArgumentsConfig
+                                 EmbeddingArgumentsConfig,
+                                 MultimodalEmbeddingArgumentsConfig,
+                                 SharedEmbeddingSpaceArgumentsConfig,
+                                 CrossModalEmbeddingArgumentsConfig
                                 )
 from src.config_params.constants import image_access_key, audio_access_key
 
@@ -279,3 +282,56 @@ class ConfiguarationManager:
         )
 
         return data_embedding_config
+    
+    def _get_crossmodal_embedding_arguments_config(self) -> CrossModalEmbeddingArgumentsConfig:
+        config = self.config.embedding.crossmodal_embedding
+        # create_directories([config.embedding_dir])
+
+        crossmodal_embedding_config = CrossModalEmbeddingArgumentsConfig(
+            dim_hidden = config.dim_hidden,
+            num_heads = config.num_heads,
+            device = config.device,
+            dropout = config.dropout,
+            batch_first = config.batch_first,
+            eps = config.eps,
+            bias = config.bias,
+            num_layers = config.num_layers,
+            training = config.training,
+            inplace = config.inplace
+        )
+
+        return crossmodal_embedding_config
+    
+    def _get_shared_embedding_arguments_config(self) -> SharedEmbeddingSpaceArgumentsConfig:
+        config = self.config.embedding.shared_embedding
+
+        shared_embedding_config = SharedEmbeddingSpaceArgumentsConfig(
+            dim_text = config.dim_text , # 512
+            dim_image = config.dim_image , # 512
+            dim_sound = config.dim_sound , # 512
+            dim_shared = config.dim_shared , # 512
+            device = config.device , # cpu
+            eps = config.eps , # 1e-6
+            bias = config.bias , # True
+        )
+
+        return shared_embedding_config
+    
+    def get_multimodal_embedding_arguments_config(self) -> MultimodalEmbeddingArgumentsConfig:
+        config = self.config.embedding.multimodal_embedding
+
+        create_directories([config.root_dir])
+
+        multimodal_embedding_config = MultimodalEmbeddingArgumentsConfig(
+            root_dir= config.root_dir,
+            embedding_dir = config.embedding_dir,
+            dropout = config.dropout,
+            num_layers = config.num_layers,
+            crossmodal_embedding = self._get_crossmodal_embedding_arguments_config(),
+            sharedspace_embedding = self._get_shared_embedding_arguments_config()
+        )
+
+        return multimodal_embedding_config
+    
+    
+

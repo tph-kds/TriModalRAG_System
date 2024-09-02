@@ -434,6 +434,35 @@ class AudioEmbeddingArgumentsConfig():
         default="src/artifacts/data",
         metadata={"help": "Root directory to save data."}
     )
+    pretrained_model_name: str = field(
+        default="",
+        metadata={"help": "Pretrained model name."}
+    )
+    device: str = field(
+        default="cpu",
+        metadata={"help": "Device to use."}
+    )
+    revision: str = field(
+        default="",
+        metadata={"help": "Revision."}
+    )
+    ignore_mismatched_sizes: bool = field(
+        default=False,
+        metadata={"help": "Ignore mismatched sizes."}
+    )
+    return_tensors: str = field(
+        default="pt",
+        metadata={"help": "Return tensors."}
+    )
+
+    trust_remote_code: bool = field(
+        default=False,
+        metadata={"help": "Trust remote code."}
+    )
+    n_components: int = field(
+        default=2,
+        metadata={"help": "Number of components."}
+    )
 
 @dataclass(frozen=True)
 class EmbeddingArgumentsConfig():
@@ -453,4 +482,104 @@ class EmbeddingArgumentsConfig():
     )
     image_data :ImageEmbeddingArgumentsConfig = field(
         default_factory=ImageEmbeddingArgumentsConfig
+    )
+
+@dataclass(frozen=True)
+class CrossModalEmbeddingArgumentsConfig():
+
+    dim_hidden: int = field(
+        default=512,
+        metadata={"help": "Dimension of hidden layer."}
+    )
+    num_heads: int = field(
+        default=8,
+        metadata={"help": "Number of attention heads."}
+    )
+    device: str = field(
+        default="cpu",
+        metadata={"help": "Device to use."}
+    )
+    dropout: float = field(
+        default=0.1,
+        metadata={"help": "Dropout probability."}
+    )
+    batch_first : bool = field(
+        default=False,
+        metadata={"help": "Batch first."}
+    )
+    eps:    float = field(
+        default=1e-6,
+        metadata={"help": "Epsilon for layer normalization."}
+    )
+    bias: bool = field(
+        default=True,
+        metadata={"help": "Bias for layer normalization."}
+    )
+    num_layers: int = field(
+        default=3,
+        metadata={"help": "Number of layers."}
+    )
+    training: bool = field(
+        default=True,
+        metadata={"help": "Training mode ."}
+    )
+    inplace: bool = field(
+        default=True,
+        metadata={"help": "Inplace mode."}
+    )   
+
+@dataclass(frozen=True)
+class SharedEmbeddingSpaceArgumentsConfig():
+    dim_text : int = field(
+        default=512,
+        metadata={"help": "Dimension of text space."}
+    )
+    dim_image:  int = field(
+        default=512,
+        metadata={"help": "Dimension of image space."}
+    )
+    dim_sound:  int = field(
+        default=512,
+        metadata={"help": "Dimension of sound space."}
+    )
+    dim_shared : int = field(
+        default=512,
+        metadata={"help": "Dimension of shared space."}
+    )
+    device : str = field(
+        default="cpu",
+        metadata={"help": "Device to use."}
+    )
+    eps : float = field(
+        default=1e-6,
+        metadata={"help": "Epsilon for layer normalization."}
+    )
+    bias : bool = field(
+        default=True,
+        metadata={"help": "Bias for layer normalization."}
+    )   
+
+@dataclass(frozen=True)
+class MultimodalEmbeddingArgumentsConfig():
+    root_dir: str  = field(
+        default="src/artifacts/data",
+        metadata={"help": "Root directory to save data."}
+    )
+    embedding_dir: str  = field(
+        default="embeddings",
+        metadata={"help": "Root directory to save data."}
+    )
+    dropout: float = field(
+        default=0.1,
+        metadata={"help": "Dropout probability."}
+    )
+    num_layers: int = field(
+        default=3,
+        metadata={"help": "Number of layers."}
+    )
+    crossmodal_embedding :CrossModalEmbeddingArgumentsConfig = field(
+        default_factory=CrossModalEmbeddingArgumentsConfig
+    )
+    sharedspace_embedding :SharedEmbeddingSpaceArgumentsConfig = field(
+        default_factory=SharedEmbeddingSpaceArgumentsConfig
     )
