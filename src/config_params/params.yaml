@@ -47,7 +47,7 @@ data_processing:
       audio_dir: "data/audio" # Dictionary containing audio data
       processed_dir: "processed_data/audio"
       audio_path: ""
-      target_sr: 16000
+      target_sr: 44100
       top_db: 60
       scale: True
       fix: True
@@ -58,7 +58,7 @@ data_processing:
       n_steps: 4
       bins_per_octave: 32
       res_type: "kaiser_best"
-      rate: 12
+      rate: 44100
       noise: 0.01
       
   image_data:
@@ -85,7 +85,7 @@ embedding:
     pretrained_model_name: "bert_base_cased"
     max_length: 512
     batch_size: 32
-    device: "cpu"
+    device: "gpu"
     return_dict: True
     output_hidden_states: True
     return_tensors: "pt" 
@@ -100,7 +100,7 @@ embedding:
   image_data:
     image_dir: "embeddings/image"
     pretrained_model_name: "openai/clip-vit-base-patch32"
-    device: "cpu"
+    device: "gpu"
     output_hidden_states: True 
     output_attentions: True
     return_dict:  True
@@ -114,7 +114,7 @@ embedding:
   audio_data:
     audio_dir: "embeddings/audio"
     pretrained_model_name: "facebook/wav2vec2-base-960h"
-    device: "cpu"
+    device: "gpu"
     revision:  "main"
     ignore_mismatched_sizes: False
     return_tensors:   "pt"
@@ -130,7 +130,7 @@ multimodal_embedding:
   crossmodal_embedding:  
       dim_hidden: 512
       num_heads: 8
-      device: "cpu"
+      device: "gpu"
       dropout: 0.1
       batch_first: False
       eps: 1e-6
@@ -144,7 +144,7 @@ multimodal_embedding:
       dim_image:  512
       dim_sound: 512
       dim_shared:  512
-      device:  "cpu" 
+      device:  "gpu" 
       eps:  1e-6
       bias:  True
 

@@ -1,0 +1,1 @@
+from src.trim_rag.components.pinecone.pinecone_setting import PineconeVectorDB

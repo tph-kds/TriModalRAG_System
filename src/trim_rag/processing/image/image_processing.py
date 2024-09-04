@@ -2,7 +2,9 @@
 import os
 import sys
 import io
+import base64
 import numpy as np
+import pandas as pd
 
 from PIL import Image
 from typing import Optional
@@ -131,6 +133,8 @@ class ImageTransform:
                 error_details = sys,
             )
             print(my_exception)
+
+
 
 
 

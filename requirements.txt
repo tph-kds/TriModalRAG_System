@@ -33,3 +33,7 @@ nltk
 PyPDF2
 librosa
 resampy
+# pinecone-client
+qdrant-client
+langchain-openai
+langchain-qdrant

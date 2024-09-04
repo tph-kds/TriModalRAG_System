@@ -162,6 +162,7 @@ cython_debug/
 #.idea/
 
 tests/unit/manual.md
+tests/config/note.md
 note.md
 rag_env/*
 artifacts/*

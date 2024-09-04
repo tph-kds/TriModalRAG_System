@@ -16,6 +16,15 @@ from src.trim_rag.config.arguments_config import (  LoggerArgumentsConfig,
                                                     MultimodalEmbeddingArgumentsConfig,
                                                     SharedEmbeddingSpaceArgumentsConfig,
                                                     CrossModalEmbeddingArgumentsConfig,
+                                                    QdrantVectorDBArgumentsConfig,
+                                                    TextDataVectorDBArgumentsConfig,
+                                                    ImageDataVectorDBArgumentsConfig,
+                                                    AudioDataVectorDBArgumentsConfig,
+                                                    TextPrepareDataQdrantArgumentsConfig,
+                                                    ImagePrepareDataQdrantArgumentsConfig,
+                                                    AudioPrepareDataQdrantArgumentsConfig,
+                                                    PrepareDataQdrantArgumentsConfig
                                                     
                                                 )
 from src.trim_rag.config.manager_config import ConfiguarationManager
+

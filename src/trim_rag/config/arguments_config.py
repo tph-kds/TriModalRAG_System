@@ -583,3 +583,123 @@ class MultimodalEmbeddingArgumentsConfig():
     sharedspace_embedding :SharedEmbeddingSpaceArgumentsConfig = field(
         default_factory=SharedEmbeddingSpaceArgumentsConfig
     )
+
+
+@dataclass(frozen=True)
+class TextDataVectorDBArgumentsConfig():
+    text_dir: str = field(
+        default="embeddings/text",
+        metadata={"help": "Root directory to save data."}
+    )
+    collection_text_name: str = field(
+        default="text",
+        metadata={"help": "Name of the collection."}
+    )
+    size_text: int = field(
+        default=512,
+        metadata={"help": "Size of the text vector."}
+    )
+
+@dataclass(frozen=True)
+class ImageDataVectorDBArgumentsConfig():
+    image_dir: str = field(
+        default="embeddings/image",
+        metadata={"help": "Root directory to save data."}
+    )
+    collection_image_name: str = field(
+        default="image",
+        metadata={"help": "Name of the collection."}
+    )
+    size_image: int = field(
+        default=512,
+        metadata={"help": "Size of the image vector."}
+    )
+
+@dataclass(frozen=True)
+class AudioDataVectorDBArgumentsConfig():
+    audio_dir: str = field(
+        default="embeddings/audio",
+        metadata={"help": "Root directory to save data."}
+    )
+    collection_audio_name: str = field(
+        default="audio",
+        metadata={"help": "Name of the collection."}
+    )
+    size_audio: int = field(
+        default=512,
+        metadata={"help": "Size of the audio vector."}
+    )
+
+@dataclass(frozen=True)
+class QdrantVectorDBArgumentsConfig():
+    root_dir: str = field(
+        default="src/artifacts/data",
+        metadata={"help": "Root directory to save data."}
+    )
+    qdrant_host: str = field(
+        default="localhost",
+        metadata={"help": "Host of the Qdrant server."}
+    )
+    qdrant_port: int = field(
+        default=6333,
+        metadata={"help": "Port of the Qdrant server."}
+    )
+
+    text_data: TextDataVectorDBArgumentsConfig = field(
+        default_factory=TextDataVectorDBArgumentsConfig
+    )
+    image_data: ImageDataVectorDBArgumentsConfig = field(
+        default_factory=ImageDataVectorDBArgumentsConfig
+    )
+    audio_data: AudioDataVectorDBArgumentsConfig = field(
+        default_factory=AudioDataVectorDBArgumentsConfig
+    )
+@dataclass(frozen=True)
+class ImagePrepareDataQdrantArgumentsConfig():
+    image_dir: str = field(
+        default="data/image",
+        metadata={"help": "Root directory to save data."}
+    )
+    format: str = field(
+        default="*.png",
+        metadata={"help": "Format of the image files."}
+    )
+
+
+@dataclass(frozen=True)
+class AudioPrepareDataQdrantArgumentsConfig():
+    audio_dir: str = field(
+        default="data/audio",
+        metadata={"help": "Root directory to save data."}
+    )
+
+@dataclass(frozen=True)
+class TextPrepareDataQdrantArgumentsConfig():
+    text_dir: str = field(
+        default="data/text",
+        metadata={"help": "Root directory to save data."}
+    )
+
+
+@dataclass(frozen=True)
+class PrepareDataQdrantArgumentsConfig():
+    root_dir: str = field(
+        default="src/artifacts/data",
+        metadata={"help": "Root directory to save data."}
+    )
+    data_dir: str = field(
+        default="data",
+        metadata={"help": "Root directory to save data."}
+    )
+    text_data: TextPrepareDataQdrantArgumentsConfig = field(
+        default_factory = TextPrepareDataQdrantArgumentsConfig
+    )   
+
+    image_data: ImagePrepareDataQdrantArgumentsConfig = field(
+        default_factory = ImagePrepareDataQdrantArgumentsConfig
+    )
+
+    audio_data: AudioPrepareDataQdrantArgumentsConfig = field(
+        default_factory = AudioPrepareDataQdrantArgumentsConfig
+    )   
+

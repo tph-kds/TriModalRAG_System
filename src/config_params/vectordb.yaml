@@ -1,0 +1,43 @@
+qdrant_vdb:
+  root_dir: "src/artifacts/data"
+  qdrant_host: "localhost"
+  qdrant_port: 6333
+  text_data: 
+    text_dir: "embeddings/text"
+    collection_text_name: "text"
+    size_text: 512
+  image_data: 
+    image_dir: "embeddings/image"
+    collection_image_name: "image"
+    size_image: 512
+  audio_data:
+    audio_dir: "embeddings/audio"
+    collection_audio_name: "audio"
+    size_audio: 512
+
+pinecone_vdb:
+  root_dir: "src/artifacts/data"
+  pinecone_host: "localhost"
+  pinecone_port: 8080
+  text_data:
+    text_dir: "embeddings/text"
+    collection_text_name: "text"
+  image_data:
+    image_dir: "embeddings/image"
+    collection_image_name: "image"
+  audio_data:
+    audio_dir: "embeddings/audio"
+    collection_audio_name: "audio"
+
+## prepare for upload on qdrant cloud
+init_embedding:
+  root_dir: "src/artifacts/data"
+  data_dir: "data"
+  text_data:
+    text_dir: "data/text"
+  image_data:
+    image_dir: "data/image"
+    format: "*.png"
+  audio_data:
+    audio_dir: "data/audio"
+

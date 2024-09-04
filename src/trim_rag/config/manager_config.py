@@ -1,6 +1,13 @@
 import os
 from src.trim_rag.utils import read_yaml, create_directories
-from src.config_params import CONFIG_FILE_PATH
+from src.config_params import (
+    CONFIG_FILE_PATH, 
+    VECTOR_FILE_PATH,
+    QDRANT_DB_URL, 
+    QDRANT_API_KEY, 
+    image_access_key, 
+    audio_access_key
+)
 from src.trim_rag.config import (LoggerArgumentsConfig, 
                                  ExceptionArgumentsConfig,
                                  DataIngestionArgumentsConfig, 
@@ -17,13 +24,23 @@ from src.trim_rag.config import (LoggerArgumentsConfig,
                                  EmbeddingArgumentsConfig,
                                  MultimodalEmbeddingArgumentsConfig,
                                  SharedEmbeddingSpaceArgumentsConfig,
-                                 CrossModalEmbeddingArgumentsConfig
+                                 CrossModalEmbeddingArgumentsConfig,
+                                 QdrantVectorDBArgumentsConfig,
+                                 TextDataVectorDBArgumentsConfig,
+                                 ImageDataVectorDBArgumentsConfig,
+                                 AudioDataVectorDBArgumentsConfig,
+                                 TextPrepareDataQdrantArgumentsConfig,
+                                 ImagePrepareDataQdrantArgumentsConfig,
+                                 AudioPrepareDataQdrantArgumentsConfig,
+                                 PrepareDataQdrantArgumentsConfig
+
                                 )
-from src.config_params.constants import image_access_key, audio_access_key
+
 
 class ConfiguarationManager:
     def __init__(self, 
                  config_filepath = CONFIG_FILE_PATH,
+                 qdrant_config = VECTOR_FILE_PATH,
                  image_access_key = image_access_key,
                  audio_access_key = audio_access_key 
                  ):
@@ -31,6 +48,7 @@ class ConfiguarationManager:
         super(ConfiguarationManager, self).__init__()
 
         self.config = read_yaml(config_filepath)
+        self.qdrant_config = read_yaml(qdrant_config)
         self.image_access_key = image_access_key
         self.audio_access_key = audio_access_key
         create_directories([self.config.artifacts_root])
@@ -205,6 +223,7 @@ class ConfiguarationManager:
 
         return data_processing_config
     
+    ### GETTING ALL EMBEDDING PARAMS  ###
     def _get_textdata_embedding_arguments_config(self) -> TextEmbeddingArgumentsConfig:
         config = self.config.embedding.text_data
 
@@ -221,7 +240,6 @@ class ConfiguarationManager:
             truncation = config.truncation,
             return_tensor = config.return_tensor,
             padding = config.padding,
-            max_length = config.max_length,
             add_special_tokens = config.add_special_tokens,
             return_token_type_ids = config.return_token_type_ids,
             return_attention_mask = config.return_attention_mask,
@@ -332,6 +350,102 @@ class ConfiguarationManager:
         )
 
         return multimodal_embedding_config
+    
+    
+    ### GETTING ALL DATA QDRANT DB PARAMS  ###  
+    def _get_text_data_drantdb_arguments_config(self) -> TextDataVectorDBArgumentsConfig:
+        text_qdrant_config = self.qdrant_config.qdrant_vdb.text_data
+
+        text_data_drantdb_config = TextDataVectorDBArgumentsConfig(
+            text_dir = text_qdrant_config.text_dir,
+            collection_text_name = text_qdrant_config.collection_text_name,
+            size_text = text_qdrant_config.size_text,
+        )
+
+        return text_data_drantdb_config
+
+    def _get_image_data_drantdb_arguments_config(self) -> ImageDataVectorDBArgumentsConfig:
+        image_qdrant_config = self.qdrant_config.qdrant_vdb.image_data
+
+        image_data_drantdb_config = ImageDataVectorDBArgumentsConfig(
+            image_dir = image_qdrant_config.image_dir,
+            collection_image_name = image_qdrant_config.collection_image_name,
+            size_image = image_qdrant_config.size_image,
+        )
+
+        return image_data_drantdb_config
+
+    def _get_audio_data_drantdb_arguments_config(self) -> AudioDataVectorDBArgumentsConfig:
+        audio_qdrant_config = self.qdrant_config.qdrant_vdb.audio_data
+
+        audio_data_drantdb_config = AudioDataVectorDBArgumentsConfig(
+            audio_dir = audio_qdrant_config.audio_dir,
+            collection_audio_name = audio_qdrant_config.collection_audio_name,
+            size_audio = audio_qdrant_config.size_audio,
+        )
+
+        return audio_data_drantdb_config
+
+    def get_qdrant_vectordb_arguments_config(self) -> QdrantVectorDBArgumentsConfig:
+        qdrant_config = self.qdrant_config.qdrant_vdb
+
+        create_directories([qdrant_config.root_dir])
+
+        qdrant_vectordb_config = QdrantVectorDBArgumentsConfig(
+            root_dir = qdrant_config.root_dir,
+            qdrant_host = qdrant_config.qdrant_host,
+            qdrant_port = qdrant_config.qdrant_port,
+            text_data = self._get_text_data_drantdb_arguments_config(),
+            image_data = self._get_image_data_drantdb_arguments_config(),
+            audio_data = self._get_audio_data_drantdb_arguments_config()
+        )
+
+        return qdrant_vectordb_config
+    
+    def _get_textdata_prepare_upload_db_arguments_config(self) -> TextPrepareDataQdrantArgumentsConfig:
+        text_qdrant_config = self.qdrant_config.init_embedding.text_data
+
+        textdata_prepare_upload_db_config = TextPrepareDataQdrantArgumentsConfig(
+            text_dir = text_qdrant_config.text_dir,            
+        )
+
+        return textdata_prepare_upload_db_config
+
+    def _get_imagedata_prepare_upload_db_arguments_config(self) -> ImagePrepareDataQdrantArgumentsConfig:
+        image_qdrant_config = self.qdrant_config.init_embedding.image_data
+
+        imagedata_prepare_upload_db_config = ImagePrepareDataQdrantArgumentsConfig(
+            image_dir = image_qdrant_config.image_dir,
+            format = image_qdrant_config.format
+        )
+
+        return imagedata_prepare_upload_db_config
+    
+    def _get_audiodata_prepare_upload_db_arguments_config(self) -> AudioPrepareDataQdrantArgumentsConfig:
+        audio_qdrant_config = self.qdrant_config.init_embedding.audio_data
+
+        audiodata_prepare_upload_db_config = AudioPrepareDataQdrantArgumentsConfig(
+            audio_dir = audio_qdrant_config.audio_dir
+        )
+
+        return audiodata_prepare_upload_db_config
+
+    def get_init_embedding_qdrant_arguments_config(self) -> PrepareDataQdrantArgumentsConfig:
+        qdrant_config = self.qdrant_config.init_embedding
+
+        create_directories([qdrant_config.root_dir])
+
+        init_embedding_qdrant_config = PrepareDataQdrantArgumentsConfig(
+            root_dir = qdrant_config.root_dir,
+            data_dir = qdrant_config.data_dir,
+            text_data = self._get_textdata_prepare_upload_db_arguments_config(),
+            image_data = self._get_imagedata_prepare_upload_db_arguments_config(),
+            audio_data = self._get_audiodata_prepare_upload_db_arguments_config()
+        )
+
+        return init_embedding_qdrant_config
+    
+    
     
     
 

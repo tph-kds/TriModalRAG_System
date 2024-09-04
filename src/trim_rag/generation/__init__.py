@@ -1,0 +1,1 @@
+from src.trim_rag.generation.multimodal_generation import MultimodalGeneration
