@@ -23,7 +23,15 @@ from src.trim_rag.config.arguments_config import (  LoggerArgumentsConfig,
                                                     TextPrepareDataQdrantArgumentsConfig,
                                                     ImagePrepareDataQdrantArgumentsConfig,
                                                     AudioPrepareDataQdrantArgumentsConfig,
-                                                    PrepareDataQdrantArgumentsConfig
+                                                    PrepareDataQdrantArgumentsConfig,
+                                                    MultiModelsArgumentsConfig,
+                                                    TextModelArgumentsConfig,
+                                                    ImageModelArgumentsConfig,
+                                                    AudioModelArgumentsConfig,
+                                                    PromptFlowsArgumentsConfig,
+                                                    PostProcessingArgumentsConfig,
+                                                    MultimodalGenerationArgumentsConfig,
+                                                    MultimodalWithMemoriesArgumentsConfig
                                                     
                                                 )
 from src.trim_rag.config.manager_config import ConfiguarationManager

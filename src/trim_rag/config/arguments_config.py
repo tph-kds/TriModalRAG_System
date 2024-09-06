@@ -703,3 +703,117 @@ class PrepareDataQdrantArgumentsConfig():
         default_factory = AudioPrepareDataQdrantArgumentsConfig
     )   
 
+## MODELS CONFIGURATION     ## 
+@dataclass(frozen=True)
+class ImageModelArgumentsConfig():
+    name_of_model: str = field(
+        default="resnet18",
+        metadata={"help": "Name of the model."}
+    )
+
+@dataclass(frozen=True)
+class TextModelArgumentsConfig():
+    name_of_model: str = field(
+        default="bert-base-uncased",
+        metadata={"help": "Name of the model."}
+    )
+
+@dataclass(frozen=True)
+class AudioModelArgumentsConfig():
+    name_of_model: str = field(
+        default="facebook/wav2vec2-base",
+        metadata={"help": "Name of the model."}
+    )
+
+@dataclass(frozen=True)
+class MultiModelsArgumentsConfig():
+    root_dir: str = field(
+        default="src/artifacts/data",
+        metadata={"help": "Root directory to save data."}
+    )
+    model_name: str = field(
+        default="gpt2",
+        metadata={"help": "Name of the model."}
+    )
+
+    text_model: TextModelArgumentsConfig = field(
+        default_factory = TextModelArgumentsConfig
+    )
+
+    image_model: ImageModelArgumentsConfig = field(
+        default_factory = ImageModelArgumentsConfig
+    )
+
+    audio_model: AudioModelArgumentsConfig = field(
+        default_factory = AudioModelArgumentsConfig
+    )
+
+@dataclass(frozen=True)
+class PromptFlowsArgumentsConfig():
+    root_dir: str = field(
+        default="src/artifacts/data",
+        metadata={"help": "Root directory to save data."}
+    )
+    prompts_dir: str = field(
+        default="prompts",
+        metadata={"help": "Root directory to save data."}
+    )
+    variable_name: str = field(
+        default="history",
+        metadata={"help": "Name of the variable."}
+    )
+
+### GENERATION CONFIGURATION
+@dataclass(frozen=True)
+class PostProcessingArgumentsConfig():
+    root_dir: str = field(
+        default="src/artifacts/generation",
+        metadata={"help": "Root directory to save data."}
+    )
+    folder_name: str = field(
+        default="generation",
+        metadata={"help": "Root directory to save data."}
+    )
+
+    temperature: float = field(
+        default=0.0,
+        metadata={"help": "Temperature of the generation."}
+    )
+
+    verbose: bool = field(
+        default=True,
+        metadata={"help": "Verbose of the generation."}
+    )
+
+    frequency_penalty: float = field(
+        default=0.0,
+        metadata={"help": "Frequency penalty of the generation."}
+    )
+
+    max_tokens: int = field(
+        default=128,
+        metadata={"help": "Max tokens of the generation."}
+    )
+
+    model_cohere: str = field(
+        default="rerank-english-v3.0",
+        metadata={"help": "Name of the model."}
+    )
+
+### GENERATION CONFIGURATION
+@dataclass(frozen=True)
+class MultimodalGenerationArgumentsConfig():
+    root_dir: str = field(
+        default="src/artifacts/generation",
+        metadata={"help": "Root directory to save data."}
+    )
+    folder_name: str = field(
+        default="generation",
+        metadata={"help": "Root directory to save data."}
+    )
+
+    system_str: str = field(
+        default="System: You are an assistant robot the masterest about weather and climate field in the world. ",
+        metadata={"help": "Root directory to save data."}
+    )
+    

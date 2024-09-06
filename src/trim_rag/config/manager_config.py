@@ -32,7 +32,15 @@ from src.trim_rag.config import (LoggerArgumentsConfig,
                                  TextPrepareDataQdrantArgumentsConfig,
                                  ImagePrepareDataQdrantArgumentsConfig,
                                  AudioPrepareDataQdrantArgumentsConfig,
-                                 PrepareDataQdrantArgumentsConfig
+                                 PrepareDataQdrantArgumentsConfig,
+                                 MultiModelsArgumentsConfig,
+                                 TextModelArgumentsConfig,
+                                 ImageModelArgumentsConfig,
+                                 AudioModelArgumentsConfig,
+                                 PromptFlowsArgumentsConfig,
+                                 PostProcessingArgumentsConfig,
+                                 MultimodalGenerationArgumentsConfig,
+                                 MultimodalWithMemoriesArgumentsConfig
 
                                 )
 
@@ -444,6 +452,98 @@ class ConfiguarationManager:
         )
 
         return init_embedding_qdrant_config
+    
+    ## GETTING ALL MODEL ARGUMENTS CONFIGS
+    def _get_textmodel_arguments_config(self) -> TextModelArgumentsConfig:
+        text_model_config = self.config.models.text_model
+
+        textmodel_arguments_config = TextModelArgumentsConfig(
+            name_of_model = text_model_config.name_of_model
+        )
+
+        return textmodel_arguments_config
+    
+    def _get_imagemodel_arguments_config(self) -> ImageModelArgumentsConfig:
+        image_model_config = self.config.models.image_model
+
+        imagemodel_arguments_config = ImageModelArgumentsConfig(
+            name_of_model = image_model_config.name_of_model
+        )
+
+        return imagemodel_arguments_config
+    
+    def _get_audiomodel_arguments_config(self) -> AudioModelArgumentsConfig:
+        audio_model_config = self.config.models.audio_model
+
+        audiomodel_arguments_config = AudioModelArgumentsConfig(
+            name_of_model = audio_model_config.name_of_model
+        )
+
+        return audiomodel_arguments_config
+    
+
+    def get_model_arguments_config(self) -> MultiModelsArgumentsConfig:
+        model_config = self.config.models
+
+        # create_directories([model_config.root_dir])
+
+        model_arguments_config = MultiModelsArgumentsConfig(
+            root_dir = model_config.root_dir,
+            model_name = model_config.model_name,
+
+            text_model = self._get_textmodel_arguments_config(),
+            image_model = self._get_imagemodel_arguments_config(),
+            audio_model = self._get_audiomodel_arguments_config(),
+
+        )
+
+        return model_arguments_config
+    
+    ### GETTING PROMPT CONFIG
+    def get_prompt_config(self) -> PromptFlowsArgumentsConfig:
+        prompt_config = self.config.prompts
+
+        create_directories([prompt_config.root_dir])
+
+        prompt_arguments_config = PromptFlowsArgumentsConfig(
+            root_dir = prompt_config.root_dir,
+            prompts_dir = prompt_config.prompts_dir,
+            variable_name = prompt_config.variable_name
+        )
+
+        return prompt_arguments_config
+    
+    ### GETTING GENERATION CONFIG
+    def get_post_processing_config(self) -> PostProcessingArgumentsConfig:
+        post_processing_config = self.config.post_processing
+
+        create_directories([post_processing_config.root_dir])
+
+        post_processing_arguments_config = PostProcessingArgumentsConfig(
+            root_dir = post_processing_config.root_dir,
+            folder_name = post_processing_config.folder_name,
+            temperature = post_processing_config.temperature,
+            verbose = post_processing_config.verbose,
+            frequency_penalty = post_processing_config.frequency_penalty,
+            max_tokens = post_processing_config.max_tokens,
+            model_cohere = post_processing_config.model_cohere
+        ) 
+
+        return post_processing_arguments_config
+    
+    def get_generation_config(self) -> MultimodalGenerationArgumentsConfig:
+        generation_config = self.config.generation
+
+        create_directories([generation_config.root_dir])
+
+        generation_arguments_config = MultimodalGenerationArgumentsConfig(
+            root_dir = generation_config.root_dir,
+            folder_name = generation_config.folder_name,
+            system_str= generation_config.system_str
+        )
+
+        return generation_arguments_config
+    
     
     
     

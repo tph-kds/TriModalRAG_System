@@ -16,6 +16,8 @@ QDRANT_DB_URL = os.getenv("QDRANT_DB_URL")
 __file__ = os.getcwd()
 ROOT_PROJECT_DIR = Path(__file__)
 
+COHERE_API_KEY = os.getenv("COHERE_API_KEY")
+
 
 
 

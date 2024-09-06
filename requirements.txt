@@ -37,3 +37,4 @@ resampy
 qdrant-client
 langchain-openai
 langchain-qdrant
+langchain-google-genai
