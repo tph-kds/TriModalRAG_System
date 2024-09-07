@@ -17,7 +17,7 @@ class AudioEmbedding:
     def __init__(self, config: AudioEmbeddingArgumentsConfig):
         super(AudioEmbedding, self).__init__()
         self.config = config
-        self.audio_data = self.config.audiodata
+        self.audio_data = self.config
 
         self.pretrained_model_name = self.audio_data.pretrained_model_name
         self.device = self.audio_data.device
@@ -93,13 +93,16 @@ class AudioEmbedding:
         try:
             logger.log_message("info", "Getting features for embedding audio started.")
             # Tokenize audio (convert to input format expected by the model)
-            inputs = self._get_tokenizer(audio, 
-                                        return_tensors=self.return_tensors).input_values
+            tokenizer = self._get_tokenizer()
+            inputs = tokenizer(audio, 
+                                return_tensors=self.return_tensors).input_values
             inputs = inputs.to(self.device)
+
 
             # Get embeddings from the model
             with torch.no_grad():
-                outputs = self._get_model(inputs)
+                model = self._get_model()
+                outputs = model(inputs)
                 embeddings = outputs.last_hidden_state
 
             logger.log_message("info", "Getting features for embedding audio completed successfully.")
@@ -115,10 +118,10 @@ class AudioEmbedding:
             print(my_exception)
 
 
-    def embedding_audio(self) -> Optional[torch.Tensor]:
+    def embedding_audio(self, audios) -> Optional[torch.Tensor]:
         try:
             logger.log_message("info", "Embedding audio started.")
-            audio = self._get_features(self.audio_data)
+            audio = self._get_features(audio=audios)
             logger.log_message("info", "Embedding audio completed successfully.")
             return audio
 

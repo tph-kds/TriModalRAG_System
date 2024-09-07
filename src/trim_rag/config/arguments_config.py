@@ -316,7 +316,7 @@ class DataTransformationArgumentsConfig():
 
 @dataclass(frozen=True)
 class TextEmbeddingArgumentsConfig():
-    embedding_dir: str  = field(
+    text_dir: str  = field(
         default="src/artifacts/data",
         metadata={"help": "Root directory to save data."}
     )
@@ -336,7 +336,7 @@ class TextEmbeddingArgumentsConfig():
         default=512,
         metadata={"help": "Max length."}
     )
-    return_hidden_states: bool = field(
+    output_hidden_states: bool = field(
         default=True,
         metadata={"help": "Return hidden states."}
     )
@@ -348,12 +348,12 @@ class TextEmbeddingArgumentsConfig():
         default=True,
         metadata={"help": "Truncation for tokenization."}
     )
-    return_tensor: bool = field(
+    return_tensors: bool = field(
         default=True,
         metadata={"help": "Return tensor."}
     )
-    padding: bool = field(
-        default=True,
+    padding: str = field(
+        default="max_length",
         metadata={"help": "Padding for tokenization."}
     )
     add_special_tokens: bool = field(
@@ -379,7 +379,7 @@ class TextEmbeddingArgumentsConfig():
 
 @dataclass(frozen=True)
 class ImageEmbeddingArgumentsConfig():
-    embedding_dir: str  = field(
+    image_dir: str  = field(
         default="src/artifacts/data",
         metadata={"help": "Root directory to save data."}
     )
@@ -430,7 +430,7 @@ class ImageEmbeddingArgumentsConfig():
 
 @dataclass(frozen=True)
 class AudioEmbeddingArgumentsConfig():
-    embedding_dir: str  = field(
+    audio_dir: str  = field(
         default="src/artifacts/data",
         metadata={"help": "Root directory to save data."}
     )

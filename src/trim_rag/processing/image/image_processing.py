@@ -122,9 +122,12 @@ class ImageTransform:
             resized_image = self._resize_image()
             augmented_image = self._augment_image(resized_image)
             converted_image = self._convert_format(augmented_image)
-            normalized_image = self._normalize_image(converted_image)
+            # normalized_image = self._normalize_image(converted_image)
 
-            return normalized_image
+
+            # return normalized_image
+
+            return converted_image
 
         except Exception as e:
             logger.log_message("warning", "Failed to process image: " + str(e))

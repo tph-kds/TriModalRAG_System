@@ -6,7 +6,8 @@ from src.config_params import (
     QDRANT_DB_URL, 
     QDRANT_API_KEY, 
     image_access_key, 
-    audio_access_key
+    audio_access_key,
+    ROOT_PROJECT_DIR
 )
 from src.trim_rag.config import (LoggerArgumentsConfig, 
                                  ExceptionArgumentsConfig,
@@ -40,7 +41,7 @@ from src.trim_rag.config import (LoggerArgumentsConfig,
                                  PromptFlowsArgumentsConfig,
                                  PostProcessingArgumentsConfig,
                                  MultimodalGenerationArgumentsConfig,
-                                 MultimodalWithMemoriesArgumentsConfig
+                                #  MultimodalWithMemoriesArgumentsConfig
 
                                 )
 
@@ -50,7 +51,8 @@ class ConfiguarationManager:
                  config_filepath = CONFIG_FILE_PATH,
                  qdrant_config = VECTOR_FILE_PATH,
                  image_access_key = image_access_key,
-                 audio_access_key = audio_access_key 
+                 audio_access_key = audio_access_key,
+                 root_project_dir = ROOT_PROJECT_DIR
                  ):
         
         super(ConfiguarationManager, self).__init__()
@@ -59,6 +61,7 @@ class ConfiguarationManager:
         self.qdrant_config = read_yaml(qdrant_config)
         self.image_access_key = image_access_key
         self.audio_access_key = audio_access_key
+        self.root_project_dir = root_project_dir
         create_directories([self.config.artifacts_root])
 
     
@@ -157,8 +160,9 @@ class ConfiguarationManager:
     ### GETTING ALL DATA TRANSFORMATION PARAMS  ###  
     def _get_textdata_transform_arguments_config(self) -> TextDataTransformArgumentsConfig:
         config = self.config.data_processing.text_data
-
-        create_directories([config.processed_dir])
+        folder = os.path.join(self.root_project_dir, self.config.data_processing.root_dir)
+        full_path = os.path.join(folder, config.processed_dir)
+        create_directories([full_path])
 
         text_data_processing_config = TextDataTransformArgumentsConfig(
             processed_dir = config.processed_dir,
@@ -170,8 +174,9 @@ class ConfiguarationManager:
     
     def _get_imagedata_transform_arguments_config(self) -> ImageDataTransformArgumentsConfig:
         config = self.config.data_processing.image_data
-
-        create_directories([config.processed_dir])
+        folder = os.path.join(self.root_project_dir, self.config.data_processing.root_dir)
+        full_path = os.path.join(folder, config.processed_dir)
+        create_directories([full_path])
 
         image_data_processing_config = ImageDataTransformArgumentsConfig(
             processed_dir = config.processed_dir,
@@ -193,8 +198,9 @@ class ConfiguarationManager:
         return image_data_processing_config
     def _get_audiodata_transform_arguments_config(self) -> AudioDataTransformArgumentsConfig:
         config = self.config.data_processing.audio_data
-
-        create_directories([config.processed_dir])
+        folder = os.path.join(self.root_project_dir, self.config.data_processing.root_dir)
+        full_path = os.path.join(folder, config.processed_dir)
+        create_directories([full_path])
 
         audio_data_processing_config = AudioDataTransformArgumentsConfig(
             processed_dir = config.processed_dir,
@@ -218,8 +224,9 @@ class ConfiguarationManager:
     
     def get_data_processing_arguments_config(self) -> DataTransformationArgumentsConfig:
         config = self.config.data_processing
-
-        create_directories([config.root_dir])
+        folder = os.path.join(self.root_project_dir, config.root_dir)
+        full_path = os.path.join(folder, config.processed_dir)
+        create_directories([full_path])
 
         data_processing_config = DataTransformationArgumentsConfig(
             root_dir = config.root_dir,
@@ -234,19 +241,20 @@ class ConfiguarationManager:
     ### GETTING ALL EMBEDDING PARAMS  ###
     def _get_textdata_embedding_arguments_config(self) -> TextEmbeddingArgumentsConfig:
         config = self.config.embedding.text_data
-
-        create_directories([config.embedding_dir])
+        folder = os.path.join(self.root_project_dir, self.config.embedding.root_dir)
+        full_path = os.path.join(folder, config.text_dir)
+        create_directories([full_path])
 
         text_data_processing_config = TextEmbeddingArgumentsConfig(
-            embedding_dir = config.embedding_dir,
+            text_dir = config.text_dir,
             pretrained_model_name = config.pretrained_model_name,
             device = config.device,
             return_dict = config.return_dict,
             max_length = config.max_length,
-            return_hidden_states = config.return_hidden_states,
+            output_hidden_states = config.output_hidden_states,
             do_lower_case = config.do_lower_case,
             truncation = config.truncation,
-            return_tensor = config.return_tensor,
+            return_tensors = config.return_tensors,
             padding = config.padding,
             add_special_tokens = config.add_special_tokens,
             return_token_type_ids = config.return_token_type_ids,
@@ -258,11 +266,12 @@ class ConfiguarationManager:
     
     def _get_imagedata_embedding_arguments_config(self) -> ImageEmbeddingArgumentsConfig:
         config = self.config.embedding.image_data
-
-        create_directories([config.embedding_dir])
+        folder = os.path.join(self.root_project_dir, self.config.embedding.root_dir)
+        full_path = os.path.join(folder, config.image_dir)
+        create_directories([full_path])
 
         image_data_processing_config = ImageEmbeddingArgumentsConfig(
-            embedding_dir = config.embedding_dir,
+            image_dir = config.image_dir,
             pretrained_model_name = config.pretrained_model_name,
             device = config.device,
             output_hidden_states = config.output_hidden_states,
@@ -279,11 +288,12 @@ class ConfiguarationManager:
     
     def _get_audiodata_embedding_arguments_config(self) -> AudioEmbeddingArgumentsConfig:
         config = self.config.embedding.audio_data
-
-        create_directories([config.embedding_dir])
+        folder = os.path.join(self.root_project_dir, self.config.embedding.root_dir)
+        full_path = os.path.join(folder, config.audio_dir)
+        create_directories([full_path])
 
         audio_data_processing_config = AudioEmbeddingArgumentsConfig(
-            embedding_dir = config.embedding_dir,
+            audio_dir = config.audio_dir,
             pretrained_model_name = config.pretrained_model_name,
             device = config.device,
             revision = config.revision,
@@ -296,8 +306,9 @@ class ConfiguarationManager:
     
     def get_data_embedding_arguments_config(self) -> EmbeddingArgumentsConfig:
         config = self.config.embedding
-
-        create_directories([config.root_dir])
+        folder = os.path.join(self.root_project_dir, config.root_dir)
+        full_path = os.path.join(folder, config.embedding_dir)
+        create_directories([full_path])
 
         data_embedding_config = EmbeddingArgumentsConfig(
             root_dir = config.root_dir,
@@ -310,7 +321,7 @@ class ConfiguarationManager:
         return data_embedding_config
     
     def _get_crossmodal_embedding_arguments_config(self) -> CrossModalEmbeddingArgumentsConfig:
-        config = self.config.embedding.crossmodal_embedding
+        config = self.config.multimodal_embedding.crossmodal_embedding
         # create_directories([config.embedding_dir])
 
         crossmodal_embedding_config = CrossModalEmbeddingArgumentsConfig(
@@ -329,7 +340,7 @@ class ConfiguarationManager:
         return crossmodal_embedding_config
     
     def _get_shared_embedding_arguments_config(self) -> SharedEmbeddingSpaceArgumentsConfig:
-        config = self.config.embedding.shared_embedding
+        config = self.config.multimodal_embedding.sharedspace_embedding
 
         shared_embedding_config = SharedEmbeddingSpaceArgumentsConfig(
             dim_text = config.dim_text , # 512
@@ -344,7 +355,7 @@ class ConfiguarationManager:
         return shared_embedding_config
     
     def get_multimodal_embedding_arguments_config(self) -> MultimodalEmbeddingArgumentsConfig:
-        config = self.config.embedding.multimodal_embedding
+        config = self.config.multimodal_embedding
 
         create_directories([config.root_dir])
 

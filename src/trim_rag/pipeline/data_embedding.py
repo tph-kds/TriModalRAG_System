@@ -33,22 +33,26 @@ class DataEmbeddingPipeline:
         self.shared_embeddings =  SharedEmbeddingSpace(self.config.sharedspace_embedding)
 
 
-    def run_data_embedding_pipeline(self, type: str = "shared") -> List[str]:
+    def run_data_embedding_pipeline(self, 
+                                    text: List[str], 
+                                    image: List[str], 
+                                    audio: List[str], 
+                                    type_embedding: str = "shared") -> List[str]:
         try:
             logger.log_message("info", "Data embedding pipeline started.")
 
-            self.text_embeddings = self.text_embedding()
-            # self.image_embeddings = self.image_embedding()
-            # self.audio_embeddings = self.audio_embedding()
-            # if type == "all":
-            #     embeddings = self._multimodal_embedding()
-            #     return embeddings
+            self.text_embeddings = self.text_embedding(texts=text)
+            self.image_embeddings = self.image_embedding(images=image)
+            self.audio_embeddings = self.audio_embedding(audios=audio)
+            if type_embedding == "all":
+                embeddings = self._multimodal_embedding()
+                return embeddings
 
-            # text_new_embeddings, image_new_embeddings, audio_new_embeddings = self.shared_embedding_space()
+            text_new_embeddings, image_new_embeddings, audio_new_embeddings = self.shared_embedding_space()
 
-            # logger.log_message("info", "Data embedding pipeline completed successfully.")
-            # return text_new_embeddings, image_new_embeddings, audio_new_embeddings
-            return self.text_embeddings
+            logger.log_message("info", "Data embedding pipeline completed successfully.")
+            return text_new_embeddings, image_new_embeddings, audio_new_embeddings
+            # return self.text_embeddings
 
         except Exception as e:
             logger.log_message("warning", "Failed to run data embedding pipeline: " + str(e))
@@ -104,7 +108,7 @@ class DataEmbeddingPipeline:
             logger.log_message("info", "Audio embedding pipeline started.")
             audioEmbedding = AudioEmbedding(self.audio_data)
             for audio in audios:
-                self.audio_embeddings.append(audioEmbedding.audio_embedding(audio))
+                self.audio_embeddings.append(audioEmbedding.embedding_audio(audio))
 
             logger.log_message("info", "Audio embedding pipeline completed successfully.")
 

@@ -82,15 +82,16 @@ embedding:
   embedding_dir: "embeddings"
   text_data:
     text_dir: "embeddings/text"
-    pretrained_model_name: "bert_base_cased"
+    pretrained_model_name: "bert-base-uncased"
     max_length: 512
-    batch_size: 32
-    device: "gpu"
+    # batch_size: 32
+    device: "cuda:0"
     return_dict: True
     output_hidden_states: True
     return_tensors: "pt" 
+    do_lower_case: True
     truncation: True 
-    padding: True
+    padding: "max_length"
     add_special_tokens: True
     return_token_type_ids: False
     return_attention_mask: False
@@ -100,7 +101,7 @@ embedding:
   image_data:
     image_dir: "embeddings/image"
     pretrained_model_name: "openai/clip-vit-base-patch32"
-    device: "gpu"
+    device: "cuda:0"
     output_hidden_states: True 
     output_attentions: True
     return_dict:  True
@@ -114,7 +115,7 @@ embedding:
   audio_data:
     audio_dir: "embeddings/audio"
     pretrained_model_name: "facebook/wav2vec2-base-960h"
-    device: "gpu"
+    device: "cuda:0"
     revision:  "main"
     ignore_mismatched_sizes: False
     return_tensors:   "pt"
@@ -130,7 +131,7 @@ multimodal_embedding:
   crossmodal_embedding:  
       dim_hidden: 512
       num_heads: 8
-      device: "gpu"
+      device: "cuda:0"
       dropout: 0.1
       batch_first: False
       eps: 1e-6
@@ -144,7 +145,7 @@ multimodal_embedding:
       dim_image:  512
       dim_sound: 512
       dim_shared:  512
-      device:  "gpu" 
+      device:  "cuda:0" 
       eps:  1e-6
       bias:  True
 

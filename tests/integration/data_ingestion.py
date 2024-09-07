@@ -4,7 +4,8 @@ from src.trim_rag.exception import MyException
 from src.trim_rag.config import ConfiguarationManager
 from src.trim_rag.pipeline import DataIngestionPipeline
 
-if __name__ == "__main__":
+
+def data_ingestion():
     try:
         logger.log_message("info", "")
         logger.log_message("info", "<<<<<<<< RUNNING DATA INGESTION SCENARIO >>>>>>>>")
@@ -28,3 +29,6 @@ if __name__ == "__main__":
 
 
 
+
+if __name__ == "__main__":
+    data_ingestion()

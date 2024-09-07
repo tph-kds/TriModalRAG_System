@@ -17,7 +17,7 @@ class ImageEmbedding:
     def __init__(self, config: ImageEmbeddingArgumentsConfig):
         super(ImageEmbedding, self).__init__()
         self.config = config
-        self.image_data = self.config.image_data
+        self.image_data = self.config
 
         self.pretrained_model_name = self.image_data.pretrained_model_name
         self.device = self.image_data.device
@@ -40,6 +40,7 @@ class ImageEmbedding:
             clipmodel = CLIPModel.from_pretrained(pretrained_model_name_or_path=self.pretrained_model_name,
                                                 ignore_mismatched_sizes=self.ignore_mismatched_sizes,
                                                 use_safetensors=self.use_safetensors,
+                                                attn_implementation="eager",
                                                 )
 
             clipmodel.to(self.device)
@@ -77,7 +78,8 @@ class ImageEmbedding:
     def _preprocess_image(self, converted_image) -> Optional[torch.Tensor]:
         # Load and preprocess image
         image = converted_image.convert("RGB")
-        return self._get_processor(images=image, 
+        processor_obj = self._get_processor()
+        return processor_obj(images=image, 
                                return_tensors=self.return_tensors, 
                                return_overflowing_tokens=self.return_overflowing_tokens,
                                return_special_tokens_mask=self.return_special_tokens_mask).pixel_values
@@ -90,7 +92,8 @@ class ImageEmbedding:
 
             with torch.no_grad():
                 # Extract image features
-                image_features = self._get_model.get_image_features(pixel_values=image_tensor,
+                image_model = self._get_model()
+                image_features = image_model.get_image_features(pixel_values=image_tensor,
                                                                 output_hidden_states=self.output_hidden_states,
                                                                 output_attentions=self.output_attentions,
                                                                 return_dict=self.return_dict,

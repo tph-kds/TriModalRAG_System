@@ -4,7 +4,8 @@ from src.trim_rag.exception import MyException
 from src.trim_rag.config import ConfiguarationManager
 from src.trim_rag.pipeline import DataTransformPipeline
 
-if __name__ == "__main__":
+
+def data_processing():
     try:
         logger.log_message("info", "")
         logger.log_message("info", "<<<<<<<< RUNNING DATA TRANSFORMATION SCENARIO >>>>>>>>")
@@ -13,14 +14,15 @@ if __name__ == "__main__":
         pipeline = DataTransformPipeline(config)
         textprocessing, imageprocessing, audioprocessing = pipeline.run_data_processing_pipeline()
 
-        print(textprocessing)
-        print(imageprocessing)
-        print(audioprocessing)
+        # print(textprocessing)
+        # print(imageprocessing)
+        # print(audioprocessing)
 
         # print(config)
         logger.log_message("info", "Data Transformation pipeline completed successfully.")
         logger.log_message("info", "<<<<<<<<   END DATA TRANSFORMATION SCENARIO   >>>>>>>>")
         logger.log_message("info", "")
+        return textprocessing, imageprocessing, audioprocessing
 
     except Exception as e:
         logger.log_message("warning", "Failed to run Data Transformation pipeline: " + str(e))
@@ -29,6 +31,13 @@ if __name__ == "__main__":
             error_details = sys,
         )
         print(my_exception)
+
+
+if __name__ == "__main__":
+    textprocessing, imageprocessing, audioprocessing = data_processing()
+    print(textprocessing)
+    print(imageprocessing)
+    print(audioprocessing)
 
 
 
