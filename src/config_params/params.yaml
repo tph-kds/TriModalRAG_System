@@ -80,6 +80,7 @@ data_processing:
 embedding:
   root_dir: "src/artifacts/data"
   embedding_dir: "embeddings"
+  device: "cuda:0"
   text_data:
     text_dir: "embeddings/text"
     pretrained_model_name: "bert-base-uncased"
@@ -141,12 +142,12 @@ multimodal_embedding:
       inplace:   True
 
   sharedspace_embedding:
-      dim_text: 512
+      dim_text: 768
       dim_image:  512
-      dim_sound: 512
+      dim_sound: 768
       dim_shared:  512
       device:  "cuda:0" 
-      eps:  1e-6
+      eps:  0.0001
       bias:  True
 
 models:

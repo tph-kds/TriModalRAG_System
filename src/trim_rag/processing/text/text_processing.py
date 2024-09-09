@@ -7,9 +7,9 @@ import PyPDF2
 import torch
 import torch.nn.functional as F
 
-nltk.download('wordnet')
-nltk.download('stopwords')
-nltk.download('punkt')
+# nltk.download('wordnet')
+# nltk.download('stopwords')
+# nltk.download('punkt')
 from typing import Optional
 from PyPDF2 import PdfReader
 from nltk.corpus import stopwords

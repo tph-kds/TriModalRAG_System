@@ -474,6 +474,10 @@ class EmbeddingArgumentsConfig():
         default="embeddings",
         metadata={"help": "Root directory to save data."}
     )
+    device : str = field(
+        default="cpu",
+        metadata={"help": "Device to use."}
+    )
     text_data :TextEmbeddingArgumentsConfig = field(
         default_factory=TextEmbeddingArgumentsConfig
     )

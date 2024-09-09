@@ -95,6 +95,8 @@ class TextEmbedding:
                 text_model = self._get_model()
                 outputs = text_model(**inputs)
                 embeddings = outputs.last_hidden_state  # Shape: (batch_size, sequence_length, hidden_size)
+            # embeddings = embeddings.mean(dim=1)  # Average over sequence length
+            # embeddings = embeddings[:, :self.target_dim]
             return embeddings
 
         except Exception as e:

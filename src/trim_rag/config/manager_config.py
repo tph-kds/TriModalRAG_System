@@ -313,6 +313,7 @@ class ConfiguarationManager:
         data_embedding_config = EmbeddingArgumentsConfig(
             root_dir = config.root_dir,
             embedding_dir = config.embedding_dir,
+            device = config.device,
             text_data = self._get_textdata_embedding_arguments_config(),
             audio_data = self._get_audiodata_embedding_arguments_config(),
             image_data = self._get_imagedata_embedding_arguments_config()

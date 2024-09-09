@@ -106,7 +106,8 @@ class AudioEmbedding:
                 embeddings = outputs.last_hidden_state
 
             logger.log_message("info", "Getting features for embedding audio completed successfully.")
-
+            # embeddings = embeddings.mean(dim=1)  # Average over sequence length
+            # embeddings = embeddings[:, :self.target_dim]
             return embeddings.cpu().numpy()
 
         except Exception as e:

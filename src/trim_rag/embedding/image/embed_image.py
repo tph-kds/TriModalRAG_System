@@ -106,6 +106,8 @@ class ImageEmbedding:
                 image_features = image_features.to(self.device)
 
             logger.log_message("info", "Getting features Images completed successfully.")
+            # image_features = image_features.mean(dim=1)  # Average over sequence length
+            # image_features = image_features[:, :self.target_dim]
             return image_features.cpu().numpy()   
         
         except Exception as e:

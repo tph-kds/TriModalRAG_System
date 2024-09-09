@@ -11,13 +11,10 @@ def data_embeddings(text, image, audio, type_embedding="shared"):
         logger.log_message("info", "<<<<<<<< RUNNING DATA EMBEDDING SCENARIO >>>>>>>>")
         logger.log_message("info", "Data Embedding pipeline started.")
         config_manager = ConfiguarationManager()
-        print("HUng")
         config = config_manager.get_multimodal_embedding_arguments_config()
-        print("HUng1")
         
         config_embed = config_manager.get_data_embedding_arguments_config()
-        print("HUn2")
-        
+
         pipeline = DataEmbeddingPipeline(config, config_embed)
         text_embeddings, image_embeddings, audio_embeddings = pipeline.run_data_embedding_pipeline(
             text=text, 
@@ -27,7 +24,12 @@ def data_embeddings(text, image, audio, type_embedding="shared"):
             )
         # text_embeddings, image_embeddings, audio_embeddings = pipeline.run_data_embedding_pipeline(type="shared")
 
-        # print(text_embeddings)
+        print(text_embeddings)
+        print("Shape of Text Embeddings: ", text_embeddings.shape)
+        print(image_embeddings)
+        print("Shape of Image Embeddings: ", image_embeddings.shape)
+        print(audio_embeddings)
+        print("Shape of Audio Embeddings: ", audio_embeddings.shape)
 
 
         # print(config)
