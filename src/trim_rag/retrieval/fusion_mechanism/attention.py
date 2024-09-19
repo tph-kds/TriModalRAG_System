@@ -14,10 +14,11 @@ class AttentionFusion(nn.Module):
         super(AttentionFusion, self).__init__()
 
         self.config = config
-
-        self.embed_dim = self.config.embed_dim
-        self.num_heads = self.config.num_heads
-        self.dropout = self.config.dropout
+        
+        self.input_dim = self.config.input_dim # 512
+        self.embed_dim = self.config.embed_dim # 512
+        self.num_heads = self.config.num_heads # 8
+        self.dropout = self.config.dropout # 0.1
 
     def forward(self, 
                 text: torch.Tensor, 

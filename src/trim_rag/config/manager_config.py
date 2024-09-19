@@ -41,7 +41,18 @@ from src.trim_rag.config import (LoggerArgumentsConfig,
                                  PromptFlowsArgumentsConfig,
                                  PostProcessingArgumentsConfig,
                                  MultimodalGenerationArgumentsConfig,
-                                #  MultimodalWithMemoriesArgumentsConfig
+                                #  MultimodalWithMemoriesArgumentsConfig,
+                                TriModalRetrievalArgumentsConfig,
+                                ModalityAlignerArgumentsConfig,
+                                FusionMechanismArgumentsConfig,
+                                AttentionFusionArgumentsConfig,
+                                TextRetrievalArgumentsConfig,
+                                ImageRetrievalArgumentsConfig,
+                                AudioRetrievalArgumentsConfig,
+                                WeightedFusionArgumentsConfig,
+                                TrimodalRetrievalPipelineArgumentsConfig,
+                                ModalityAlignerArgumentsConfig,
+
 
                                 )
 
@@ -555,6 +566,103 @@ class ConfiguarationManager:
         )
 
         return generation_arguments_config
+    
+    ### GETTING RETRIEVAL CONFIG
+    def _get_attention_fusion_retrieval_config(self) -> AttentionFusionArgumentsConfig:
+        at_retrieval_config = self.config.retrieval.fusion_method.attention_fusion
+
+        at_retrieval_arguments_config = AttentionFusionArgumentsConfig(
+                input_dim=at_retrieval_config.input_dim,
+                embed_dim=at_retrieval_config.embed_dim,
+                num_heads=at_retrieval_config.num_heads,
+                dropout=at_retrieval_config.dropout
+        )
+
+        return at_retrieval_arguments_config
+    
+    def _get_weighted_fusion_retrieval_config(self) -> WeightedFusionArgumentsConfig:
+        wf_retrieval_config = self.config.retrieval.fusion_method.weighted_fusion
+
+        wf_retrieval_arguments_config = WeightedFusionArgumentsConfig(
+                dropout=wf_retrieval_config.dropout
+        )
+
+        return wf_retrieval_arguments_config
+    
+    def _get_modality_aligner_retrieval_config(self) -> ModalityAlignerArgumentsConfig:
+        ma_retrieval_config = self.config.retrieval.fusion_method.modality_aligner
+
+        ma_retrieval_arguments_config = ModalityAlignerArgumentsConfig(
+                input_dim=ma_retrieval_config.input_dim,
+                output_dim=ma_retrieval_config.output_dim
+        )
+
+        return ma_retrieval_arguments_config
+    
+    def _get_fusion_method_config(self) -> FusionMechanismArgumentsConfig:
+        fusion_method_config = self.config.retrieval.fusion_method
+
+        fusion_method_arguments_config = FusionMechanismArgumentsConfig(
+            attention_fusion = self._get_attention_fusion_retrieval_config(),
+            weighted_fusion = self._get_weighted_fusion_retrieval_config(),
+            modality_aligner = self._get_modality_aligner_retrieval_config()
+        )
+
+        return fusion_method_arguments_config
+    
+    def _get_text_retrieval_config(self) -> TextRetrievalArgumentsConfig:
+        text_retrieval_config = self.config.retrieval.trimodal_retrieval.text_retrieval
+
+        text_retrieval_arguments_config = TextRetrievalArgumentsConfig(
+            device = text_retrieval_config.device
+        )
+
+        return text_retrieval_arguments_config
+    
+    def _get_image_retrieval_config(self) -> ImageRetrievalArgumentsConfig:
+        image_retrieval_config = self.config.retrieval.trimodal_retrieval.image_retrieval
+
+        image_retrieval_arguments_config = ImageRetrievalArgumentsConfig(
+            device = image_retrieval_config.device
+        )
+
+        return image_retrieval_arguments_config
+    
+    def _get_audio_retrieval_config(self) -> AudioRetrievalArgumentsConfig:
+        audio_retrieval_config = self.config.retrieval.trimodal_retrieval.audio_retrieval
+
+        audio_retrieval_arguments_config = AudioRetrievalArgumentsConfig(
+            device = audio_retrieval_config.device
+        )
+
+        return audio_retrieval_arguments_config
+    
+    
+    def get_trimodal_retrieval_config(self) -> TriModalRetrievalArgumentsConfig:
+        trimodal_retrieval_config = self.config.retrieval.trimodal_retrieval
+        
+        trimodal_retrieval_arguments_config = TriModalRetrievalArgumentsConfig(
+            text_retrieval = self._get_text_retrieval_config(),
+            image_retrieval = self._get_image_retrieval_config(),
+            audio_retrieval = self._get_audio_retrieval_config(),
+        )
+
+        return trimodal_retrieval_arguments_config
+    
+    def get_retrieval_config(self) -> TrimodalRetrievalPipelineArgumentsConfig:
+        retrieval_config = self.config.retrieval
+
+        create_directories([retrieval_config.root_dir])
+
+        retrieval_arguments_config = TrimodalRetrievalPipelineArgumentsConfig(
+            root_dir = retrieval_config.root_dir,
+            retrieval_dir = retrieval_config.retrieval_dir,
+            device = retrieval_config.device,
+            fusion_method = self._get_fusion_method_config(),
+            trimodal_retrieval = self.get_trimodal_retrieval_config()
+        )
+
+        return retrieval_arguments_config
     
     
     

@@ -809,15 +809,149 @@ class PostProcessingArgumentsConfig():
 class MultimodalGenerationArgumentsConfig():
     root_dir: str = field(
         default="src/artifacts/generation",
-        metadata={"help": "Root directory to save data."}
+        metadata={"help": "Root directory to save data of the generation."}
     )
     folder_name: str = field(
         default="generation",
-        metadata={"help": "Root directory to save data."}
+        metadata={"help": "Folder name of the generation."}
     )
 
     system_str: str = field(
         default="System: You are an assistant robot the masterest about weather and climate field in the world. ",
-        metadata={"help": "Root directory to save data."}
+        metadata={"help": "System string of the generation."}
     )
+@dataclass(frozen=True)
+class TriModalRetrievalArgumentsConfig():
+    device: str = field(
+        default="cuda:0",
+        metadata={"help": "device format of the retrieval model."}
+    )
+
+@dataclass(frozen=True)
+class TextRetrievalArgumentsConfig():
+    device: str = field(
+        default="cuda:0",
+        metadata={"help": "Device format of text retrieval."}
+    )
+
+@dataclass(frozen=True)
+class ImageRetrievalArgumentsConfig():
+    device: str = field(
+        default="cuda:0",
+        metadata={"help": "device format of the image retrieval model."}
+    )
+
+@dataclass(frozen=True)
+class AudioRetrievalArgumentsConfig():
+    device: str = field(
+        
+        default="cuda:0",
+        metadata={"help": "device format of the audio retrieval model."}
+    )        
+
+@dataclass(frozen=True)
+class TriModalRetrievalArgumentsConfig():
+
+    text_retrieval: TextRetrievalArgumentsConfig = field(
+        default_factory = TextRetrievalArgumentsConfig,
+        metadata={"help": "Text retrieval arguments."}
+    )
+
+    image_retrieval: ImageRetrievalArgumentsConfig = field(
+        default_factory = ImageRetrievalArgumentsConfig,
+        metadata={"help": "Image retrieval arguments."}
+    )
+
+    audio_retrieval: AudioRetrievalArgumentsConfig = field(
+        default_factory = AudioRetrievalArgumentsConfig,
+        metadata={"help": "Audio retrieval arguments."}
+    )
+
+@dataclass(frozen=True)
+class AttentionFusionArgumentsConfig():
+    input_dim: int = field(
+        default=512,
+        metadata={"help": "Input dimension of the model."}
+    )
+    embed_dim: int = field(
+        default=512,
+        metadata={"help": "Embedding dimension of the model."}
+    )
+    num_heads: int = field(
+        default=8,
+        metadata={"help": "Number of heads of the model."}
+    )
+    dropout: float = field(
+        default=0.1,
+        metadata={"help": "Dropout probability of the model."}
+    )
+
+@dataclass(frozen=True)
+class ModalityAlignerArgumentsConfig():
+    input_dim: int = field(
+        default=512,
+        metadata={"help": "Input dimension of the model."}
+    )
+    output_dim: int = field(
+        default=512,
+        metadata={"help": "Output dimension of the model."}
+    )
+
+@dataclass(frozen=True)
+class WeightedFusionArgumentsConfig():
+    dropout: float = field(
+        default=0.1,
+        metadata={"help": "Dropout probability of the model."}
+    )
+
+@dataclass(frozen=True)
+class FusionMechanismArgumentsConfig():
+    dropout: float = field(
+        default=0.1,
+        metadata={"help": "Dropout probability of the model."}
+    )
+
+    attention_fusion: AttentionFusionArgumentsConfig = field(
+        default_factory = AttentionFusionArgumentsConfig,
+        metadata={"help": "Attention fusion arguments."}
+    )
+
+    modality_aligner: ModalityAlignerArgumentsConfig = field(
+        default_factory = ModalityAlignerArgumentsConfig,
+        metadata={"help": "Modality aligner arguments."}
+    )
+
+    weighted_fusion: WeightedFusionArgumentsConfig = field(
+        default_factory = WeightedFusionArgumentsConfig,
+        metadata={"help": "Weighted fusion arguments."}
+    )
+
+@dataclass(frozen=True)
+class TrimodalRetrievalPipelineArgumentsConfig():
+    root_dir: str = field(
+        default="src/artifacts/data",
+        metadata={"help": "Root directory to save data of the generation."}
+    )
+    retrieval_dir: str = field(
+        default="retrieval",
+        metadata={"help": "Folder name of the generation."}
+    )
+
+    device: str = field(
+        default="cuda:0",
+        metadata={"help": "device format of the retrieval model."}
+    )
+
+    fusion_method: FusionMechanismArgumentsConfig = field(
+        default_factory = FusionMechanismArgumentsConfig,
+        metadata={"help": "Fusion mechanism arguments."}
+    )
+
+    trimodal_retrieval: TrimodalRetrievalArgumentsConfig = field(
+        default_factory = TrimodalRetrievalArgumentsConfig,
+        metadata={"help": "Trimodal retrieval arguments."}
+    )
+
+
+
     

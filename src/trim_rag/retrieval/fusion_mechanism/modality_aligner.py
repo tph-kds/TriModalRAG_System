@@ -14,8 +14,8 @@ class ModalityAligner(nn.Module):
         super(ModalityAligner, self).__init__()
 
         self.config = config
-        self.input_dim = self.config.input_dim
-        self.output_dim = self.config.output_dim
+        self.input_dim = self.config.input_dim # 512
+        self.output_dim = self.config.output_dim # 512
 
     def forward(self, x):  
         return self._modality_aligner()(x)

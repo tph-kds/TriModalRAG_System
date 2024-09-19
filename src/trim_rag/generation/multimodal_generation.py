@@ -35,7 +35,7 @@ class MultimodalGeneration:
 
             logger.log_message("info", "Getting multimodal generation started.")
 
-            messages_question = self._create_messages(prompt, image_url, video_url)
+            _, messages_question = self._create_messages(prompt, image_url, video_url)
 
             text_rag_chain = self._rag_chain_for_text(prompt, self.llm_text)
             image_rag_chain = self._rag_chain_for_image()

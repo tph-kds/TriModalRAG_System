@@ -44,6 +44,10 @@ class QdrantVectorDBPipeline:
                                     self.QDRANT_DB_URL)
             ### Connect to Qdrant server
             qdrant.qdrant_setting_version_2()
+            
+            ### Delete text embeddings from Qdrant
+            self.delete_all_from_qdrant(qdrant)
+            
             ### Upload text embeddings to Qdrant 
             qdrant.upload_embeddings(self.text_collection, text_records)
             ### Upload image embeddings to Qdrant
@@ -78,6 +82,30 @@ class QdrantVectorDBPipeline:
             logger.log_message("warning", "Failed to run text preparation pipeline: " + str(e))
             my_exception = MyException(
                 error_message = "Failed to run text preparation pipeline: " + str(e),
+                error_details = sys,
+            )
+            print(my_exception)
+
+    def delete_all_from_qdrant(self, qdrant: QdrantVectorDB):
+        try:
+            logger.log_message("info", "Running Reset embeddings from qdrant pipeline...")
+            # qdrant = QdrantVectorDB(self.config, 
+            #                         self.QDRANT_API_KEY, 
+            #                         self.QDRANT_DB_URL)
+            # ### Connect to Qdrant server
+            # qdrant.qdrant_setting_version_2()
+            ### Delete text embeddings from Qdrant
+            qdrant.delete_embeddings(self.text_collection)
+            ### Delete image embeddings from Qdrant
+            qdrant.delete_embeddings(self.image_collection)
+            ### Delete audio embeddings from Qdrant
+            qdrant.delete_embeddings(self.audio_collection)
+
+            return None
+        except Exception as e:
+            logger.log_message("warning", "Failed to run to reset embeddings pipeline: " + str(e))
+            my_exception = MyException(
+                error_message = "Failed to run to reset embeddings pipeline: " + str(e),
                 error_details = sys,
             )
             print(my_exception)

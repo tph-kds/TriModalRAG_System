@@ -15,17 +15,19 @@ class WeightedFusion(nn.Module):
 
         self.config = config
 
+        self.weights = self._weights_fusion()
+
     def forward(self, 
                 text: torch.Tensor, 
                 image: torch.Tensor, 
                 audio: torch.Tensor
-                ):
+                ) -> torch.Tensor:
         weighted_sum = (self.weights[0] * text) + (self.weights[1] * image) + (self.weights[2] * audio)
         
 
         return weighted_sum / torch.sum(self.weights)
     
-    def weights_fusion(self):
+    def _weights_fusion(self) -> nn.Parameter:
         try:
             weights = nn.Parameter(torch.tensor([1.0, 1.0, 1.0], dtype=torch.float32))
 

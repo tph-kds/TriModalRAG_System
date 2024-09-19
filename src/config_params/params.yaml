@@ -150,6 +150,33 @@ multimodal_embedding:
       eps:  0.0001
       bias:  True
 
+retrieval:
+  root_dir: "src/artifacts/data"
+  retrieval_dir: "retrieval"
+  device: "cuda:0"
+  fusion_method:
+    dropout: 0.1 
+    attention_fusion:
+      input_dim: 512
+      embed_dim:  512
+      num_heads: 8
+      dropout: 0.1
+    modality_aligner:
+      input_dim: 512
+      output_dim: 512
+    weighted_fusion:
+      dropout: 0.1
+  trimodal_retrieval:
+    text_retrieval:
+      device: "cuda:0"
+    image_retrieval:
+      device: "cuda:0"
+    audio_retrieval:
+      device: "cuda:0"
+
+
+
+
 models:
   root_dir: "src/artifacts/models"
   model_name: "gpt2"

@@ -169,3 +169,7 @@ artifacts/*
 .env
 data/*
 requirements_dev.txt
+serving/multimodalchatbot/*
+serving/gradiochatbot/*
+serving/note.md
+
