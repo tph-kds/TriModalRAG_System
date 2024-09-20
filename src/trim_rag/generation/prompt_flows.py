@@ -27,7 +27,12 @@ class PromptFlows:
         self.config = config
         self.variable_name = self.config.variable_name
 
-    def prompt_flows(self) -> Optional[ChatPromptTemplate]:
+    def prompt_flows(self, 
+                     system_str: str,
+                     context_str: str,
+                     question_str: str,
+                     image_str: str,
+                     video_str: str) -> Optional[ChatPromptTemplate]:
         try:
             logger.log_message("info", "Getting prompt flows started.")
             template =[
@@ -53,6 +58,11 @@ class PromptFlows:
             ),]
 
             prompt = ChatPromptTemplate.from_messages(messages=template)
+            prompt = prompt.format(system_str=system_str,
+                                   context_str=context_str,
+                                   image_str=image_str,
+                                   video_str=video_str,
+                                   question_str=question_str)
 
             logger.log_message("info", "Getting prompt flows completed successfully.")
             return prompt

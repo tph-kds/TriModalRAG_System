@@ -18,7 +18,7 @@ def data_generation(retriever=None,
         config = config_manager.get_generation_config()
         pipeline = GenerationPipeline(config)
 
-        multi_generation, p_processing = pipeline.run_generation_pipeline(
+        rag_chain = pipeline.run_generation_pipeline(
             retriever=retriever,
             image_url=image_url,
             video_url=video_url,
@@ -28,7 +28,7 @@ def data_generation(retriever=None,
         logger.log_message("info", "Data Generation pipeline completed successfully.")
         logger.log_message("info", "<<<<<<<<   END DATA GENERATION SCENARIO   >>>>>>>>")
         logger.log_message("info", "")
-        return multi_generation, p_processing
+        return rag_chain
 
     except Exception as e:
         logger.log_message("warning", "Failed to run Data Generation pipeline: " + str(e))
@@ -37,6 +37,7 @@ def data_generation(retriever=None,
             error_details = sys,
         )
         print(my_exception)
+
 
 
 

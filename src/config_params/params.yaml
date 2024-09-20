@@ -204,7 +204,8 @@ generation:
   root_dir: "src/artifacts/generation"
   folder_name: "generation"
   system_str: "System: You are an assistant robot the masterest about weather and climate field in the world. "
-  
+  # Context regarding weather topic such as lighting, rain, snow, etc suitable for rag chain generation.
+  context: "Lighting, rain, snow, etc. suitable for rag chain generation. "
 
 
 

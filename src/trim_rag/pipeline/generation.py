@@ -2,8 +2,11 @@ import os
 import sys
 from typing import Optional
 
-from langchain.chains import SimpleChain
+from langchain.chains.sequential import SequentialChain
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+
 
 
 from src.trim_rag.logger import logger
@@ -37,27 +40,40 @@ class GenerationPipeline:
         self.post_processing = PostProcessing(config=self.post_processing_config)
 
     def run_generation_pipeline(self, 
-                                retriever: Optional[SimpleChain],
+                                retriever: Optional[SequentialChain],
                                 image_url: Optional[str],
                                 video_url: Optional[str],
                                 query: Optional[str]
-                                ) -> SimpleChain:
+                                ) -> SequentialChain:
         try: 
             logger.log_message("info", "Running generation pipeline...")
-            prompt = self._get_prompt_flows()
-            multimodal_generation = self._get_multimodal_generation(
+            prompt = self._get_prompt_flows(system_str=self.multimodal_generation_config.system_str,
+                                            context_str=self.multimodal_generation_config.context_str,
+                                            question_str=query,
+                                            image_str=image_url,
+                                            video_str=video_url
+                                            )
+            full_chain, _ = self._get_multimodal_generation(
                 prompt=prompt,
                 image_url=image_url,
                 video_url=video_url
             )
             p_chain = self.post_processing.post_processing(retriever=retriever,
                                                             query=query)
+            def format_docs(docs):
+                return "\n\n".join([doc.page_content for doc in docs])
             
-
+            rag_chain = (
+                {"context": retriever | format_docs, "question": RunnablePassthrough()}
+                | prompt
+                | full_chain
+                | p_chain
+                | StrOutputParser()
+            )
             
             logger.log_message("info", "Generation pipeline completed")
 
-            return multimodal_generation, p_chain
+            return rag_chain
 
         except Exception as e:
             logger.log_message("warning", "Failed to run generation pipeline: " + str(e))

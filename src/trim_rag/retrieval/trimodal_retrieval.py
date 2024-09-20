@@ -1,7 +1,7 @@
 import os
 import sys
 
-from langchain.chains import SimpleChain
+from langchain.chains.sequential import SequentialChain
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 from src.trim_rag.config import TriModalRetrievalArgumentsConfig
@@ -35,7 +35,7 @@ class TriModalRetrieval:
             print(my_exception)
 
 
-    def trimodal_retrieval(self) -> SimpleChain:
+    def trimodal_retrieval(self) -> SequentialChain:
         try:
             logger.log_message("info", "Starting to retrieve text embeddings...")
             fusion_mechanism, tex_retrieval, img_retrieval, aud_retrieval = self._init_func()
@@ -55,7 +55,7 @@ class TriModalRetrieval:
             # Fusion
             fusion = fusion_mechanism(text_embedding, image_embedding, audio_embedding)
 
-            chain = SimpleChain.from_chains([tex_retrieval, img_retrieval, aud_retrieval, fusion])
+            chain = SequentialChain(chains = [tex_retrieval, img_retrieval, aud_retrieval, fusion])
 
             return chain
 

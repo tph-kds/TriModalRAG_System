@@ -1,7 +1,7 @@
 import os
 import sys
 
-from langchain.chains import SimpleChain
+from langchain.chains.sequential import SequentialChain
 
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
@@ -16,7 +16,7 @@ class DataRetrievalPipeline:
         # self.config = config
 
 
-    def run_data_retrieval_pipeline(self) -> SimpleChain:
+    def run_data_retrieval_pipeline(self) -> SequentialChain:
         try: 
             logger.log_message("info", "Running data retrieval pipeline...")
             tri_modal_retrieval = TriModalRetrieval()

@@ -562,7 +562,8 @@ class ConfiguarationManager:
         generation_arguments_config = MultimodalGenerationArgumentsConfig(
             root_dir = generation_config.root_dir,
             folder_name = generation_config.folder_name,
-            system_str= generation_config.system_str
+            system_str= generation_config.system_str,
+            context = generation_config.context
         )
 
         return generation_arguments_config

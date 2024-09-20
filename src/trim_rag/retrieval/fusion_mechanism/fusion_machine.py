@@ -8,11 +8,9 @@ from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 from src.trim_rag.config import FusionMechanismArgumentsConfig
 
-from src.trim_rag.retrieval.fusion_mechanism import (
-    AttentionFusion, 
-    ModalityAligner, 
-    WeightedFusion
-)
+from src.trim_rag.retrieval.fusion_mechanism.attention import     AttentionFusion
+from src.trim_rag.retrieval.fusion_mechanism.modality_aligner import   ModalityAligner
+from src.trim_rag.retrieval.fusion_mechanism.weighted_fusion import WeightedFusion
 
 class FusionMechanism:
     def __init__(self, config: FusionMechanismArgumentsConfig):

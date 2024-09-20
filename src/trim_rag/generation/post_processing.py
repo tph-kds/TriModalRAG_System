@@ -88,7 +88,8 @@ class PostProcessing:
 
             logger.log_message("info", "Post processing completed successfully.")
 
-            return chain.run({"query": query})
+            # return chain.run({"query": query})
+            return chain
         
         except Exception as e:
             logger.log_message("warning", "Failed to post processing: " + str(e))

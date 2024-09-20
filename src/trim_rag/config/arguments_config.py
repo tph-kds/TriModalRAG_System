@@ -820,12 +820,18 @@ class MultimodalGenerationArgumentsConfig():
         default="System: You are an assistant robot the masterest about weather and climate field in the world. ",
         metadata={"help": "System string of the generation."}
     )
-@dataclass(frozen=True)
-class TriModalRetrievalArgumentsConfig():
-    device: str = field(
-        default="cuda:0",
-        metadata={"help": "device format of the retrieval model."}
+
+    context: str = field(
+        default="Lighting, rain, snow, etc. suitable for rag chain generation. ",
+        metadata={"help": "Context of the generation."}
     )
+
+# @dataclass(frozen=True)
+# class TriModalRetrievalArgumentsConfig():
+#     device: str = field(
+#         default="cuda:0",
+#         metadata={"help": "device format of the retrieval model."}
+#     )
 
 @dataclass(frozen=True)
 class TextRetrievalArgumentsConfig():
@@ -947,8 +953,8 @@ class TrimodalRetrievalPipelineArgumentsConfig():
         metadata={"help": "Fusion mechanism arguments."}
     )
 
-    trimodal_retrieval: TrimodalRetrievalArgumentsConfig = field(
-        default_factory = TrimodalRetrievalArgumentsConfig,
+    trimodal_retrieval: TriModalRetrievalArgumentsConfig = field(
+        default_factory = TriModalRetrievalArgumentsConfig,
         metadata={"help": "Trimodal retrieval arguments."}
     )
 

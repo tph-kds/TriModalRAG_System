@@ -44,7 +44,7 @@ class MultimodalGeneration:
 
             response = full_chain.invoke([messages_question])
             logger.log_message("info", "Getting multimodal generation completed successfully.")
-            return response
+            return full_chain, response
 
         except Exception as e:
             logger.log_message("warning", "Failed to get multimodal generation: " + str(e))

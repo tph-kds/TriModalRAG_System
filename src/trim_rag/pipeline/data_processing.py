@@ -5,6 +5,8 @@ from src.trim_rag.exception import MyException
 from src.trim_rag.logger import logger
 from src.trim_rag.config  import DataTransformationArgumentsConfig
 from src.trim_rag.processing import TextTransform, ImageTransform, AudioTransform
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 
 class DataTransformPipeline:
     def __init__(self, config: DataTransformationArgumentsConfig):
@@ -45,7 +47,10 @@ class DataTransformPipeline:
             print(my_exception)
 
 
-    def text_processing(self) -> None:
+    def text_processing(self, 
+                        chunk_size: int , 
+                        chunk_overlap: int
+                        ) -> None:
        try:
             logger.log_message("info", "Text processing pipeline started.")
             # access data folder before transforming
@@ -62,8 +67,14 @@ class DataTransformPipeline:
                                                text_path = link_textdata
                                                )
                 text_data_prcessed = textprocessing.text_processing()
+                ## create small chunk text from big text
+                # Example for word-based splitting (Recursive splitting)
+                word_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=100)
+                text_data_chunks = word_splitter.split_text(text_data_prcessed)
 
-                self.list_text_processeds.append(text_data_prcessed)
+                self.list_text_processeds.append(text_data_chunks)
+
+            
             
             logger.log_message("info", "Text processing pipeline completed successfully.")
             return self.list_text_processeds
