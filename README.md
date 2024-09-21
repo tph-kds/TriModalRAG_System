@@ -1,6 +1,6 @@
 <h1 align="center">TriModal Ritrieval Augmented Generation - TriModalRAG</h1>
 
-![]()
+![](https://github.com/tph-kds/image_storages/tree/ac4db01000f4603602be502753adea6724183f1b/images/svgs/TriModal_RAG/logo.png)
 
 # Tripple Model + Langchain  : Find and support data scientists in providing solutions for weather data
 
