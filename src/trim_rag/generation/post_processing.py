@@ -7,7 +7,7 @@ from src.trim_rag.exception import MyException
 from src.trim_rag.config import PostProcessingArgumentsConfig
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langhchain_cohere import CohereTextSplitter, CohereRerank
+from langchain_cohere import CohereRerank
 from langchain.chains import RetrievalQA
 
 from langchain.retrievers.contextual_compression import ContextualCompressionRetriever

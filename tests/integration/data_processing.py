@@ -12,7 +12,7 @@ def data_processing():
         logger.log_message("info", "Data Transformation pipeline started.")
         config = ConfiguarationManager().get_data_processing_arguments_config()
         pipeline = DataTransformPipeline(config)
-        textprocessing, imageprocessing, audioprocessing = pipeline.run_data_processing_pipeline()
+        textprocessing, title_files, imageprocessing, audioprocessing = pipeline.run_data_processing_pipeline()
 
         # print(textprocessing)
         # print(imageprocessing)
@@ -22,7 +22,7 @@ def data_processing():
         logger.log_message("info", "Data Transformation pipeline completed successfully.")
         logger.log_message("info", "<<<<<<<<   END DATA TRANSFORMATION SCENARIO   >>>>>>>>")
         logger.log_message("info", "")
-        return textprocessing, imageprocessing, audioprocessing
+        return textprocessing, title_files, imageprocessing, audioprocessing
 
     except Exception as e:
         logger.log_message("warning", "Failed to run Data Transformation pipeline: " + str(e))

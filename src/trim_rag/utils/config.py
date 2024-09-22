@@ -4,7 +4,8 @@ import json
 import joblib
 import base64
 import sys
-
+import torch
+import pandas as pd
 from src.trim_rag.exception import MyException
 
 from box.exceptions import BoxValueError
@@ -57,6 +58,88 @@ def create_directories(path_to_directories: list, verbose = True):
         os.makedirs(path, exist_ok=True)
         # if verbose:
         #     logger.log_message("info", f"created directory at: {path}")
+
+@ensure_annotations
+def save_tensor(data: torch.Tensor, path: Path):
+    """save tensor file
+
+    Args:
+        data (torch.Tensor): data to be saved as tensor
+        path (Path): path to tensor file
+    """
+    # Save the tensor as a .pt file
+    torch.save(data, path)
+
+
+@ensure_annotations
+def load_tensor(path: Path) -> torch.Tensor:
+    """load tensor file
+
+    Args:
+        path (Path): path to tensor file
+
+    Returns:
+        torch.Tensor: data as tensor
+    """
+    # Load the tensor from the .pt file
+    data = torch.load(path)
+
+    return data
+
+
+@ensure_annotations
+def save_list(data: list, path: Path):
+    """save list file
+
+    Args:
+        data (list): data to be saved as list
+        path (Path): path to list file
+    """
+    # Save the list as a .json file
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4)
+
+@ensure_annotations
+def load_list(path: Path) -> list:
+    """load list file
+
+    Args:
+        path (Path): path to list file
+
+    Returns:
+        list: data as list
+    """
+    # Load the list from the .json file
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    return data
+
+
+@ensure_annotations
+def save_csv(data: pd.DataFrame, path: Path):
+    """save csv file
+
+    Args:
+        data (pd.DataFrame): data to be saved as csv
+        path (Path): path to csv file
+    """
+    data.to_csv(path, index=False)
+
+
+@ensure_annotations
+def load_csv(path: Path) -> pd.DataFrame:
+    """load csv file
+
+    Args:
+        path (Path): path to csv file
+
+    Returns:
+        pd.DataFrame: data as dataframe
+    """
+    data = pd.read_csv(path)
+
+    return data
 
 # @ensure_annotations
 # def load_json(path: Path) -> ConfigBox:

@@ -303,6 +303,14 @@ class DataTransformationArgumentsConfig():
         default="processed_data",
         metadata={"help": "Root directory to save data."}
     )
+    chunk_size: int = field(
+        default=1024,
+        metadata={"help": "Chunk size of the data."}
+    )
+    chunk_overlap: int = field(
+        default=100,
+        metadata={"help": "Chunk overlap of the data."}
+    )
     text_data :TextDataTransformArgumentsConfig = field(
         default_factory=TextDataTransformArgumentsConfig
     )
@@ -676,12 +684,20 @@ class AudioPrepareDataQdrantArgumentsConfig():
         default="data/audio",
         metadata={"help": "Root directory to save data."}
     )
+    format: str = field(
+        default="*.wav",
+        metadata={"help": "Format of the audio files."}
+    )
 
 @dataclass(frozen=True)
 class TextPrepareDataQdrantArgumentsConfig():
     text_dir: str = field(
         default="data/text",
         metadata={"help": "Root directory to save data."}
+    )
+    format: str = field(
+        default="*.pdf",
+        metadata={"help": "Format of the text files."}
     )
 
 

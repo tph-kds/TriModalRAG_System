@@ -14,6 +14,7 @@ class QdrantVectorDBPipeline:
                  config: QdrantVectorDBArgumentsConfig,
                  prepare_config: PrepareDataQdrantArgumentsConfig,
                  text_embeddings: Optional[List] = None,
+                 titles: Optional[List] = None,
                  image_embeddings: Optional[List] = None,
                  audio_embeddings: Optional[List] = None,
                  QDRANT_API_KEY: Optional[str] = None,
@@ -35,6 +36,8 @@ class QdrantVectorDBPipeline:
         self.text_collection = self.config.text_data.collection_text_name
         self.audio_collection = self.config.audio_data.collection_audio_name
 
+        self.titles = titles
+
     def run_qdrant_vector_db_pipeline(self) -> None:
         try:
             logger.log_message("info", "Running upload embeddings to qdrant pipeline...")
@@ -42,18 +45,19 @@ class QdrantVectorDBPipeline:
             qdrant = QdrantVectorDB(self.config, 
                                     self.QDRANT_API_KEY, 
                                     self.QDRANT_DB_URL)
+            ### Delete text embeddings from Qdrant
+            self.delete_all_from_qdrant(qdrant)
+
             ### Connect to Qdrant server
             qdrant.qdrant_setting_version_2()
             
-            ### Delete text embeddings from Qdrant
-            self.delete_all_from_qdrant(qdrant)
             
             ### Upload text embeddings to Qdrant 
-            qdrant.upload_embeddings(self.text_collection, text_records)
+            qdrant._upload_records_v1(self.text_collection, text_records)
             ### Upload image embeddings to Qdrant
-            qdrant.upload_embeddings(self.image_collection, image_records)
+            qdrant._upload_records_v1(self.image_collection, image_records)
             ### Upload audio embeddings to Qdrant
-            qdrant.upload_embeddings(self.audio_collection, audio_records)
+            qdrant._upload_records_v1(self.audio_collection, audio_records)
 
             return None
             # return text_records, image_records, audio_records
@@ -70,6 +74,7 @@ class QdrantVectorDBPipeline:
         try:
             prepare_data_qdrant = PrepareDataQdrant(self.prepare_config, 
                                                     self.text_embeddings, 
+                                                    self.titles,
                                                     self.image_embeddings, 
                                                     self.audio_embeddings
                                                     )
@@ -95,11 +100,11 @@ class QdrantVectorDBPipeline:
             # ### Connect to Qdrant server
             # qdrant.qdrant_setting_version_2()
             ### Delete text embeddings from Qdrant
-            qdrant.delete_embeddings(self.text_collection)
+            qdrant._delete_collection(self.text_collection)
             ### Delete image embeddings from Qdrant
-            qdrant.delete_embeddings(self.image_collection)
+            qdrant._delete_collection(self.image_collection)
             ### Delete audio embeddings from Qdrant
-            qdrant.delete_embeddings(self.audio_collection)
+            qdrant._delete_collection(self.audio_collection)
 
             return None
         except Exception as e:

@@ -3,7 +3,9 @@ import sys
 import io
 import base64
 import pandas as pd
+from pathlib import Path
 from typing import Optional, List
+
 
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
@@ -11,6 +13,7 @@ from src.trim_rag.exception import MyException
 from src.trim_rag.config import TextPrepareDataQdrantArgumentsConfig
 
 from qdrant_client import models
+from src.config_params import ROOT_PROJECT_DIR
 
 
 ### Handle on all files of this folder
@@ -19,6 +22,7 @@ class TextQdrantDB:
         super(TextQdrantDB, self).__init__()
         self.config = config
         self.text_dir = self.config.text_dir
+        self.format = self.config.format # "*.pdf"
 
         self._text_urls: List = []
         self._types: List = []
@@ -84,12 +88,13 @@ class TextQdrantDB:
     def create_pyload(self, titles: Optional[List]) -> Optional[dict]:
         try:
             logger.log_message("info", "Creating pyload started for preparing upload to qdrant.")
+            path_text_embeddings = ROOT_PROJECT_DIR / self.text_dir
 
-            for text_p in self.text_dir.glob(self.format):
-                text_url = self._create_text_url(text_p)
+            for text_p in path_text_embeddings.glob(self.format):
+                # text_url = self._create_text_url(text_p)
                 type = self._create_types()
 
-                self._text_urls.append(text_url)
+                self._text_urls.append(text_p)
                 self._types.append(type)
             
 

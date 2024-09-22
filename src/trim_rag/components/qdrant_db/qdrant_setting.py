@@ -6,8 +6,9 @@ from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 from src.trim_rag.config import QdrantVectorDBArgumentsConfig
 from langchain_community.vectorstores.qdrant import Qdrant
-from qdrant_client import QdrantClient
+from qdrant_client import QdrantClient, models
 from qdrant_client.http.models import Distance, VectorParams
+
 
 
 class QdrantVectorDB:
@@ -19,9 +20,9 @@ class QdrantVectorDB:
         super(QdrantVectorDB, self).__init__()
 
         self.config = config
-        self.host = self.config.host
-        self.port = self.config.port
-        self.api_key = self.config.api_key
+        self.host = self.config.qdrant_host
+        self.port = self.config.qdrant_port
+        # self.api_key = self.config.api_key
 
         self.QDRANT_API_KEY = QDRANT_API_KEY
         self.QDRANT_DB_URL = QDRANT_DB_URL
@@ -32,6 +33,9 @@ class QdrantVectorDB:
         self.size_text = self.text_data.size_text
         self.size_image = self.image_data.size_image
         self.size_audio = self.audio_data.size_audio
+        self.collection_text_name = self.text_data.collection_text_name
+        self.collection_image_name = self.image_data.collection_image_name
+        self.collection_audio_name = self.audio_data.collection_audio_name
 
 
 
@@ -40,21 +44,21 @@ class QdrantVectorDB:
         try:
             logger.log_message("info", "Connecting to Qdrant server...")
             self.client = QdrantClient(
-                host=self.host,
-                port=self.port,
+                # host=self.host,
+                # port=self.port,
                 url=self.QDRANT_DB_URL,
                 api_key=self.QDRANT_API_KEY,
             )
             logger.log_message("info", "Connected to Qdrant server")
 
-            self.client.wait_connection()
+            # self.client.wait_connection()
 
             logger.log_message("info", "Qdrant server connected successfully")
 
             return self.client
         
         except Exception as e:
-            logger.log_message("info", f"Error connecting to Qdrant server: {e}")
+            logger.log_message("warning", f"Error connecting to Qdrant server: {e}")
             my_exception = MyException(
                 error_message=f"Error connecting to Qdrant server: {e}",
                 error_details= sys,
@@ -69,12 +73,16 @@ class QdrantVectorDB:
         try:
             logger.log_message("info", "Initializing collection...")
 
-            self.client.recreate_collection(
+            self.client.create_collection(
                 collection_name=collection_name,
                 vectors_config=VectorParams(
                     size=embeddings_lenght,
                     distance=Distance.COSINE,
                 ),
+                optimizers_config=models.OptimizersConfigDiff(
+                    indexing_threshold=0,
+                ),
+                shard_number=2,
             )
     #             vectors_config=models.VectorParams(
     #     size=1024,
@@ -83,12 +91,12 @@ class QdrantVectorDB:
 
             logger.log_message("info", "Initializing created successfully")
 
-            self.client.wait_for_loading_collection()
+            # self.client.wait_for_loading_collection()
 
             return None
 
         except Exception as e:
-            logger.log_message("info", f"Error Initializing collection: {e}")
+            logger.log_message("warning", f"Error Initializing collection: {e}")
             my_exception = MyException(
                 error_message=f"Error Initializing collection: {e}",
                 error_details= sys,
@@ -122,7 +130,7 @@ class QdrantVectorDB:
             
         
         except Exception as e:
-            logger.log_message("info", f"Error creating collection: {e}")
+            logger.log_message("warning", f"Error creating collection: {e}")
             my_exception = MyException(
                 error_message=f"Error creating collection: {e}",
                 error_details= sys,
@@ -193,12 +201,50 @@ class QdrantVectorDB:
             return None
 
         except Exception as e:
-            logger.log_message("info", f"Error inserting text data: {e}")
+            logger.log_message("warning", f"Error inserting text data: {e}")
             my_exception = MyException(
                 error_message=f"Error inserting text data: {e}",
                 error_details= sys,
             )
             print(my_exception)
+    
+    def _delete_collection(self, collection_name) -> None:
+        try:
+            logger.log_message("info", f"Deleting collection {collection_name}...")
+            self.client = self._connect_qdrant()
+            self.client.delete_collection(collection_name)
+            logger.log_message("info", "Collection deleted successfully")
+
+            return None
+
+        except Exception as e:
+            logger.log_message("warning", f"Error deleting collection: {e}")
+            my_exception = MyException(
+                error_message=f"Error deleting collection: {e}",
+                error_details= sys,
+            )
+            print(my_exception)
+
+    def _upload_collection(self, 
+                           collection_name: str,
+                           data: List,
+                           batch_size: int,
+                           ) -> None:
+        for i in range(0, len(data), batch_size):
+            batch = data[i:i + batch_size]
+            try:
+                logger.log_message("info", "Uploading collection...")
+                self.client.upload_collection(collection_name=collection_name, 
+                                              vectors=batch)
+                logger.log_message("info", f"Uploaded batch {i // batch_size + 1}")
+
+            except Exception as e:
+                logger.log_message("warning", f"Error uploading collection: {e}")
+                my_exception = MyException(
+                    error_message=f"Error uploading collection: {e}",
+                    error_details= sys,
+                )
+                print(my_exception)
 
     def qdrant_setting_version_1(self, 
                      text_embeddings: Optional[List], 
@@ -225,33 +271,63 @@ class QdrantVectorDB:
             return None
 
         except Exception as e:
-            logger.log_message("info", f"Error connecting to Qdrant server: {e}")
+            logger.log_message("warning", f"Error connecting to Qdrant server: {e}")
             my_exception = MyException(
                 error_message=f"Error connecting to Qdrant server: {e}",
                 error_details= sys,
             )
             print(my_exception)
 
-    def upload_records(self, collection_name,  records) -> None:
+    def _upload_records(self, 
+                        collection_name: str,  
+                        records, 
+                        batch_size) -> None:
+
+        for i in range(0, len(records), batch_size):
+            batch = records[i:i + batch_size]
+            try:
+                logger.log_message("info", f"Uploading records with {collection_name} name to Qdrant...")
+                self.client.upload_records(
+                    collection_name=collection_name,
+                    records=batch
+                )
+
+                logger.log_message("info", f"Uploaded batch {i // batch_size + 1}")
+
+
+            except Exception as e:
+                logger.log_message("warning", f"Error uploading records: {e}")
+                my_exception = MyException(
+                    error_message=f"Error uploading records: {e}",
+                    error_details= sys,
+                )
+                print(my_exception)
+
+        logger.log_message("info", f"Records with {collection_name} name uploaded successfully")
+
+    def _upload_records_v1(self, 
+                        collection_name: str,  
+                        records, ) -> None:
+
         try:
             logger.log_message("info", f"Uploading records with {collection_name} name to Qdrant...")
             self.client.upload_records(
                 collection_name=collection_name,
-                records=records
+                records=records,
+                batch_size=32,
+                wait=True
             )
 
             logger.log_message("info", f"Records with {collection_name} name uploaded successfully")
 
-            return None
 
         except Exception as e:
-            logger.log_message("info", f"Error uploading records: {e}")
+            logger.log_message("warning", f"Error uploading records: {e}")
             my_exception = MyException(
                 error_message=f"Error uploading records: {e}",
                 error_details= sys,
             )
             print(my_exception)
-
 
     ## Only conect to Qdrant server and if you want to update or add data, you need to update outside of class
     def qdrant_setting_version_2(self) -> None:
@@ -265,7 +341,7 @@ class QdrantVectorDB:
             return None
 
         except Exception as e:
-            logger.log_message("info", f"Error connecting to Qdrant server: {e}")
+            logger.log_message("warning", f"Error connecting to Qdrant server: {e}")
             my_exception = MyException(
                 error_message=f"Error connecting to Qdrant server: {e}",
                 error_details= sys,

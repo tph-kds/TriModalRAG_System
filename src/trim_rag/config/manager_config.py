@@ -242,6 +242,8 @@ class ConfiguarationManager:
         data_processing_config = DataTransformationArgumentsConfig(
             root_dir = config.root_dir,
             processed_dir = config.processed_dir,
+            chunk_size = config.chunk_size,
+            chunk_overlap = config.chunk_overlap,
             text_data = self._get_textdata_transform_arguments_config(),
             audio_data = self._get_audiodata_transform_arguments_config(),
             image_data = self._get_imagedata_transform_arguments_config()
@@ -437,7 +439,8 @@ class ConfiguarationManager:
         text_qdrant_config = self.qdrant_config.init_embedding.text_data
 
         textdata_prepare_upload_db_config = TextPrepareDataQdrantArgumentsConfig(
-            text_dir = text_qdrant_config.text_dir,            
+            text_dir = text_qdrant_config.text_dir,    
+            format = text_qdrant_config.format        
         )
 
         return textdata_prepare_upload_db_config
@@ -456,7 +459,8 @@ class ConfiguarationManager:
         audio_qdrant_config = self.qdrant_config.init_embedding.audio_data
 
         audiodata_prepare_upload_db_config = AudioPrepareDataQdrantArgumentsConfig(
-            audio_dir = audio_qdrant_config.audio_dir
+            audio_dir = audio_qdrant_config.audio_dir,
+            format = audio_qdrant_config.format
         )
 
         return audiodata_prepare_upload_db_config

@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import List, Optional
+from typing import List, Optional, Union
 from src.trim_rag.exception import MyException
 from src.trim_rag.logger import logger
 from src.trim_rag.config  import DataTransformationArgumentsConfig
@@ -17,26 +17,32 @@ class DataTransformPipeline:
         self.text_data = self.config.text_data
         self.image_data = self.config.image_data
         self.audio_data = self.config.audio_data
+        self.chunk_size = self.config.chunk_size # 512
+        self.chunk_overlap = self.config.chunk_overlap # 64
 
         self.list_text_processeds: List[int] = []
         self.list_image_processeds: List[int] = []
         self.list_audio_processeds: List[int] = []
+        self.titles_file: List[str] = []
 
 
-    def run_data_processing_pipeline(self) -> Optional[List[int]]:
+    def run_data_processing_pipeline(self) -> Union[Optional[List[float]], 
+                                                    Optional[List[str]],
+                                                    Optional[List[float]],
+                                                    Optional[List[float]]]:
         try:
             logger.log_message("info", "Data processing pipeline started.")
 
             # textprocessing = None
             # imageprocessing = None
             # audioprocessing = None
-            textprocessing = self.text_processing()
+            textprocessing, title_files = self.text_processing()
             imageprocessing = self.image_processing()
             audioprocessing = self.audio_processing()
             # self.data_processing()
 
             logger.log_message("info", "Data Processing pipeline completed successfully.")
-            return textprocessing, imageprocessing, audioprocessing
+            return textprocessing, title_files, imageprocessing, audioprocessing
 
         except Exception as e:
             logger.log_message("warning", "Failed to run Data Processing pipeline: " + str(e))
@@ -47,10 +53,7 @@ class DataTransformPipeline:
             print(my_exception)
 
 
-    def text_processing(self, 
-                        chunk_size: int , 
-                        chunk_overlap: int
-                        ) -> None:
+    def text_processing(self, ) -> Union[Optional[List[float]], Optional[List[str]]]:
        try:
             logger.log_message("info", "Text processing pipeline started.")
             # access data folder before transforming
@@ -58,6 +61,7 @@ class DataTransformPipeline:
             list_textdata = os.listdir(dir_textdata)
             # print(list_textdata)
             for listr_textdata in list_textdata:
+                self.titles_file.append(listr_textdata)
                 link_textdata = dir_textdata + "/" + listr_textdata
                 link_textdata = link_textdata.replace("\\", "/")
                 # print(link_textdata)
@@ -69,7 +73,8 @@ class DataTransformPipeline:
                 text_data_prcessed = textprocessing.text_processing()
                 ## create small chunk text from big text
                 # Example for word-based splitting (Recursive splitting)
-                word_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=100)
+                word_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size, 
+                                                               chunk_overlap=self.chunk_overlap)
                 text_data_chunks = word_splitter.split_text(text_data_prcessed)
 
                 self.list_text_processeds.append(text_data_chunks)
@@ -77,7 +82,7 @@ class DataTransformPipeline:
             
             
             logger.log_message("info", "Text processing pipeline completed successfully.")
-            return self.list_text_processeds
+            return self.list_text_processeds, self.titles_file
 
        except Exception as e:
             logger.log_message("warning", "Failed to run text processing pipeline: " + str(e))

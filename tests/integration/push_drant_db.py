@@ -6,7 +6,7 @@ from src.trim_rag.pipeline import QdrantVectorDBPipeline
 from src.config_params import QDRANT_DB_URL, QDRANT_API_KEY
 
 
-def push_drant_db(text_embeds, image_embeds, audio_embeds):
+def push_drant_db(text_embeds, titles, image_embeds, audio_embeds):
     try:
         logger.log_message("info", "")
         logger.log_message("info", "<<<<<<<< RUNNING TO PUSH QDRANT DATABASE SCENARIO >>>>>>>>")
@@ -17,6 +17,7 @@ def push_drant_db(text_embeds, image_embeds, audio_embeds):
         pipeline = QdrantVectorDBPipeline(config, 
                                           prepare_db_config, 
                                           text_embeds, 
+                                          titles,
                                           image_embeds, 
                                           audio_embeds,
                                           QDRANT_API_KEY=QDRANT_API_KEY,

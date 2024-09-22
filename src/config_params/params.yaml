@@ -38,6 +38,8 @@ data_ingestion:
 data_processing:
   root_dir: "src/artifacts/data"
   processed_dir: "processed_data"
+  chunk_size: 512
+  chunk_overlap: 64
   text_data:
       text_dir: "data/text" # Dictionary containing text data
       processed_dir: "processed_data/text"

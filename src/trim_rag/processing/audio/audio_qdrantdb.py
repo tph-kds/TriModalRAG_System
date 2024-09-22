@@ -7,6 +7,8 @@ from typing import Optional, List
 
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
+from src.config_params import ROOT_PROJECT_DIR
+
 
 from src.trim_rag.config import AudioPrepareDataQdrantArgumentsConfig
 from qdrant_client import models
@@ -23,6 +25,7 @@ class AudioQdrantDB:
         self._audio_urls: List = []
         self._types: List = []
         self._names: List = []
+        self.format = self.config.format # "*.mp3"
 
 
     def _create_audio_url(self, audio_p) -> Optional[str]:
@@ -65,13 +68,15 @@ class AudioQdrantDB:
     def create_pyload(self, processing_embedding) -> Optional[dict]:
         try:
             logger.log_message("info", "Creating pyload started for preparing upload to qdrant.")
+            path_audio_embeddings = ROOT_PROJECT_DIR / self.audio_dir
 
-            for audio_p in self.audio_dir.glob(self.format):
-                audio_url = self._create_audio_url(audio_p)
+            for audio_p in path_audio_embeddings.glob(self.format):
+                # audio_url = self._create_audio_url(audio_p)
                 type = self._create_types()
-                extract_name = os.path.basename(audio_p.split(".")[0])
+                extract_name = os.path.basename(str(audio_p).split(".")[0])
+                # extract_name = os.path.basename(audio_p.split(".")[0])
 
-                self._audio_urls.append(audio_url)
+                self._audio_urls.append(audio_p)
                 self._types.append(type)
                 self._names.append(extract_name)
             

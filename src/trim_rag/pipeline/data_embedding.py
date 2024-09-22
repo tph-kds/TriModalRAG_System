@@ -3,7 +3,7 @@ import sys
 import torch
 from torch import nn
 
-from typing import List, Optional
+from typing import List, Optional, Union, Tuple
 from src.trim_rag.exception import MyException
 from src.trim_rag.logger import logger
 
@@ -41,7 +41,7 @@ class DataEmbeddingPipeline:
                                     text: List[str], 
                                     image: List[str], 
                                     audio: List[str], 
-                                    type_embedding: str = "shared") -> List[str]:
+                                    type_embedding: str = "shared") -> Optional[Tuple[torch.Tensor, torch.Tensor, torch.Tensor]]:
         try:
             logger.log_message("info", "Data embedding pipeline started.")
 
@@ -76,13 +76,17 @@ class DataEmbeddingPipeline:
         try:
             logger.log_message("info", "Text embedding pipeline started.")
             textEmbedding = TextEmbedding(self.text_data)
-            for text in texts:
-                self.text_embeddings.append(textEmbedding.embedding_text(text))
+            for i, text in enumerate(texts):
+                embedding_text = textEmbedding.embedding_text(text)
+                if i == 0:
+                    self.text_embeddings.append(embedding_text)
+                else:
+                    # torch.Size([20, 512, 768]) + torch.Size([18, 512, 768]) = torch.Size([38, 512, 768])
+                    self.text_embeddings = torch.cat((self.text_embeddings[0], embedding_text), dim=0)
 
             logger.log_message("info", "Text embedding pipeline completed successfully.")
-            
-            text_tensors = torch.stack(self.text_embeddings)
-            text_tensors_flatten = text_tensors.squeeze(1) # torch.Size([n_texts, 512, 768])
+            # print(self.text_embeddings.shape)
+            text_tensors_flatten = torch.tensor(self.text_embeddings).squeeze(1) # torch.Size([n_texts, 512, 768])
             pooled_text_tensors = torch.mean(text_tensors_flatten, dim=1) # torch.Size([n_texts, 768])
             return pooled_text_tensors
 

@@ -2,6 +2,7 @@ import os
 import sys
 import io
 import base64
+from PIL import Image
 import pandas as pd
 from typing import Optional, List
 
@@ -10,6 +11,9 @@ from src.trim_rag.exception import MyException
 
 from src.trim_rag.config import ImagePrepareDataQdrantArgumentsConfig
 from qdrant_client import models
+# from src.trim_rag.processing.image.image_processing import ImageTransform
+
+from src.config_params import ROOT_PROJECT_DIR
 
 
 ### Handle on all files of this folder
@@ -42,18 +46,26 @@ class ImageQdrantDB:
             )
             print(my_exception)
 
-    def _create_base64_strings(self, image) -> Optional[str]:
+    def _create_base64_strings(self, image_path: str) -> str:
         # Convert image to base64 string
-        def convert_to_base64(image):
+        def open_image(image_path: str) -> Image.Image:
+            img = Image.open(image_path)
+            return img
+            
+        def convert_to_base64(image: Image.Image) -> str:
             image_bytes = io.BytesIO()
-            image.save(image_bytes, format=self.format)
+            image.save(image_bytes, format=self.format.split('.')[-1])
             image_bytes.seek(0)
             return base64.b64encode(image_bytes.getvalue()).decode('utf-8')
 
         try:
             logger.log_message("info", "Creating base64 string started.")
-
+            image = open_image(image_path)
+            image = image.resize((224, 224))
+            # print(image)
             base64_string = convert_to_base64(image)
+
+            # print(base64_string)
 
             logger.log_message("info", "Creating base64 string completed.")
 
@@ -89,13 +101,15 @@ class ImageQdrantDB:
     def create_pyload(self, processing_embedding) -> Optional[dict]:
         try:
             logger.log_message("info", "Creating pyload started for preparing upload to qdrant.")
+            path_image_embeddings = ROOT_PROJECT_DIR / self.image_dir
 
-            for image_p in self.image_dir.glob(self.format):
-                image_url = self._create_image_url(image_p)
+            for image_p in path_image_embeddings.glob(self.format):
+                # image_url = self._create_image_url(image_p)
                 type = self._create_types()
-                base64_string = self._create_base64_strings(processing_embedding)
+                # print(image_p)
+                base64_string = self._create_base64_strings(image_p)
 
-                self._image_urls.append(image_url)
+                self._image_urls.append(image_p)
                 self._types.append(type)
                 self._base64_strings.append(base64_string)
             

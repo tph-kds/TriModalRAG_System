@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 
@@ -12,6 +12,7 @@ class PrepareDataQdrant:
     def __init__(self,
                  config: PrepareDataQdrantArgumentsConfig,
                  text_embeddings: Optional[List] = None,
+                 titles: Optional[List] = None,
                  image_embeddings: Optional[List] = None,
                  audio_embeddings: Optional[List] = None,
                  ) -> None:
@@ -25,7 +26,9 @@ class PrepareDataQdrant:
         self.image_embeddings = image_embeddings
         self.audio_embeddings = audio_embeddings
 
-    def run_prepare_data_qdrant_pipeline(self) -> Optional[List]:
+        self.titles = titles
+
+    def run_prepare_data_qdrant_pipeline(self) -> Tuple[Optional[List], Optional[List], Optional[List]]:
         try:
             logger.log_message("info", "Running text preparation for data embeddings to qdrant pipeline...")
             text_records = self.records_text_to_qdrant()
@@ -48,7 +51,7 @@ class PrepareDataQdrant:
         try:
             textqdrant = TextQdrantDB(self.text_data)
             text_records = textqdrant.create_records(processing_embedding=self.text_embeddings,
-                                      titles= self.text_data.titles
+                                      titles= self.titles
                                       )
             return text_records
 

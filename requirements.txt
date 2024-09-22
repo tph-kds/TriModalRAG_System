@@ -11,7 +11,6 @@ tensorboardx
 h5py
 opencv-python
 
-
 requests
 tqdm
 streamlit
@@ -33,9 +32,11 @@ nltk
 PyPDF2
 librosa
 resampy
-# pinecone-client
 qdrant-client
 langchain-openai
 langchain-qdrant
 langchain-google-genai
 langchain-cohere
+urllib3==2.0
+langchain-core==0.2.41
+

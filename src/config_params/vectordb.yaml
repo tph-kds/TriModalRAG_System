@@ -35,9 +35,11 @@ init_embedding:
   data_dir: "data"
   text_data:
     text_dir: "data/text"
+    format: "*.pdf"
   image_data:
     image_dir: "data/image"
     format: "*.png"
   audio_data:
     audio_dir: "data/audio"
+    format: "*.mp3"
 
