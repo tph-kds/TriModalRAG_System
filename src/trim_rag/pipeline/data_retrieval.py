@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import List, Optional
 
 from langchain.chains.sequential import SequentialChain
 
@@ -7,23 +8,46 @@ from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 
 from src.trim_rag.retrieval import TriModalRetrieval
+from src.trim_rag.config import (
+    TrimodalRetrievalPipelineArgumentsConfig,
+    QdrantVectorDBArgumentsConfig
+)
 
 class DataRetrievalPipeline:
 
-    def __init__(self, ) -> None:
+    def __init__(self, config: TrimodalRetrievalPipelineArgumentsConfig,
+                 qdrant_config: QdrantVectorDBArgumentsConfig,
+                 QDRANT_API_KEY:  Optional[str] = None,
+                 QDRANT_DB_URL:  Optional[str] = None,
+                   ) -> None:
         super(DataRetrievalPipeline, self).__init__()
 
-        # self.config = config
+        self.config = config
+        self.qdrant_config = qdrant_config
+
+        self.QDRANT_API_KEY = QDRANT_API_KEY
+        self.QDRANT_DB_URL = QDRANT_DB_URL
 
 
-    def run_data_retrieval_pipeline(self) -> SequentialChain:
+    def run_data_retrieval_pipeline(self,
+                                    text_embedding_query: Optional[List[float]] = None,
+                                    image_embedding_query: Optional[List[float]] = None,
+                                    audio_embedding_query: Optional[List[float]] = None
+                                    ) -> SequentialChain:
         try: 
             logger.log_message("info", "Running data retrieval pipeline...")
-            tri_modal_retrieval = TriModalRetrieval()
-            chain_retrieval = tri_modal_retrieval.trimodal_retrieval()
+            tri_modal_retrieval = TriModalRetrieval( config=self.config, 
+                                                     config_qdrant=self.qdrant_config,
+                                                     QDRANT_API_KEY=self.QDRANT_API_KEY,
+                                                     QDRANT_DB_URL=self.QDRANT_DB_URL
+                                                    )
+            chain_retrieval, fusion, _, _, _ = tri_modal_retrieval.trimodal_retrieval(text_embedding_query=text_embedding_query,
+                                                                      image_embedding_query=image_embedding_query,
+                                                                      audio_embedding_query=audio_embedding_query
+                                                                      )
             logger.log_message("info", "Data retrieval pipeline completed")
-
-            return chain_retrieval
+        
+            return chain_retrieval, fusion
 
         except Exception as e:
             logger.log_message("warning", "Failed to run data retrieval pipeline: " + str(e))

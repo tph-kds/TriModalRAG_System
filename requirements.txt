@@ -5,6 +5,7 @@ matplotlib
 numpy
 scipy
 pyyaml
+makefile
 packaging
 pycocotools
 tensorboardx
@@ -39,4 +40,5 @@ langchain-google-genai
 langchain-cohere
 urllib3==2.0
 langchain-core==0.2.41
+langchain_huggingface
 

@@ -179,6 +179,10 @@ class AudioDataTransformArgumentsConfig():
         default="",
         metadata={"help": "Root directory to save data."}
     )
+    segment_duration: int = field(
+        default=30,
+        metadata={"help": "Segment duration of an audio."}
+    )
     target_sr: int = field(
         default=16000,
         metadata={"help": "Target sampling rate."}
@@ -837,10 +841,31 @@ class MultimodalGenerationArgumentsConfig():
         metadata={"help": "System string of the generation."}
     )
 
-    context: str = field(
+    context_str: str = field(
         default="Lighting, rain, snow, etc. suitable for rag chain generation. ",
         metadata={"help": "Context of the generation."}
     )
+
+@dataclass(frozen=True)
+class MultimodalGenerationPipelineArgumentsConfig():
+
+    multimodal_generation: MultimodalGenerationArgumentsConfig = field(
+        default_factory = MultimodalGenerationArgumentsConfig,
+        metadata={"help": "Multimodal generation arguments."}
+    )
+
+    post_processing: PostProcessingArgumentsConfig = field(
+        default_factory = PostProcessingArgumentsConfig,
+        metadata={"help": "Post processing arguments."}
+    )
+    
+    prompts: PromptFlowsArgumentsConfig = field(
+        default_factory = PromptFlowsArgumentsConfig,
+        metadata={"help": "Prompt flows arguments."}
+    )
+
+
+
 
 # @dataclass(frozen=True)
 # class TriModalRetrievalArgumentsConfig():

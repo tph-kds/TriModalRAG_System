@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import List, Optional
 
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
@@ -7,34 +8,74 @@ from src.trim_rag.exception import MyException
 from src.trim_rag.config import TextRetrievalArgumentsConfig, QdrantVectorDBArgumentsConfig
 
 from src.trim_rag.components import QdrantVectorDB
+from qdrant_client import QdrantClient
+from qdrant_client import models
+# from langchain.chains.sequential import SequentialChain
+import torch
+
 
 class TextRetrieval:
     def __init__(self, 
                  config: TextRetrievalArgumentsConfig,
-                 config_qdrant: QdrantVectorDBArgumentsConfig) -> None:
+                 config_qdrant: QdrantVectorDBArgumentsConfig,
+                 client: QdrantClient) -> None:
         super(TextRetrieval, self).__init__()
 
         self.config = config
+        self.client = client
         self.config_qdrant = config_qdrant
-        self.client = QdrantVectorDB(config_qdrant)._connect_qdrant()
+        self.name_collection = self.config_qdrant.text_data.collection_text_name
+
+        # custom chain
+        self.input_keys = ["text"]
+        self.output_keys = ["text_retrieval"]
+
+    
+    def __call__(self, inputs):
+        input = inputs["text"]
+        vector_text = None
+        if input is not None:
+            # Retrieve text embeddings
+            text_embedding = self.text_retrieval(input)
+            vector_text = text_embedding[0].vector # get the vector after retrieval from qdrant
+            vector_text = torch.tensor(vector_text) # convert to tensor 
+
+        else:
+            vector_text = None
+
+        return {"text_retrieval": vector_text}
 
 
-    def text_retrieval(self, query_embedding) -> None:
+    def text_retrieval(self, query_embedding: Optional[List[float]]) -> None:
         try: 
             logger.log_message("info", "Starting to retrieve text embeddings...")
-
+            # print(self.client.get_collection(self.name_collection))
             # Retrieve text embeddings
+            
             results = self.client.search(
-                collection_name=self.config_qdrant.name_text_collection,
-                query_vector=query_embedding,
-                limit=5  # Get top 5 most similar texts,
+                collection_name=self.name_collection,
+                query_vector=query_embedding.tolist()[0],
+                # with_payload=["text"],
+                limit=1,  # Get top 5 most similar texts,
+                with_vectors=True,
 
             )
+            # results = self.client.query_points(
+            #     collection_name=self.name_collection,
+            #     query=query_embedding.tolist()[0],
+            #     # using= "text",
+            #     limit=1,
+            # ).points
+            # print(results.points)
+            # print(results)
+
+            # for hit in hits:
+            #     print(hit.payload, "score:", hit.score)
             logger.log_message("info", "Retrieved text embeddings successfully")
             return results
         
         except Exception as e:
-            logger.log_message("info", f"Error retrieving text embeddings: {e}")
+            logger.log_message("warning", f"Error retrieving text embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error retrieving text embeddings: {e}",
                 error_details= sys,
@@ -55,7 +96,7 @@ class TextRetrieval:
             logger.log_message("info", "Deleted text embeddings successfully")
 
         except Exception as e:
-            logger.log_message("info", f"Error deleting text embeddings: {e}")
+            logger.log_message("warning", f"Error deleting text embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error deleting text embeddings: {e}",
                 error_details= sys,
@@ -73,7 +114,7 @@ class TextRetrieval:
             logger.log_message("info", "Deleted all text embeddings successfully")
 
         except Exception as e:
-            logger.log_message("info", f"Error deleting all text embeddings: {e}")
+            logger.log_message("warning", f"Error deleting all text embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error deleting all text embeddings: {e}",
                 error_details= sys,
@@ -90,7 +131,7 @@ class TextRetrieval:
             logger.log_message("info", "Recreated text collection successfully")
 
         except Exception as e:
-            logger.log_message("info", f"Error recreating text collection: {e}")
+            logger.log_message("warning", f"Error recreating text collection: {e}")
             my_exception = MyException(
                 error_message=f"Error recreating text collection: {e}",
                 error_details= sys,

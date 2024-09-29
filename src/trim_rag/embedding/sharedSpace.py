@@ -41,16 +41,34 @@ class SharedEmbeddingSpace(nn.Module):
 
     def forward(self, text, image, sound):
 
-        # Project each modality to the shared space
-        text_emb = self.activation(self.text_proj(text))
-        image_emb = self.activation(self.image_proj(image))
-        sound_emb = self.activation(self.sound_proj(sound))
+        # # Project each modality to the shared space
+        # text_emb = self.activation(self.text_proj(text))
+        # image_emb = self.activation(self.image_proj(image))
+        # sound_emb = self.activation(self.sound_proj(sound))
         
 
-        # Normalize embeddings (optional)
-        text_emb = self._layer_norm(text_emb)
-        image_emb = self._layer_norm(image_emb)
-        sound_emb = self._layer_norm(sound_emb)
+        # # Normalize embeddings (optional)
+        # text_emb = self._layer_norm(text_emb)
+        # image_emb = self._layer_norm(image_emb)
+        # sound_emb = self._layer_norm(sound_emb)
+        
+        # Project each modality to the shared space
+        if text is not None:
+            text_emb = self.activation(self.text_proj(text))
+            text_emb = self._layer_norm(text_emb)
+        else:
+            text_emb = None
+        if image is not None:
+            image_emb = self.activation(self.image_proj(image))
+            image_emb = self._layer_norm(image_emb)
+        else:
+            image_emb = None
+        if sound is not None:
+            sound_emb = self.activation(self.sound_proj(sound))
+            # Normalize embeddings (optional)
+            sound_emb = self._layer_norm(sound_emb)
+        else:
+            sound_emb = None
 
         
         return text_emb, image_emb, sound_emb

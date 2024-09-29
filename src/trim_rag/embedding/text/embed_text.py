@@ -1,12 +1,14 @@
 import os
 import sys
-from typing import Optional
+from typing import List, Optional, Tuple
 
 from src.trim_rag.exception import MyException
 from src.trim_rag.logger import logger
 from src.trim_rag.config import TextEmbeddingArgumentsConfig
 from transformers import BertModel, BertTokenizer
 import torch
+from langchain_core.embeddings import Embeddings
+from langchain_core.pydantic_v1 import BaseModel
 
 # # Initialize BERT model and tokenizer
 # model = BertModel.from_pretrained('bert-base-uncased')
@@ -74,7 +76,7 @@ class TextEmbedding:
             )
             print(my_exception)
 
-    def get_bert_embeddings(self, text) -> Optional[torch.Tensor]:
+    def get_bert_embeddings(self, text) -> Tuple[Optional[torch.Tensor], Optional[List[torch.Tensor]]] :
         try:
             logger.log_message("info", f"Getting {self.pretrained_model_name.split('-')[0].upper()} embeddings ...")
             tokenizer = self._get_tokenizer()
@@ -89,6 +91,7 @@ class TextEmbedding:
                             return_overflowing_tokens=self.return_overflowing_tokens,
                             return_special_tokens_mask=self.return_special_tokens_mask
                             )
+            input_ids = inputs["input_ids"]
             inputs = {key: value.to(self.device) for key, value in inputs.items()}
             
             with torch.no_grad():
@@ -97,7 +100,7 @@ class TextEmbedding:
                 embeddings = outputs.last_hidden_state  # Shape: (batch_size, sequence_length, hidden_size)
             # embeddings = embeddings.mean(dim=1)  # Average over sequence length
             # embeddings = embeddings[:, :self.target_dim]
-            return embeddings
+            return embeddings, input_ids
 
         except Exception as e:
             logger.log_message("warning", f"Failed to get {self.pretrained_model_name.split('-')[0].upper()} embeddings: " + str(e))
@@ -110,9 +113,15 @@ class TextEmbedding:
     def embedding_text(self, text) -> Optional[torch.Tensor]:
         try:
             logger.log_message("info", "Embedding text started.")
-            embeddings = self.get_bert_embeddings(text)
+            tokenizer = self._get_tokenizer()
+            embeddings, input_ids = self.get_bert_embeddings(text)
             logger.log_message("info", "Embedding text completed successfully.")
-            return embeddings
+            # Convert input IDs back to tokens (for verification)
+            tokens = tokenizer.convert_ids_to_tokens(input_ids[0])
+
+            # Print tokens and their corresponding embeddings
+            tokens_list = [token for token, embedding in zip(tokens, embeddings[0])]
+            return embeddings, tokens_list
 
         except Exception as e:
             logger.log_message("warning", "Failed to embed text: " + str(e))

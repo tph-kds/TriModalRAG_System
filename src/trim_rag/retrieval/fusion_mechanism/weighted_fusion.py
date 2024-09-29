@@ -22,10 +22,21 @@ class WeightedFusion(nn.Module):
                 image: torch.Tensor, 
                 audio: torch.Tensor
                 ) -> torch.Tensor:
+        print("Hung")
+        none_count = 0
+        if text is None:
+            none_count += 1
+            text = 0
+        if image is None:
+            none_count += 1
+            image = 0
+        if audio is None:
+            none_count += 1
+            audio = 0
+        
         weighted_sum = (self.weights[0] * text) + (self.weights[1] * image) + (self.weights[2] * audio)
         
-
-        return weighted_sum / torch.sum(self.weights)
+        return weighted_sum / (torch.sum(self.weights) - none_count) if torch.sum(self.weights) - none_count > 0 else 0
     
     def _weights_fusion(self) -> nn.Parameter:
         try:
@@ -34,7 +45,7 @@ class WeightedFusion(nn.Module):
             return weights
 
         except Exception as e:
-            logger.log_message("info", f"Error creating weighted fusion: {e}")
+            logger.log_message("warning", f"Error creating weighted fusion: {e}")
             my_exception = MyException(
                 error_message=f"Error creating weighted fusion: {e}",
                 error_details= sys,

@@ -12,7 +12,7 @@ from src.trim_rag.retrieval.fusion_mechanism.attention import     AttentionFusio
 from src.trim_rag.retrieval.fusion_mechanism.modality_aligner import   ModalityAligner
 from src.trim_rag.retrieval.fusion_mechanism.weighted_fusion import WeightedFusion
 
-class FusionMechanism:
+class FusionMechanism(nn.Module):
     def __init__(self, config: FusionMechanismArgumentsConfig):
         super(FusionMechanism, self).__init__()
 
@@ -34,21 +34,38 @@ class FusionMechanism:
         :param audio_results: List of (id, score) tuples for audio retrieval.
         :return: Fused results as a list of (id, fused_score) tuples.
         """
-        # Perform modality aligner
-        text = self.modality_aligner(text_results)
-        image = self.modality_aligner(image_results)
-        audio = self.modality_aligner(audio_results)
+        print("test")
+        if text_results != None:
+            # Perform modality aligner
+            text = self.modality_aligner(text_results)
+            # Perform attention fusion
+            text = self.attention_fusion(text, text, text)
+        else:
+            text = text_results
 
-        # Perform attention fusion
-        text = self.attention_fusion(text)
-        image = self.attention_fusion(image)
-        audio = self.attention_fusion(audio)
+        if image_results != None:
+            image = self.modality_aligner(image_results)
+            image = self.attention_fusion(image, image, image)
 
+        else:
+            image = image_results
+
+        if audio_results != None:
+            audio = self.modality_aligner(audio_results)
+            audio = self.attention_fusion(audio)
+
+        else:   
+            audio = audio_results
+
+        attention_fusion_results = self.attention_fusion(text, image, audio)
         # Perform weighted fusion
-        fused_results = self.weighted_fusion(text, image, audio)
+        fused_results = self.weighted_fusion(text, image, audio)    
+        if attention_fusion_results != None:
+            fused_results = attention_fusion_results + fused_results
 
         finally_fused_results = self.modality_aligner(fused_results)
         finally_fused_results = nn.Dropout(self.dropout)(finally_fused_results)
+        print("Húngdsdsd")
 
         return finally_fused_results
 

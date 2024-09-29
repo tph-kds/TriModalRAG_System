@@ -1,27 +1,31 @@
 import os
 import sys
+from typing import Optional
 
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 
-from src.trim_rag.config import AudioModelArgumentsConfig
+from src.trim_rag.config import (
+    AudioModelArgumentsConfig,
+    AudioEmbeddingArgumentsConfig,
+)
 from src.trim_rag.embedding import AudioEmbedding
+from transformers import Wav2Vec2Model
 
 class AudioModel:
     def __init__(self, 
                  config: AudioModelArgumentsConfig,
-                 audio_embedding: AudioEmbedding) -> None:
+                 embed_config: AudioEmbeddingArgumentsConfig) -> None:
         super(AudioModel, self).__init__()
 
         self.config = config
         self.name_of_model = self.config.name_of_model
-        self.audio_embedding = audio_embedding
+        self.audio_embedding = AudioEmbedding(embed_config)
 
-    def audio_model(self) -> None:
+    def audio_model(self) -> Optional[Wav2Vec2Model]:
         try:
             logger.log_message("info", "Initializing audio model...")
-            audio_embedding = AudioEmbedding(self.audio_embedding)
-            models = audio_embedding._get_model()
+            models = self.audio_embedding._get_model()
             logger.log_message("info", "audio model initialized successfully.")
             return models
         

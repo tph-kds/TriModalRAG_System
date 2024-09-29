@@ -72,18 +72,18 @@ class QdrantVectorDB:
                          ) -> None:
         try:
             logger.log_message("info", "Initializing collection...")
-
-            self.client.create_collection(
-                collection_name=collection_name,
-                vectors_config=VectorParams(
-                    size=embeddings_lenght,
-                    distance=Distance.COSINE,
-                ),
-                optimizers_config=models.OptimizersConfigDiff(
-                    indexing_threshold=0,
-                ),
-                shard_number=2,
-            )
+            if not self.client.collection_exists(collection_name=collection_name): 
+                self.client.create_collection(
+                    collection_name=collection_name,
+                    vectors_config=VectorParams(
+                        size=embeddings_lenght,
+                        distance=Distance.COSINE,
+                    ),
+                    optimizers_config=models.OptimizersConfigDiff(
+                        indexing_threshold=0,
+                    ),
+                    shard_number=2,
+                )
     #             vectors_config=models.VectorParams(
     #     size=1024,
     #     distance=models.Distance.DOT,

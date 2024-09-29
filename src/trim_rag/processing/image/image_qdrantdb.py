@@ -113,10 +113,15 @@ class ImageQdrantDB:
                 self._types.append(type)
                 self._base64_strings.append(base64_string)
             
+            print(self._image_urls)
+            print(len(self._image_urls))
+            print(self._types)
+            print(len(self._types))
+            print(len(self._base64_strings))
 
-            pyloads = pd.DataFrame.from_records([{"image_url": self._image_urls,
-                                                  "type": self._types,
-                                                  "base64": self._base64_strings}])
+            pyloads = pd.DataFrame({"image_url": self._image_urls,
+                                    "type": self._types,
+                                    "base64": self._base64_strings})
 
             pyload_dicts = pyloads.to_dict(orient="records")
 
@@ -130,18 +135,19 @@ class ImageQdrantDB:
                 error_details = sys,
             )
             print(my_exception)
+
     
     def create_records(self, processing_embedding) -> Optional[dict]:
         try:
             logger.log_message("info", "Creating records started for preparing upload to qdrant.")
-
+            payloads = self.create_pyload(processing_embedding)
             records = [
                 models.Record(
                     id = idx,
-                    payload = self.create_pyload(processing_embedding)[idx],
+                    payload = payloads[idx],
                     vector = processing_embedding[idx]
                 )
-                for idx in range(len(self.create_pyload(processing_embedding)))
+                for idx in range(len(payloads))
             ]
 
             logger.log_message("info", "Creating records completed for preparing upload to qdrant.")

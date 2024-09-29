@@ -37,32 +37,88 @@ class PromptFlows:
             logger.log_message("info", "Getting prompt flows started.")
             template =[
                 (   "system",
-                 
-                    "System: {system_str}"
-                    "---------------------\n"
-                    "Context: {context_str}\n"
-                    "---------------------\n"
+                    (
+                        "System: {system_str}"
+                        "---------------------\n"
+                        "Context: {context_str}\n"
+                        "---------------------\n"
+                    )
                 ),
                     MessagesPlaceholder(variable_name=self.variable_name),
 
-                (    "---------------------\n"
-                    "Human:", 
-
-                    "Metadata for image: {image_str}\n"
-                    "---------------------\n"
-                    "Metadata for video: {video_str} \n"
-                    "---------------------\n"
-                    "Question: {question_str}\n"
-                ),(
-                    "Answer[Bot]: "
-            ),]
+                (
+                    "user", 
+                    (
+                        "{variable_name}: "
+                        "Metadata for image: {image_str}\n"
+                        "---------------------\n"
+                        "Metadata for video: {video_str} \n"
+                        "---------------------\n"
+                        "Question: {question_str}\n"
+                    )
+                ),
+                    (
+                        "assistant", 
+                        "Answer[Bot]: "
+                    )
+            ]
 
             prompt = ChatPromptTemplate.from_messages(messages=template)
-            prompt = prompt.format(system_str=system_str,
-                                   context_str=context_str,
-                                   image_str=image_str,
-                                   video_str=video_str,
-                                   question_str=question_str)
+            # prompt = prompt.format(system_str=system_str,
+            #                        context_str=context_str,
+            #                        image_str=image_str,
+            #                        video_str=video_str,
+            #                        question_str=question_str)
+            data_prompt = {
+                "system_str": system_str,
+                "context_str": context_str,
+                "image_str": image_str,
+                "video_str": video_str,
+                "question_str": question_str
+            }
+
+
+            logger.log_message("info", "Getting prompt flows completed successfully.")
+            return prompt, data_prompt
+
+        except Exception as e:
+            logger.log_message("warning", "Failed to get prompt flows: " + str(e))
+            my_exception = MyException(
+                error_message = "Failed to get prompt flows: " + str(e),
+                error_details = sys,
+            )
+            print(my_exception)
+
+    def prompt_llm(self) -> Optional[ChatPromptTemplate]:
+        try:
+            logger.log_message("info", "Getting prompt flows started.")
+            template =[
+                (   "system",
+                    (
+                        "System: {system_str}"
+                        "---------------------\n"
+                        "Context: {context_str}\n"
+                        "---------------------\n"
+                    )
+                ),
+                    MessagesPlaceholder(variable_name=self.variable_name),
+
+                (
+                    "user", 
+                    (
+                        "{variable_name}: "
+                        "Metadata for {type_str}: {info_str}\n"
+                        "---------------------\n"
+                        "Question: {question_str}\n"
+                    )
+                ),
+                    (
+                        "assistant", 
+                        "Answer[Bot]: "
+                    )
+            ]
+
+            prompt = ChatPromptTemplate.from_messages(messages=template)
 
             logger.log_message("info", "Getting prompt flows completed successfully.")
             return prompt

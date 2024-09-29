@@ -38,8 +38,9 @@ The primary goal of this system is to enhance traditional information retrieval 
 
 ### Architecture
 
+
 <p align="center">
-  <img align="center" src="" width="800">
+  <img align="center" src="https://github.com/tph-kds/image_storages/blob/409dbcf62bbb3ad13e7e02ab323d332d85702487/images/svgs/TriModal_RAG/architecture.png" width="800">
   
 </p>
 
@@ -123,5 +124,6 @@ Thank you for your interest in my project. We hope you find it useful. If you ha
 
 ## References
 - Chen, Wenhu, et al. "Murag: Multimodal retrieval-augmented generator for open question answering over images and text." arXiv preprint arXiv:2210.02928 (2022). [Available on this link.](https://arxiv.org/pdf/2210.02928)
+<!-- https://www.marqo.ai/blog/context-is-all-you-need-multimodal-vector-search-with-personalization -->
 
 

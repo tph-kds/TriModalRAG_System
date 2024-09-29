@@ -26,6 +26,7 @@ class TextQdrantDB:
 
         self._text_urls: List = []
         self._types: List = []
+        self._token: List = []
 
 
     def _create_text_url(self, text_p) -> Optional[str]:
@@ -85,7 +86,9 @@ class TextQdrantDB:
 
 
 
-    def create_pyload(self, titles: Optional[List]) -> Optional[dict]:
+    def create_pyload(self, 
+                      titles: Optional[List],
+                      text_embeddings) -> Optional[dict]:
         try:
             logger.log_message("info", "Creating pyload started for preparing upload to qdrant.")
             path_text_embeddings = ROOT_PROJECT_DIR / self.text_dir
@@ -97,10 +100,14 @@ class TextQdrantDB:
                 self._text_urls.append(text_p)
                 self._types.append(type)
             
-
-            pyloads = pd.DataFrame.from_records([{"text_url": self._text_urls,
-                                                  "type": self._types,
-                                                  "title": titles}])
+            print(len(self._text_urls))
+            print(len(self._types))
+            print(len(titles))
+            print(len(text_embeddings[1]))
+            pyloads = pd.DataFrame({"text_url": self._text_urls,
+                                    "type": self._types,
+                                    "title": titles,
+                                    "token": text_embeddings[1]})
 
             pyload_dicts = pyloads.to_dict(orient="records")
 
@@ -121,14 +128,16 @@ class TextQdrantDB:
                        ) -> Optional[dict]:
         try:
             logger.log_message("info", "Creating records started for preparing upload to qdrant.")
-
+            payloads = self.create_pyload(titles, processing_embedding)
+            # print(payloads)
+            # print("Hung")
             records = [
                 models.Record(
                     id = idx,
-                    payload = self.create_pyload(titles)[idx],
-                    vector = processing_embedding[idx]
+                    payload = payloads[idx],
+                    vector = processing_embedding[0][idx]
                 )
-                for idx in range(len(self.create_pyload(titles)))
+                for idx in range(len(payloads))
             ]
 
             logger.log_message("info", "Creating records completed for preparing upload to qdrant.")

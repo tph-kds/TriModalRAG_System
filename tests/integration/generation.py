@@ -15,8 +15,10 @@ def data_generation(retriever=None,
         logger.log_message("info", "<<<<<<<< RUNNING DATA GENERATION SCENARIO >>>>>>>>")
         logger.log_message("info", "Data Generation pipeline started.")
         config_manager = ConfiguarationManager()
-        config = config_manager.get_generation_config()
-        pipeline = GenerationPipeline(config)
+        config = config_manager.get_multimodal_generation_config()
+        models_config = config_manager.get_model_arguments_config()
+        embeddings_config = config_manager.get_data_embedding_arguments_config()
+        pipeline = GenerationPipeline(config, models_config, embeddings_config)
 
         rag_chain = pipeline.run_generation_pipeline(
             retriever=retriever,

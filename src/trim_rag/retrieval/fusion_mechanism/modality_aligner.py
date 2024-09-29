@@ -17,18 +17,19 @@ class ModalityAligner(nn.Module):
         self.input_dim = self.config.input_dim # 512
         self.output_dim = self.config.output_dim # 512
 
-    def forward(self, x):  
-        return self._modality_aligner()(x)
+    def forward(self, x):
+        linear_layer = self._modality_aligner()  
+        return linear_layer(x)
 
     def _modality_aligner(self) -> nn.Linear:
         try:
-            linear_layer = nn.Linear(self.input_dim, 
-                                    self.output_dim
+            linear_layer = nn.Linear(in_features=self.input_dim, 
+                                    out_features=self.output_dim
                                     )
             return linear_layer
 
         except Exception as e:
-            logger.log_message("info", f"Error creating linear layer: {e}")
+            logger.log_message("warning", f"Error creating linear layer: {e}")
             my_exception = MyException(
                 error_message=f"Error creating linear layer: {e}",
                 error_details= sys,

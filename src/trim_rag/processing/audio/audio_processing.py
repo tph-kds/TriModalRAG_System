@@ -3,6 +3,7 @@ import os
 import sys
 import librosa
 import numpy as np
+import soundfile as sf
 
 from PIL import Image
 from typing import Optional
@@ -25,6 +26,7 @@ class AudioTransform:
         self.audio_data = self.config
 
         self.audio_path = audio_path 
+        self.segment_duration = self.audio_data.segment_duration
         self.target_sr = self.audio_data.target_sr # target_sr=16000
         self.top_db = self.audio_data.top_db # top_db=60
         self.scale = self.audio_data.scale # scale=True
@@ -41,7 +43,27 @@ class AudioTransform:
         self.res_type = self.audio_data.res_type # res_type='kaiser_fast'
         self.rate = self.audio_data.rate # rate=12
         self.noise = self.audio_data.noise # noise=0.005
+    
+    def _plit_and_create(self, audio_p) -> None:
+         # Load the audio file
+        audio, sr = librosa.load(audio_p, sr=None)
+        segment_samples = sr * self.segment_duration  # Calculate the number of samples per segment
+        if os.path.exists(audio_p):
+            os.remove(audio_p)
 
+        # Split and save each segment
+        for i in range(0, len(audio), segment_samples):
+            segment = audio[i:i + segment_samples]
+            
+            # Save as WAV first (librosa doesn't support MP3 directly)
+            output_file = f'{audio_p}'
+            sf.write(output_file, segment, sr)
+            break
+        return None            
+            # Convert WAV to MP3 using pydub
+            # mp3_output_file = f'audio_segment_{i // segment_samples}.mp3'
+            # sound = AudioSegment.from_wav(wav_output_file)
+            # sound.export(mp3_output_file, format="mp3")
 
 
 
@@ -138,7 +160,9 @@ class AudioTransform:
 
 
     def audio_processing(self) -> Optional[np.ndarray]:
-        try: 
+        try:
+            # PLit audio longer than 30 minutes    
+            self._plit_and_create(self.audio_path)
             audio_f = self._resample_audio(self.audio_path)
             audio_f_silence = self._remove_silence(audio_f)
             audio_f_normalized = self._normalize_audio(audio_f_silence)

@@ -80,10 +80,15 @@ class AudioQdrantDB:
                 self._types.append(type)
                 self._names.append(extract_name)
             
-
-            pyloads = pd.DataFrame.from_records([{"audio_url": self._audio_urls,
-                                                  "type": self._types,
-                                                  "base64": self._names}])
+            print(self._audio_urls)
+            print(len(self._audio_urls))
+            print(self._types)
+            print(len(self._types))
+            print(self._names)
+            print(len(self._names))
+            pyloads = pd.DataFrame({"audio_url": self._audio_urls,
+                                    "type": self._types,
+                                    "base64": self._names})
 
             pyload_dicts = pyloads.to_dict(orient="records")
 
@@ -101,14 +106,15 @@ class AudioQdrantDB:
     def create_records(self, processing_embedding) -> Optional[dict]:
         try:
             logger.log_message("info", "Creating records started for preparing upload to qdrant.")
-
+            print(processing_embedding.shape)
+            payloads = self.create_pyload(processing_embedding)
             records = [
                 models.Record(
                     id = idx,
-                    payload = self.create_pyload(processing_embedding)[idx],
+                    payload = payloads[idx],
                     vector = processing_embedding[idx]
                 )
-                for idx in range(len(self.create_pyload(processing_embedding)))
+                for idx in range(len(payloads))
             ]
 
             logger.log_message("info", "Creating records completed for preparing upload to qdrant.")

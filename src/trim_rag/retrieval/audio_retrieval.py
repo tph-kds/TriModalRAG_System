@@ -11,12 +11,14 @@ from src.trim_rag.components import QdrantVectorDB
 class AudioRetrieval:
     def __init__(self, 
                  config: AudioRetrievalArgumentsConfig,
-                 config_qdrant: QdrantVectorDBArgumentsConfig) -> None:
+                 config_qdrant: QdrantVectorDBArgumentsConfig,
+                 client: QdrantVectorDB) -> None:
         super(AudioRetrieval, self).__init__()
 
         self.config = config
+        self.client = client
         self.config_qdrant = config_qdrant
-        self.client = QdrantVectorDB(config_qdrant)._connect_qdrant()
+        self.name_collection = self.config_qdrant.audio_data.collection_audio_name
 
 
     def audio_retrieval(self, query_embedding) -> None:
@@ -24,17 +26,22 @@ class AudioRetrieval:
             logger.log_message("info", "Starting to retrieve audio embeddings...")
 
             # Retrieve audio embeddings
-            results = self.client.search(
-                collection_name=self.config_qdrant.name_audio_collection,
-                query_vector=query_embedding,
-                limit=5  # Get top 5 most similar audios,
+            # results = self.client.search(
+            #     collection_name=self.name_collection,
+            #     query_vector=(self.name_collection, query_embedding),
+            #     limit=5  # Get top 5 most similar audios,
 
-            )
+            # )
+            results = self.client.query_points(
+                collection_name=self.name_collection,
+                query=query_embedding.tolist(),
+                limit=3,
+            ).points
             logger.log_message("info", "Retrieved audio embeddings successfully")
             return results
         
         except Exception as e:
-            logger.log_message("info", f"Error retrieving audio embeddings: {e}")
+            logger.log_message("warning", f"Error retrieving audio embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error retrieving audio embeddings: {e}",
                 error_details= sys,
@@ -56,7 +63,7 @@ class AudioRetrieval:
             logger.log_message("info", "Deleted audio embeddings successfully")
 
         except Exception as e:
-            logger.log_message("info", f"Error deleting audio embeddings: {e}")
+            logger.log_message("warning", f"Error deleting audio embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error deleting audio embeddings: {e}",
                 error_details= sys,
@@ -74,7 +81,7 @@ class AudioRetrieval:
             logger.log_message("info", "Deleted all audio embeddings successfully")
 
         except Exception as e:
-            logger.log_message("info", f"Error deleting all audio embeddings: {e}")
+            logger.log_message("warning", f"Error deleting all audio embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error deleting all audio embeddings: {e}",
                 error_details= sys,
@@ -91,7 +98,7 @@ class AudioRetrieval:
             logger.log_message("info", "Recreated audio collection successfully")
 
         except Exception as e:
-            logger.log_message("info", f"Error recreating audio collection: {e}")
+            logger.log_message("warning", f"Error recreating audio collection: {e}")
             my_exception = MyException(
                 error_message=f"Error recreating audio collection: {e}",
                 error_details= sys,

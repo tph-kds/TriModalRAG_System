@@ -48,20 +48,20 @@ class DataEmbeddingPipeline:
             text_embeds = self.text_embedding(texts=text)
             image_embeds = self.image_embedding(images=image)
             audio_embeds = self.audio_embedding(audios=audio)
-            print(f" TEXT EMBEDS:  {text_embeds.shape}", 
-                  f" IMAGE EMBEDS: {image_embeds.shape}", 
-                  f" AUDIO EMBEDS: {audio_embeds.shape}")
+            # print(f" TEXT EMBEDS:  {text_embeds.shape}", 
+            #       f" IMAGE EMBEDS: {image_embeds.shape}", 
+            #       f" AUDIO EMBEDS: {audio_embeds.shape}")
             
             if type_embedding == "all":
                 embeddings = self._multimodal_embedding()
                 return embeddings
 
-            text_new_embeddings, image_new_embeddings, audio_new_embeddings = self.shared_embedding_space(text_embeds,
+            text_new_embeddings, image_new_embeddings, audio_new_embeddings = self.shared_embedding_space(text_embeds[0],
                                                                                                           image_embeds,
                                                                                                           audio_embeds)
-
+            textnew_embed = (text_new_embeddings, text_embeds[1])
             logger.log_message("info", "Data embedding pipeline completed successfully.")
-            return text_new_embeddings, image_new_embeddings, audio_new_embeddings
+            return textnew_embed,  image_new_embeddings, audio_new_embeddings
             # return self.text_embeddings
 
         except Exception as e:
@@ -76,19 +76,22 @@ class DataEmbeddingPipeline:
         try:
             logger.log_message("info", "Text embedding pipeline started.")
             textEmbedding = TextEmbedding(self.text_data)
+            tokens = []
             for i, text in enumerate(texts):
-                embedding_text = textEmbedding.embedding_text(text)
+                embedding_text, token_list = textEmbedding.embedding_text(text)
+                tokens.append(token_list)
                 if i == 0:
                     self.text_embeddings.append(embedding_text)
                 else:
                     # torch.Size([20, 512, 768]) + torch.Size([18, 512, 768]) = torch.Size([38, 512, 768])
                     self.text_embeddings = torch.cat((self.text_embeddings[0], embedding_text), dim=0)
-
+                if len(texts) == 1:
+                    self.text_embeddings = self.text_embeddings[0]
             logger.log_message("info", "Text embedding pipeline completed successfully.")
-            # print(self.text_embeddings.shape)
             text_tensors_flatten = torch.tensor(self.text_embeddings).squeeze(1) # torch.Size([n_texts, 512, 768])
             pooled_text_tensors = torch.mean(text_tensors_flatten, dim=1) # torch.Size([n_texts, 768])
-            return pooled_text_tensors
+            text_tensors = (pooled_text_tensors, tokens) # 0 : pooled_text_tensors, 1: token_list, 2:shape_texts 
+            return text_tensors
 
         except Exception as e:
             logger.log_message("warning", "Failed to run text embedding pipeline: " + str(e))
@@ -126,16 +129,30 @@ class DataEmbeddingPipeline:
         try:
             logger.log_message("info", "Audio embedding pipeline started.")
             audioEmbedding = AudioEmbedding(self.audio_data)
-            for audio in audios:
-                self.audio_embeddings.append(audioEmbedding.embedding_audio(audio))
+            for i, audio in enumerate(audios):
+                embedding_audio = audioEmbedding.embedding_audio(audio)  
+                mean_tensor = torch.mean(torch.tensor(embedding_audio), dim=1) # [1, 768]
+                if i == 0:
+                    self.audio_embeddings.append(mean_tensor)
+                    # print(torch.tensor((self.audio_embeddings[0])).shape)
+                else:
+                    # torch.Size([20, 512, 768]) + torch.Size([18, 512, 768]) = torch.Size([38, 512, 768])
+                    self.audio_embeddings = torch.cat((self.audio_embeddings[0], mean_tensor), dim=0)
+                    print(self.audio_embeddings.shape)
+                if len(audios) == 1:
+                    self.audio_embeddings = self.audio_embeddings[0]
+
+            # print(self.audio_embeddings)
+            # print(self.audio_embeddings.shape)
 
             logger.log_message("info", "Audio embedding pipeline completed successfully.")
-            audio_embed = [ae for ae in self.audio_embeddings if ae is not None]
+            # audio_embed = [ae for ae in self.audio_embeddings if ae is not None]
             # print(len(audio_embed))
-            audio_embed = torch.tensor(audio_embed) # torch.Size([n_audios, 1, 8169, 768])
-            pooled_audio_embed = audio_embed.squeeze(1) # torch.Size([n_audios,  1,  768])
-            pooled_audio_embed = torch.mean(pooled_audio_embed, dim=1) # torch.Size([n_audios, 768])
-            pooled_audio_embed = pooled_audio_embed.to(self.device)
+
+            # audio_embed = torch.tensor(self.audio_embeddings) # torch.Size([n_audios, 1, 8169, 768])
+            # pooled_audio_embed = audio_embed.squeeze(1) # torch.Size([n_audios,  1,  768])
+            # pooled_audio_embed = torch.mean(pooled_audio_embed, dim=1) # torch.Size([n_audios, 768])
+            pooled_audio_embed = self.audio_embeddings.to(self.device)
             return pooled_audio_embed
 
         except Exception as e:

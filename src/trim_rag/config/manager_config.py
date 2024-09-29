@@ -52,7 +52,7 @@ from src.trim_rag.config import (LoggerArgumentsConfig,
                                 WeightedFusionArgumentsConfig,
                                 TrimodalRetrievalPipelineArgumentsConfig,
                                 ModalityAlignerArgumentsConfig,
-
+                                MultimodalGenerationPipelineArgumentsConfig
 
                                 )
 
@@ -217,6 +217,7 @@ class ConfiguarationManager:
             processed_dir = config.processed_dir,
             audio_dir = config.audio_dir,
             audio_path = config.audio_path,
+            segment_duration = config.segment_duration,
             target_sr = config.target_sr,
             top_db = config.top_db,
             scale = config.scale,
@@ -528,7 +529,7 @@ class ConfiguarationManager:
     
     ### GETTING PROMPT CONFIG
     def get_prompt_config(self) -> PromptFlowsArgumentsConfig:
-        prompt_config = self.config.prompts
+        prompt_config = self.config.generation.prompts
 
         create_directories([prompt_config.root_dir])
 
@@ -542,7 +543,7 @@ class ConfiguarationManager:
     
     ### GETTING GENERATION CONFIG
     def get_post_processing_config(self) -> PostProcessingArgumentsConfig:
-        post_processing_config = self.config.post_processing
+        post_processing_config = self.config.generation.post_processing
 
         create_directories([post_processing_config.root_dir])
 
@@ -559,7 +560,7 @@ class ConfiguarationManager:
         return post_processing_arguments_config
     
     def get_generation_config(self) -> MultimodalGenerationArgumentsConfig:
-        generation_config = self.config.generation
+        generation_config = self.config.generation.multimodal_generation
 
         create_directories([generation_config.root_dir])
 
@@ -567,10 +568,25 @@ class ConfiguarationManager:
             root_dir = generation_config.root_dir,
             folder_name = generation_config.folder_name,
             system_str= generation_config.system_str,
-            context = generation_config.context
+            context_str = generation_config.context_str
         )
 
         return generation_arguments_config
+
+    def get_multimodal_generation_config(self) -> MultimodalGenerationPipelineArgumentsConfig:
+        multimodal_generation_config = self.config.generation
+
+        # create_directories([multimodal_generation_config.root_dir])
+
+        multimodal_generation_arguments_config = MultimodalGenerationPipelineArgumentsConfig(
+            # root_dir = multimodal_generation_config.root_dir,
+            # folder_name = multimodal_generation_config.folder_name,
+            multimodal_generation = self.get_generation_config(),
+            post_processing = self.get_post_processing_config(),
+            prompts = self.get_prompt_config()
+        )
+
+        return multimodal_generation_arguments_config
     
     ### GETTING RETRIEVAL CONFIG
     def _get_attention_fusion_retrieval_config(self) -> AttentionFusionArgumentsConfig:

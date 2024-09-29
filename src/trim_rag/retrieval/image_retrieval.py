@@ -11,12 +11,14 @@ from src.trim_rag.components import QdrantVectorDB
 class ImageRetrieval:
     def __init__(self, 
                  config: ImageRetrievalArgumentsConfig,
-                 config_qdrant: QdrantVectorDBArgumentsConfig) -> None:
+                 config_qdrant: QdrantVectorDBArgumentsConfig,
+                 client: QdrantVectorDB) -> None:
         super(ImageRetrieval, self).__init__()
 
         self.config = config
+        self.client = client
         self.config_qdrant = config_qdrant
-        self.client = QdrantVectorDB(config_qdrant)._connect_qdrant()
+        self.name_collection = self.config_qdrant.image_data.collection_image_name
 
 
     def image_retrieval(self, query_embedding) -> None:
@@ -24,17 +26,22 @@ class ImageRetrieval:
             logger.log_message("info", "Starting to retrieve image embeddings...")
 
             # Retrieve image embeddings
-            results = self.client.search(
-                collection_name=self.config_qdrant.name_image_collection,
-                query_vector=query_embedding,
-                limit=5  # Get top 5 most similar images,
+            # results = self.client.search(
+            #     collection_name=self.name_collection,
+            #     query_vector=(self.name_collection, query_embedding),
+            #     limit=5  # Get top 5 most similar images,
 
-            )
+            # )
+            results = self.client.query_points(
+                collection_name=self.name_collection,
+                query=query_embedding.tolist(),
+                limit=3,
+            ).points
             logger.log_message("info", "Retrieved image embeddings successfully")
             return results
         
         except Exception as e:
-            logger.log_message("info", f"Error retrieving image embeddings: {e}")
+            logger.log_message("warning", f"Error retrieving image embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error retrieving image embeddings: {e}",
                 error_details= sys,
@@ -56,7 +63,7 @@ class ImageRetrieval:
             logger.log_message("info", "Deleted image embeddings successfully")
 
         except Exception as e:
-            logger.log_message("info", f"Error deleting image embeddings: {e}")
+            logger.log_message("warning", f"Error deleting image embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error deleting image embeddings: {e}",
                 error_details= sys,
@@ -74,7 +81,7 @@ class ImageRetrieval:
             logger.log_message("info", "Deleted all image embeddings successfully")
 
         except Exception as e:
-            logger.log_message("info", f"Error deleting all image embeddings: {e}")
+            logger.log_message("warning", f"Error deleting all image embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error deleting all image embeddings: {e}",
                 error_details= sys,
@@ -91,7 +98,7 @@ class ImageRetrieval:
             logger.log_message("info", "Recreated image collection successfully")
 
         except Exception as e:
-            logger.log_message("info", f"Error recreating image collection: {e}")
+            logger.log_message("warning", f"Error recreating image collection: {e}")
             my_exception = MyException(
                 error_message=f"Error recreating image collection: {e}",
                 error_details= sys,
