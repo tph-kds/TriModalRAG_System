@@ -9,7 +9,7 @@ help:
 
 .PHONY: env
 env:
-	set PYTHONPATH=D:\DataScience_For_mySelf\Projects_myself\RagMLOPS\TriModalRAG_System
+	set PYTHONPATH=${ROOT}
 
 
 

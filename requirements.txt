@@ -39,6 +39,10 @@ langchain-qdrant
 langchain-google-genai
 langchain-cohere
 urllib3==2.0
-langchain-core==0.2.41
+langchain==0.3.0
+langchain-core==0.3.6
 langchain_huggingface
+langchain-google-vertexai
+langchain-google-genai==2.0.0
+
 

@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from langchain.chains.sequential import SequentialChain
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -25,6 +25,15 @@ from src.trim_rag.generation import (
 )
 
 from langchain_core.runnables.base import RunnableSerializable
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.messages.system import SystemMessage
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.ai import AIMessage
+from langchain_core.messages.base import BaseMessage
+
+from langchain_core.runnables import RunnableParallel
+from operator import itemgetter
+
 
 class GenerationPipeline:
 
@@ -51,6 +60,11 @@ class GenerationPipeline:
                                                           )
         
         self.post_processing = PostProcessing(config=self.post_processing_config)
+        self.chat_history: BaseMessage  = [
+            HumanMessage(content="Hello, How about you with a weather, today?"),
+            AIMessage(content="Hi, I'm doing well, but more colder for the previous day. How about you?"),
+        ]
+
 
     def run_generation_pipeline(self, 
                                 retriever: Optional[SequentialChain],
@@ -60,36 +74,38 @@ class GenerationPipeline:
                                 ) -> SequentialChain:
         try: 
             logger.log_message("info", "Running generation pipeline...")
-            prompt, data_prompt = self._get_prompt_flows(system_str=self.multimodal_generation_config.system_str,
-                                            context_str=self.multimodal_generation_config.context_str,
-                                            question_str=query,
-                                            image_str=image_url,
-                                            video_str=video_url
-                                            )
+            prompt= self._get_prompt_flows()
             
             prompt_llm = self._get_prompt_llm(), self._get_prompt_llm(), self._get_prompt_llm()
 
-            full_chain, messages_question = self._get_multimodal_generation(
+            full_message = self._get_multimodal_generation(
                 prompt=prompt,
                 prompt_llm=prompt_llm,
+                question_str=query,
                 image_url=image_url,
                 video_url=video_url,
-                retriever=retriever
+                retriever=retriever,
+                chat_history=self.chat_history
             )
+            meta_data_main = self.meta_data(
+                question_str=query,
+                image_url=image_url,
+                audio_url=video_url,
+                response_retriever=full_message
+            ) 
+            pre_prompt = self.pre_prompt()
             p_chain = self.post_processing.post_processing(retriever=retriever,
                                                             query=query)
-            def format_docs(docs):
-                return "\n\n".join([doc.page_content for doc in docs])
             
             rag_chain = (
-                  messages_question
-                | full_chain
-                # | p_chain
+                  pre_prompt
+                | p_chain
                 | StrOutputParser()
             )
             print("RAG CHAIN: ", rag_chain)
             
             logger.log_message("info", "Generation pipeline completed")
+            print(rag_chain.invoke(meta_data_main))
 
             return rag_chain
 
@@ -101,30 +117,15 @@ class GenerationPipeline:
             )
             print(my_exception)
 
-    def _get_prompt_flows(self, 
-                          system_str: str, 
-                          context_str: str, 
-                          question_str: str, 
-                          image_str: str, 
-                          video_str: str) -> Optional[ChatPromptTemplate]:
+    def _get_prompt_flows(self) -> Optional[ChatPromptTemplate]:
         try:
 
             logger.log_message("info", "Getting prompt flows started.")
 
-            prompt, data_prompt = self.prompt_flows.prompt_flows(
-                system_str=system_str,
-                context_str=context_str,
-                question_str=question_str,
-                image_str=image_str,
-                video_str=video_str
-            )
+            prompt= self.prompt_flows.prompt_flows()
 
             logger.log_message("info", "Getting prompt flows completed successfully.")
-            # print("\n\n")
-            # print(prompt)
-            # print("\n\n")
-            # print(data_prompt)
-            return prompt, data_prompt
+            return prompt
         
         except Exception as e:
             logger.log_message("warning", "Failed to get prompt flows: " + str(e))
@@ -139,7 +140,7 @@ class GenerationPipeline:
 
             logger.log_message("info", "Getting prompt llm started.")
 
-            prompt, data_prompt = self.prompt_flows.prompt_llm()
+            prompt = self.prompt_flows.prompt_llm()
 
             logger.log_message("info", "Getting prompt llm completed successfully.")
 
@@ -156,9 +157,11 @@ class GenerationPipeline:
     def _get_multimodal_generation(self, 
                                    prompt: Optional[ChatPromptTemplate],
                                    prompt_llm: Optional[ChatPromptTemplate],
+                                   question_str: Optional[str],
                                    image_url: Optional[str],
                                    video_url: Optional[str],
-                                   retriever: Optional[RunnablePassthrough]
+                                   retriever: Optional[RunnablePassthrough],
+                                   chat_history: Optional[BaseChatMessageHistory]
                                    ) -> Optional[RunnableSerializable]:
         try:
 
@@ -167,9 +170,11 @@ class GenerationPipeline:
             multimodal_generation = self.multimodal_generation.multimodal_generation(
                 prompt=prompt,
                 prompt_llm=prompt_llm,
+                question_str=question_str,
                 image_url=image_url,
                 video_url=video_url,
-                retriever=retriever
+                retriever=retriever,
+                chat_history=chat_history
             )
 
             logger.log_message("info", "Getting multimodal generation completed successfully.")
@@ -205,6 +210,39 @@ class GenerationPipeline:
                 error_details = sys,
             )
             print(my_exception)
+
+    def meta_data(self, 
+                  question_str: str,
+                  image_url: str,
+                  audio_url: str,
+                  response_retriever: Dict) -> Dict:
+
+        logger.log_message("info", "Getting meta data in generation pipeline started.")
+        def concat_function(docs):
+            return " ".join(str(key + "\n")  for doc, key in docs.items())
+        logger.log_message("info", "Getting pre prompt in generation pipeline started.")
+
+        return {
+                    # "chat_history":  chat_history,
+                    "context_str": concat_function(response_retriever) , 
+                    "question_str":  question_str[0],
+                    "image_url": image_url,
+                    "audio_url":  audio_url
+                } 
+    
+    def pre_prompt(self) -> RunnableParallel:
+        
+        logger.log_message("info", "Getting pre prompt in generation pipeline started.")
+
+        pre_prompt = RunnableParallel({
+            "context_str": RunnablePassthrough(itemgetter("context_str")),   
+            "question_str": RunnablePassthrough(itemgetter("question_str")),
+            "image_url": RunnablePassthrough(itemgetter("image_url")),
+            "audio_url": RunnablePassthrough(itemgetter("audio_url")),
+            "chat_history": itemgetter("chat_history"),
+        } ) 
+
+        return pre_prompt
 
 
 

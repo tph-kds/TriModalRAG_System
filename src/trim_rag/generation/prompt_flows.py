@@ -27,19 +27,22 @@ class PromptFlows:
         self.config = config
         self.variable_name = self.config.variable_name
 
-    def prompt_flows(self, 
-                     system_str: str,
-                     context_str: str,
-                     question_str: str,
-                     image_str: str,
-                     video_str: str) -> Optional[ChatPromptTemplate]:
+    def prompt_flows(self) -> Optional[ChatPromptTemplate]:
         try:
             logger.log_message("info", "Getting prompt flows started.")
             template =[
                 (   "system",
                     (
-                        "System: {system_str}"
+                        "System: You are a helpful assistant that helps you answer questions related to images and videos."
+
+                        "----------------------\n"
+                        "1. Determine the weather forcast: Decide on a weather that you were extracted from the context of the previous question and retriever data.\n"
+
+                        "2. Describe the basic weather features in contexts that are relevant: example 'Lightning and lightning accompanied by a heavy wind and drizzle', 'Thick snow covered houses and white roads throughout the area',...\n"
+
+                        "3. Provide some effective solution: The best way to avoid them and safe more positively when the weather become more seriously \n"
                         "---------------------\n"
+                       
                         "Context: {context_str}\n"
                         "---------------------\n"
                     )
@@ -49,12 +52,12 @@ class PromptFlows:
                 (
                     "user", 
                     (
-                        "{variable_name}: "
                         "Metadata for image: {image_str}\n"
                         "---------------------\n"
                         "Metadata for video: {video_str} \n"
                         "---------------------\n"
                         "Question: {question_str}\n"
+                        "---------------------\n"
                     )
                 ),
                     (
@@ -64,22 +67,9 @@ class PromptFlows:
             ]
 
             prompt = ChatPromptTemplate.from_messages(messages=template)
-            # prompt = prompt.format(system_str=system_str,
-            #                        context_str=context_str,
-            #                        image_str=image_str,
-            #                        video_str=video_str,
-            #                        question_str=question_str)
-            data_prompt = {
-                "system_str": system_str,
-                "context_str": context_str,
-                "image_str": image_str,
-                "video_str": video_str,
-                "question_str": question_str
-            }
-
 
             logger.log_message("info", "Getting prompt flows completed successfully.")
-            return prompt, data_prompt
+            return prompt
 
         except Exception as e:
             logger.log_message("warning", "Failed to get prompt flows: " + str(e))
@@ -118,7 +108,7 @@ class PromptFlows:
                     )
             ]
 
-            prompt = ChatPromptTemplate.from_messages(messages=template)
+            prompt = ChatPromptTemplate.from_messages(template)
 
             logger.log_message("info", "Getting prompt flows completed successfully.")
             return prompt
