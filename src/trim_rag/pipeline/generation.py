@@ -31,8 +31,7 @@ from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.ai import AIMessage
 from langchain_core.messages.base import BaseMessage
 
-from langchain_core.runnables import RunnableParallel
-from operator import itemgetter
+from langchain_core.runnables import Runnable
 
 
 class GenerationPipeline:
@@ -70,7 +69,8 @@ class GenerationPipeline:
                                 retriever: Optional[SequentialChain],
                                 image_url: Optional[str],
                                 video_url: Optional[str],
-                                query: Optional[str]
+                                question_str: Optional[str],
+                                query_str: Optional[str],
                                 ) -> SequentialChain:
         try: 
             logger.log_message("info", "Running generation pipeline...")
@@ -81,38 +81,74 @@ class GenerationPipeline:
             full_message = self._get_multimodal_generation(
                 prompt=prompt,
                 prompt_llm=prompt_llm,
-                question_str=query,
+                question_str=question_str,
                 image_url=image_url,
                 video_url=video_url,
                 retriever=retriever,
                 chat_history=self.chat_history
             )
+
+            # update chat history
+            def format_history(chat_history, input) -> List[BaseMessage]:
+                for key, text in input.items():
+                    key_str = key.split("_")[0]
+                    
+                    if key_str == "answer":
+                        chat_history.append(AIMessage(content=str(text)))
+                    else:
+                        chat_history.append(HumanMessage(content=str(text)))
+                return chat_history
+
+            self.chat_history = format_history(self.chat_history, full_message)
+
+            ## Get meta data for the question and response
             meta_data_main = self.meta_data(
-                question_str=query,
-                image_url=image_url,
-                audio_url=video_url,
-                response_retriever=full_message
+                question_str=query_str,
+                response_retriever=full_message,
+                chat_history=self.chat_history
             ) 
-            pre_prompt = self.pre_prompt()
-            p_chain = self.post_processing.post_processing(retriever=retriever,
-                                                            query=query)
             
-            rag_chain = (
-                  pre_prompt
-                | p_chain
-                | StrOutputParser()
+            # Get RAG CHAIN
+            rag_chain = self.post_processing.post_processing(
+                prompt=prompt
             )
+
             print("RAG CHAIN: ", rag_chain)
             
             logger.log_message("info", "Generation pipeline completed")
             print(rag_chain.invoke(meta_data_main))
 
-            return rag_chain
+            return rag_chain, meta_data_main
 
         except Exception as e:
             logger.log_message("warning", "Failed to run generation pipeline: " + str(e))
             my_exception = MyException(
                 error_message = "Failed to run generation pipeline: " + str(e),
+                error_details = sys,
+            )
+            print(my_exception)
+
+    def meta_data(self, question_str: Optional[str],
+                  response_retriever: Optional[Dict],
+                  chat_history: Optional[List[BaseMessage]]
+                  ) -> Dict:
+        try:
+
+            logger.log_message("info", "Getting meta data started.")
+
+            meta_data = self.post_processing.meta_data(
+                question_str=question_str,
+                response_retriever=response_retriever,
+                chat_history=chat_history
+            )
+
+            logger.log_message("info", "Getting meta data completed successfully.")
+            return meta_data
+        
+        except Exception as e:
+            logger.log_message("warning", "Failed to get meta data: " + str(e))
+            my_exception = MyException(
+                error_message = "Failed to get meta data: " + str(e),
                 error_details = sys,
             )
             print(my_exception)
@@ -189,18 +225,17 @@ class GenerationPipeline:
             print(my_exception)
 
     def _get_post_processing(self, 
-                             retriever, 
-                             query
-                             ) -> None:
+                             prompt: Optional[ChatPromptTemplate]
+                             ) -> Runnable:
         try:
 
             logger.log_message("info", "Getting post processing started.")
 
-            post_processing = self.post_processing.post_processing(retriever=retriever, 
-                                                                   query=query
-                                                                   )
+            post_processing = self.post_processing.post_processing(
+                prompt=prompt, 
+            )
 
-            logger.log_message("info", "Getting post processing completed successfully.")
+            logger.log_message("info", "Getting post processing completed successfully. Output is a main Runnable for the generation pipeline.")
             return post_processing
         
         except Exception as e:
@@ -211,38 +246,38 @@ class GenerationPipeline:
             )
             print(my_exception)
 
-    def meta_data(self, 
-                  question_str: str,
-                  image_url: str,
-                  audio_url: str,
-                  response_retriever: Dict) -> Dict:
+    # def meta_data(self, 
+    #               question_str: str,
+    #               image_url: str,
+    #               audio_url: str,
+    #               response_retriever: Dict) -> Dict:
 
-        logger.log_message("info", "Getting meta data in generation pipeline started.")
-        def concat_function(docs):
-            return " ".join(str(key + "\n")  for doc, key in docs.items())
-        logger.log_message("info", "Getting pre prompt in generation pipeline started.")
+    #     logger.log_message("info", "Getting meta data in generation pipeline started.")
+    #     def concat_function(docs):
+    #         return " ".join(str(key + "\n")  for doc, key in docs.items())
+    #     logger.log_message("info", "Getting pre prompt in generation pipeline started.")
 
-        return {
-                    # "chat_history":  chat_history,
-                    "context_str": concat_function(response_retriever) , 
-                    "question_str":  question_str[0],
-                    "image_url": image_url,
-                    "audio_url":  audio_url
-                } 
+    #     return {
+    #                 # "chat_history":  chat_history,
+    #                 "context_str": concat_function(response_retriever) , 
+    #                 "question_str":  question_str[0],
+    #                 "image_url": image_url,
+    #                 "audio_url":  audio_url
+    #             } 
     
-    def pre_prompt(self) -> RunnableParallel:
+    # def pre_prompt(self) -> RunnableParallel:
         
-        logger.log_message("info", "Getting pre prompt in generation pipeline started.")
+    #     logger.log_message("info", "Getting pre prompt in generation pipeline started.")
 
-        pre_prompt = RunnableParallel({
-            "context_str": RunnablePassthrough(itemgetter("context_str")),   
-            "question_str": RunnablePassthrough(itemgetter("question_str")),
-            "image_url": RunnablePassthrough(itemgetter("image_url")),
-            "audio_url": RunnablePassthrough(itemgetter("audio_url")),
-            "chat_history": itemgetter("chat_history"),
-        } ) 
+    #     pre_prompt = RunnableParallel({
+    #         "context_str": RunnablePassthrough(itemgetter("context_str")),   
+    #         "question_str": RunnablePassthrough(itemgetter("question_str")),
+    #         "image_url": RunnablePassthrough(itemgetter("image_url")),
+    #         "audio_url": RunnablePassthrough(itemgetter("audio_url")),
+    #         "chat_history": itemgetter("chat_history"),
+    #     } ) 
 
-        return pre_prompt
+    #     return pre_prompt
 
 
 

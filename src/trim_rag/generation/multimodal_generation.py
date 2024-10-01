@@ -162,9 +162,12 @@ class MultimodalGeneration:
 
             ## give them to additional chains in the main defined prompt above.
             full_response = {
-                "text": result_text,
-                "image": result_image,
-                "audio": result_audio
+                "question": question_str,
+                "text_answer": result_text,
+                "image": image_url,
+                "image_answer": result_image,
+                "audio": video_url,
+                "audio_answer": result_audio
             }
             
             # text_rag_chain: find embed relevant text from Qdrant
@@ -270,7 +273,7 @@ class MultimodalGeneration:
         return {
                     # "chat_history":  chat_history,
                     "context_str": test_function(retriever) , 
-                    "question_str":  question_str[0],
+                    "question_str":  question_str,
                     "system_str": system_str,
                     "type_str":  type_str,
                     "info_str":  info_str,

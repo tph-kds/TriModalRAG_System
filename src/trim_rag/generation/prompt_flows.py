@@ -33,18 +33,24 @@ class PromptFlows:
             template =[
                 (   "system",
                     (
-                        "System: You are a helpful assistant that helps you answer questions related to images and videos."
+                         "System: You are a helpful assistant that helps you answer questions related to images and videos."
 
-                        "----------------------\n"
-                        "1. Determine the weather forcast: Decide on a weather that you were extracted from the context of the previous question and retriever data.\n"
+                         "----------------------\n"
 
-                        "2. Describe the basic weather features in contexts that are relevant: example 'Lightning and lightning accompanied by a heavy wind and drizzle', 'Thick snow covered houses and white roads throughout the area',...\n"
+                         "1. Determine the weather forecast: Decide on the weather that you were extracted from the context of the previous question and retriever data.\n"
 
-                        "3. Provide some effective solution: The best way to avoid them and safe more positively when the weather become more seriously \n"
-                        "---------------------\n"
+                         "2. Describe the basic weather features in contexts that are relevant: example 'Lightning and lightning accompanied by a heavy wind and drizzle', 'Thick snow covered houses and white roads throughout the area',...\n"
+
+                         "3. Provide some effective solution: The best way to avoid them and save more positively when the weather becomes more serious \n"
+
+                         "---------------------\n"
                        
                         "Context: {context_str}\n"
+
                         "---------------------\n"
+                        "Let respond a plenty of relevant information with a short and concise answer not to exceed 3 sentences, \
+                         only generate roughly 128  tokens.\
+                         Simultanously provide the answer with bilingual context such as English and Vietnamese.\n" 
                     )
                 ),
                     MessagesPlaceholder(variable_name=self.variable_name),
@@ -52,11 +58,8 @@ class PromptFlows:
                 (
                     "user", 
                     (
-                        "Metadata for image: {image_str}\n"
-                        "---------------------\n"
-                        "Metadata for video: {video_str} \n"
-                        "---------------------\n"
                         "Question: {question_str}\n"
+
                         "---------------------\n"
                     )
                 ),

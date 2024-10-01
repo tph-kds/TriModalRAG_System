@@ -27,6 +27,7 @@ class UpperCaseRunnable(Runnable):
     
 def main( image_url=None, 
          video_url=None, 
+         question_str=None,
          query=None
          ):
     
@@ -59,21 +60,20 @@ def main( image_url=None,
         # text_embeddings = load_tensor(ROOT_PROJECT_DIR /  ("src/"  "artifacts/" + "data/" + "embeddings/text/text_embeddings.pt"))
         # image_embeddings = load_tensor(ROOT_PROJECT_DIR /  ("src/"  "artifacts/" + "data/" + "embeddings/image/image_embeddings.pt"))
         # audio_embeddings = load_tensor(ROOT_PROJECT_DIR /  ("src/"  "artifacts/" + "data/" + "embeddings/audio/audio_embeddings.pt"))
-        text_embed_query, image_embed_query, audio_embed_query = data_inference(query, image_url, video_url) 
+        # text_embed_query, image_embed_query, audio_embed_query = data_inference(query, image_url, video_url) 
         # inform data  retrieval stage of the pipeline
         # print(text_embed_query.tolist()[0])
         # _, _,  retriever = data_retriever(text_embed_query, image_embed_query, audio_embed_query)
         # print(retriever)
         retriever = ["hello", "world", "how", "are", "you", "today", "My", "name", "is", "John", "Doe"]
         # inform data  generation stage of the pipeline
-        rag_chain = data_generation(retriever, 
+        rag_chain, metadata = data_generation(retriever, 
                                     image_url,
                                     video_url,
+                                    question_str,
                                     query
                                     )
-        print(rag_chain.invoke({"query": query}))
-        
-        
+        print(rag_chain.invoke(metadata))
         
         logger.log_message("info", "All scenarios completed successfully.")
         logger.log_message("info", "<<<<<<<<   END ALL SCENARIOS   >>>>>>>>")
@@ -88,7 +88,9 @@ def main( image_url=None,
         print(my_exception)
 
 if __name__ == "__main__":
-    query = "What weather are you looking for?"
-    main(None, None, [query])
+    question_str = "Yagi's devastation and aftermath: A recap of Vietnam's biggest disaster in decades\
+            Typhoon Yagi, the most powerful storm to hit Vietnam in 30 years, unleashed devastating floods and landslides across northern provinces, leaving widespread destruction in its wake as shattered communities struggle to recover and rebuild."
+    query = "Does Typhoon Yagi have damages in Vietnam country and what is the damage?"
+    main(None, None, question_str, query)
     
 

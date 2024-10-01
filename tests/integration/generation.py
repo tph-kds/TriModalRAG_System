@@ -8,6 +8,7 @@ from src.trim_rag.pipeline import GenerationPipeline
 def data_generation(retriever=None, 
                     image_url=None, 
                     video_url=None, 
+                    question_str=None,
                     query=None
                     ):
     try:
@@ -24,7 +25,8 @@ def data_generation(retriever=None,
             retriever=retriever,
             image_url=image_url,
             video_url=video_url,
-            query=query
+            question_str=question_str,
+            query_str=query
         )
         # print(config)
         logger.log_message("info", "Data Generation pipeline completed successfully.")

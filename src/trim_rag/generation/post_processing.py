@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import Optional
+from typing import Dict, Optional
 
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
@@ -8,10 +8,18 @@ from src.trim_rag.config import PostProcessingArgumentsConfig
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_cohere import CohereRerank
-from langchain.chains import RetrievalQA
+from langchain.chains.retrieval_qa.base import RetrievalQA
 
 from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
-from langchain_community.llms import Cohere
+from langchain_cohere.llms import Cohere
+from src.trim_rag.generation.customRunnable import StringFormatterRunnable
+
+from langchain_core.runnables import RunnableParallel
+from operator import itemgetter
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough, Runnable
+from langchain_core.output_parsers import StrOutputParser
+
 
 
 # https://python.langchain.com/v0.2/docs/integrations/retrievers/cohere-reranker/
@@ -34,7 +42,8 @@ class PostProcessing:
         # get a new token: https://dashboard.cohere.ai/
         self.cohere_api_key = COHERE_API_KEY
 
-    def _get_llm(self):
+
+    def _get_llm(self) -> Cohere:
         try:
             logger.log_message("info", "Getting LLM is Cohere started.")
             llms = Cohere(temperature=self.temperature, 
@@ -54,42 +63,83 @@ class PostProcessing:
             )
             print(my_exception) 
         
-    def _get_retriever(self, retriever):
-        try:
-            logger.log_message("info", "Getting retriever in post processing started.")
-            compressor = CohereRerank(model=self.model_cohere)
+    # def _get_retriever(self, retriever):
+    #     # Older version of Cohere, so I don't use it for this project
+    #     try:
+    #         logger.log_message("info", "Getting retriever in post processing started.")
+    #         compressor = CohereRerank(model=self.model_cohere)
 
-            compression_retriever = ContextualCompressionRetriever(
-                base_compressor=compressor, 
-                base_retriever=retriever
-            )
+    #         compression_retriever = ContextualCompressionRetriever(
+    #             base_compressor=compressor, 
+    #             base_retriever=retriever
+    #         )
 
-            logger.log_message("info", "Getting retriever in post processing completed successfully.")
-            return compression_retriever
+    #         logger.log_message("info", "Getting retriever in post processing completed successfully.")
+    #         return compression_retriever
         
-        except Exception as e:
-            logger.log_message("warning", "Failed to get retriever in post processing: " + str(e))
-            my_exception = MyException(
-                error_message = "Failed to get retriever in post processing: " + str(e),
-                error_details = sys,
-            )
-            print(my_exception)
-    
+    #     except Exception as e:
+    #         logger.log_message("warning", "Failed to get retriever in post processing: " + str(e))
+    #         my_exception = MyException(
+    #             error_message = "Failed to get retriever in post processing: " + str(e),
+    #             error_details = sys,
+    #         )
+    #         print(my_exception)
 
-    def post_processing(self, retriever, query) -> None:
+    def pre_prompt(self) -> RunnableParallel:
+        
+        logger.log_message("info", "Getting pre prompt for post processing started.")
+
+        pre_prompt = RunnableParallel({
+            "context_str": RunnablePassthrough(itemgetter("context_str")),   
+            "question_str": RunnablePassthrough(itemgetter("question_str")),
+            # "image_url": RunnablePassthrough(itemgetter("image_url")),
+            # "audio_url": RunnablePassthrough(itemgetter("audio_url")),
+            "chat_history": itemgetter("chat_history"),
+        } ) 
+
+        return pre_prompt
+    
+    def meta_data(self, 
+                  question_str: str,
+                  response_retriever: Dict,
+                  chat_history: str) -> Dict:
+
+        logger.log_message("info", "Getting meta data in post processing started.")
+        def concat_function(docs):
+            return " ".join(str(doc) + " : " + str(key + "\n")  for doc, key in docs.items() if key != None)
+        logger.log_message("info", "Getting pre prompt in post processing started.")
+
+        return {
+                    "chat_history":  chat_history,
+                    "context_str": concat_function(response_retriever) , 
+                    "question_str":  question_str,
+                    # "image_url": image_url,
+                    # "audio_url":  audio_url
+                } 
+
+    def post_processing(self, 
+                        prompt: ChatPromptTemplate ) -> Runnable:
         try: 
             logger.log_message("info", "Post processing started.")
             llm = self._get_llm()
-            compression_retriever = self._get_retriever(retriever)
-            chain = RetrievalQA.from_chain_type(
-                llm=llm, 
-                retriever=compression_retriever
+            # compression_retriever = self._get_retriever(retriever)
+            # chain = RetrievalQA.from_chain_type(
+            #     llm=llm, 
+            #     retriever=compression_retriever
+            # )
+            pre_prompt = self.pre_prompt()
+
+            final_chain = ( 
+                pre_prompt 
+                | prompt 
+                | llm 
+                | StrOutputParser() 
             )
 
             logger.log_message("info", "Post processing completed successfully.")
 
             # return chain.run({"query": query})
-            return chain
+            return final_chain
         
         except Exception as e:
             logger.log_message("warning", "Failed to post processing: " + str(e))
@@ -98,6 +148,8 @@ class PostProcessing:
                 error_details = sys,
             )
             print(my_exception)
+
+
 
 
 # Step 5: Simulate a conversation
