@@ -46,10 +46,12 @@
 </p>
 
 ## :book: Contents
-* [Model Overview](#model-overview)
+* [Model Overview](#-model-overview)
     * [Introduction](#introduction)
     * [Architecture](#architecture)
-* [Getting Started](#getting-started)
+* [Getting Started](#-getting-started)
+    * [Installation](#shield-installation)
+    * [QuickStart](#fire-quickstart)
     * [Install Required Packages](#install-required-packages)
     * [Prepare the Training Data](#prepare-the-training-data)
     * [Models](#models)
