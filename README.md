@@ -13,7 +13,8 @@
         <img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg">
     </a>
     <a href="https://www.langchain.com/">
-        <img alt=" LangChain " src="https://github.com/tph-kds/image_storages/blob/f06866b8acfe588582fd8d12dbbf41ebb07250f5/images/svgs/TriModal_RAG/langchain_red.svg">
+        <img alt="Open In LangChain" src="https://github.com/tph-kds/image_storages/blob/f06866b8acfe588582fd8d12dbbf41ebb07250f5/images/svgs/TriModal_RAG/langchain_red.svg">
+        <img src="https://img.shields.io/badge/LangChain-8A2BE2">
     </a>
     <a href="https://github.com/tph-kds/TriModalRAG_System/">
         <img alt="Downloads" src="https://badges.frapsoft.com/os/v1/open-source.svg?v=103">
