@@ -23,7 +23,7 @@
 
 <h4 align="center">
     <p>
-        <a href="#contents">Content</a> |
+        <a href="#book-contents">Content</a> |
         <a href="#shield-installation">Installation</a> |
         <a href="#fire-quickstart">Quickstart</a> |
         <a href="#acknowledgements">Acknowledgements</a> |
