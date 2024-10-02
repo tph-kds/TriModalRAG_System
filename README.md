@@ -58,8 +58,8 @@
 * [Inference and Demo](#infer-and-demo)
     * [Results](#results)
     * [Deployment](#deployment)
-* [Acknowledgements](#acknowledgements)
-* [Future Plans](#future-plans)
+* [Acknowledgements](#v-acknowledgements)
+* [Future Plans](#star-future-plans)
 * [References](#references)
 
 
