@@ -26,7 +26,7 @@
         <a href="#book-contents">Content</a> |
         <a href="#shield-installation">Installation</a> |
         <a href="#fire-quickstart">Quickstart</a> |
-        <a href="#acknowledgements">Acknowledgements</a> |
+        <a href="#v-acknowledgements">Acknowledgements</a> |
         <a href="#references">References</a> |
         <a href="https://huggingface.co/vikenkd">Hugging Face</a>
         |
