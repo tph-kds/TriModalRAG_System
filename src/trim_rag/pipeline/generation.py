@@ -1,37 +1,32 @@
 import os
 import sys
+
 from typing import Dict, List, Optional, Tuple, Union
-
-from langchain.chains.sequential import SequentialChain
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.output_parsers import StrOutputParser
-
-
 
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
-
 from src.trim_rag.config import (
     MultimodalGenerationPipelineArgumentsConfig,
     MultiModelsArgumentsConfig,
     EmbeddingArgumentsConfig
 )
-
 from src.trim_rag.generation import (
     PromptFlows, 
     MultimodalGeneration,
     PostProcessing
 )
-
-from langchain_core.runnables.base import RunnableSerializable
+from langchain.chains.sequential import SequentialChain
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.messages.system import SystemMessage
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.ai import AIMessage
 from langchain_core.messages.base import BaseMessage
-
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables import Runnable
+from langchain_core.runnables.base import RunnableSerializable
+
 
 
 class GenerationPipeline:

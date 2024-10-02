@@ -1,39 +1,9 @@
 import os
 import sys
 import getpass
-from typing import Dict, List, Optional, Union
-
-
-from src.config_params.constants import COHERE_API_KEY
-from src.trim_rag.logger import logger
-from src.trim_rag.exception import MyException
-
-from src.trim_rag.config import (
-    MultimodalGenerationArgumentsConfig,
-    MultiModelsArgumentsConfig,
-    EmbeddingArgumentsConfig
-)
-from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
-from src.trim_rag.models import TextModel, ImageModel, AudioModel
-from langchain_qdrant import QdrantVectorStore
-from langchain_core.runnables import Runnable, RunnableParallel
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain.memory import ChatMessageHistory
-from src.trim_rag.models import (
-    TextModelRunnable, 
-    ImageModelRunnable, 
-    AudioModelRunnable
-)
-from langchain_cohere import ChatCohere
-from langchain_core.prompts.chat import HumanMessagePromptTemplate, SystemMessagePromptTemplate
-from langchain_core.prompts import ChatPromptTemplate
 
 from operator import itemgetter
-
-# from langchain_google_vertexai.chat_models import ChatVertexAI
-from langchain_google_genai import ChatGoogleGenerativeAI
+from typing import Dict, List, Optional, Union
 
 from src.config_params import (
     LANGCHAIN_ENDPOINT,
@@ -42,12 +12,37 @@ from src.config_params import (
     GOOGLE_API_KEY,
     LANGCHAIN_API_KEY
 )
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-# from langchain.chains import create_history_aware_retriever, create_retrieval_chain
+from src.config_params.constants import COHERE_API_KEY
+from src.trim_rag.logger import logger
+from src.trim_rag.exception import MyException
+from src.trim_rag.config import (
+    MultimodalGenerationArgumentsConfig,
+    MultiModelsArgumentsConfig,
+    EmbeddingArgumentsConfig
+)
+from src.trim_rag.models import (
+    TextModelRunnable, 
+    ImageModelRunnable, 
+    AudioModelRunnable
+)
+
+# from langchain_google_vertexai.chat_models import ChatVertexAI
 from langchain.chains.history_aware_retriever import create_history_aware_retriever
 from langchain.chains.combine_documents.stuff import create_stuff_documents_chain
 from langchain.chains.retrieval import create_retrieval_chain
+from langchain.memory import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import Runnable, RunnableParallel
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_qdrant import QdrantVectorStore
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+
 
 
 class MultimodalGeneration:

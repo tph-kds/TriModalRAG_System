@@ -1,24 +1,22 @@
 import os
 import sys
+from operator import itemgetter
 from typing import Dict, Optional
 
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 from src.trim_rag.config import PostProcessingArgumentsConfig
-
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_cohere import CohereRerank
-from langchain.chains.retrieval_qa.base import RetrievalQA
-
-from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
-from langchain_cohere.llms import Cohere
 from src.trim_rag.generation.customRunnable import StringFormatterRunnable
 
+from langchain.chains.retrieval_qa.base import RetrievalQA
+from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
+from langchain_cohere import CohereRerank
+from langchain_cohere.llms import Cohere
 from langchain_core.runnables import RunnableParallel
-from operator import itemgetter
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough, Runnable
 from langchain_core.output_parsers import StrOutputParser
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 
@@ -149,10 +147,3 @@ class PostProcessing:
             )
             print(my_exception)
 
-
-
-
-# Step 5: Simulate a conversation
-# query_1 = "What is the weather forecast for tomorrow?"
-# response_1 = tri_modal_rag.run(query_1, message_history=memory.load_memory_variables({}))
-# print(f"User: {query_1}\nSystem: {response_1}\n")

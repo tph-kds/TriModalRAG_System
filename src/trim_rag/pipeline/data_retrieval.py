@@ -1,17 +1,15 @@
 import os
 import sys
+
 from typing import List, Optional
-
-from langchain.chains.sequential import SequentialChain
-
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
-
 from src.trim_rag.retrieval import TriModalRetrieval
 from src.trim_rag.config import (
     TrimodalRetrievalPipelineArgumentsConfig,
     QdrantVectorDBArgumentsConfig
 )
+from langchain.chains.sequential import SequentialChain
 
 class DataRetrievalPipeline:
 

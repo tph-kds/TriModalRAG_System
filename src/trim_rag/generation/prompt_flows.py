@@ -9,6 +9,7 @@ from src.trim_rag.config import PromptFlowsArgumentsConfig
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
+## Example: 
 # prompt = "Here is a question that you should answer based on the given context. Write a response that answers the question using only information provided in the context. Provide the answer in Spanish."
 
 # context = """Water boils at 100°C (212°F) at standard atmospheric pressure, which is at sea level.

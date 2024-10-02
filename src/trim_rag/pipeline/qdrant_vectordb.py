@@ -5,9 +5,8 @@ from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 
 from src.trim_rag.config import QdrantVectorDBArgumentsConfig, PrepareDataQdrantArgumentsConfig
-from src.trim_rag.processing import PrepareDataQdrant
-
 from src.trim_rag.components.qdrant_db import QdrantVectorDB
+from src.trim_rag.processing import PrepareDataQdrant
 
 class QdrantVectorDBPipeline:
     def __init__(self, 
