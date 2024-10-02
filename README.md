@@ -1,21 +1,19 @@
 <p align="center">
     <a href="https://github.com/tph-kds/TriModalRAG_System
 /releases">
-        <img alt="GitHub release" src="https://img.shields.io/github/release/tph-kds/TriModalRAG_System
-.svg">
+        <img alt="GitHub release" src="https://img.shields.io/github/release/tph-kds/TriModalRAG_System.svg">
     </a>
     <a href="https://www.python.org/">
             <img alt="Build" src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg?color=purple">
     </a>
     <a href="https://github.com/tph-kds/TriModalRAG_System/blob/main/LICENSE">
-        <img alt="License" src="https://img.shields.io/github/license/tph-kds/TriModalRAG_System
-.svg?color=green">
+        <img alt="License" src="https://img.shields.io/github/license/tph-kds/TriModalRAG_System.svg?color=green">
     </a>
     <a href="https://colab.research.google.com/github/tph-kds/TriModalRAG_System/blob/main/docs/quickstart.ipynb">
         <img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg">
     </a>
     <a href="https://www.langchain.com/">
-        <img alt="LangChain" src="https://github.com/tph-kds/image_storages/blob/d9f4572f5a81690e26f6a0c65a163a6910982cd6/images/svgs/TriModal_RAG/langchain.png">
+        <img alt=" LangChain " src="https://github.com/tph-kds/image_storages/blob/f06866b8acfe588582fd8d12dbbf41ebb07250f5/images/svgs/TriModal_RAG/langchain_red.svg">
     </a>
     <a href="https://github.com/tph-kds/TriModalRAG_System/">
         <img alt="Downloads" src="https://badges.frapsoft.com/os/v1/open-source.svg?v=103">
