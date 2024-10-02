@@ -3,6 +3,10 @@
 /releases">
         <img alt="GitHub release" src="https://img.shields.io/github/release/tph-kds/TriModalRAG_System.svg">
     </a>
+    <a href="https://github.com/tph-kds/TriModalRAG_System
+/actions/workflows/ci.yaml">
+        <img alt="Github Testing" src="https://github.com/tph-kds/TriModalRAG_System/actions/workflows/ci.yaml/badge.svg">
+    </a>
     <a href="https://www.python.org/">
             <img alt="Build" src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg?color=purple">
     </a>

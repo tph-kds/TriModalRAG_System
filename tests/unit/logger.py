@@ -9,3 +9,4 @@ from src.trim_rag.logger import logger
 
 
 logger.log_message("info", "Hallo Welt!")
+

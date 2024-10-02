@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "trim-rag"
-version = "0.1.0"
+version = "0.0.1"
 description = "A MultiModal RAG."
 authors = ["Hung Tran"]
 license = "MIT"
@@ -15,10 +15,11 @@ uvicorn = "^0.14.0"
 
 [build-system]
 requires = ["poetry>=0.12", "setuptools >= 42.0", "wheel"]
-build-backend = "poetry.masonry.api"
-# build-backend = "setuptools.build_meta"
+# build-backend = "poetry.masonry.api"
+build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
+addopts = "--cov=trim_rag"
 testpaths = [
     "tests"
 ]
@@ -26,3 +27,15 @@ testpaths = [
 [tool.mypy]
 mypy_path  = "src"
 ignore_missing_imports = true
+check_untyped_defs = true
+disallow_any_generics = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+no_implicit_reexport = true
+
