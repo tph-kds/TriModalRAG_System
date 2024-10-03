@@ -17,7 +17,7 @@
         <img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg">
     </a>
     <a href="https://www.langchain.com/">
-        <img alt="Open In LangChain" src="https://github.com/tph-kds/image_storages/blob/f06866b8acfe588582fd8d12dbbf41ebb07250f5/images/svgs/TriModal_RAG/langchain_red.svg">
+        <img alt="Open In LangChain" src="readme/images/langchain_red.svg">
         <img src="https://img.shields.io/badge/LangChain-8A2BE2">
     </a>
     <a href="https://github.com/tph-kds/TriModalRAG_System/">
@@ -40,7 +40,7 @@
 
 <h1 align="center">TriModal Ritrieval Augmented Generation - TriModalRAG</h1>
 <p align="center">
-  <img align="center" src="https://github.com/tph-kds/image_storages/blob/ac4db01000f4603602be502753adea6724183f1b/images/svgs/TriModal_RAG/logo.png" width="1200">
+  <img align="center" src="readme/images/logo.png" width="1200">
 </p>
 
 # Tripple Model + Langchain: Find and support users in providing solutions for weather data
@@ -84,7 +84,7 @@ The primary goal of this system is to enhance traditional information retrieval 
 
 
 <p align="center">
-  <img align="center" src="https://github.com/tph-kds/image_storages/blob/409dbcf62bbb3ad13e7e02ab323d332d85702487/images/svgs/TriModal_RAG/architecture.png" width="800">
+  <img align="center" src="readme/images/architecture.png" width="800">
   
 </p>
 
@@ -115,25 +115,6 @@ This is a small example program you can run to see `trim_rag` in action!
 
 ```python
 
-from datasets import Dataset 
-import os
-from ragas import evaluate
-from ragas.metrics import faithfulness, answer_correctness
-
-os.environ["OPENAI_API_KEY"] = "your-openai-key"
-
-data_samples = {
-    'question': ['When was the first super bowl?', 'Who won the most super bowls?'],
-    'answer': ['The first superbowl was held on Jan 15, 1967', 'The most super bowls have been won by The New England Patriots'],
-    'contexts' : [['The First AFL–NFL World Championship Game was an American football game played on January 15, 1967, at the Los Angeles Memorial Coliseum in Los Angeles,'], 
-    ['The Green Bay Packers...Green Bay, Wisconsin.','The Packers compete...Football Conference']],
-    'ground_truth': ['The first superbowl was held on January 15, 1967', 'The New England Patriots have won the Super Bowl a record six times']
-}
-
-dataset = Dataset.from_dict(data_samples)
-
-score = evaluate(dataset,metrics=[faithfulness,answer_correctness])
-score.to_pandas()
 ```
 
 ### Install Required Packages
