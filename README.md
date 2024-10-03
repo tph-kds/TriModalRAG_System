@@ -133,7 +133,7 @@ chmod +x init_setup.sh
 bash init_setup.sh
 ```
 
-To be detailed requirements on [Pypi Website](https://pypi.org/project/pip/)
+To be detailed requirements on [Pypi Website](https://pypi.org/project/trim-rag/)
 
 **The required supportive environment uses a hardware accelerator GPUs such as T4 of Colab, GPU A100, etc.**
 
