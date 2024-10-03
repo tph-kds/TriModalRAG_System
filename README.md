@@ -75,10 +75,10 @@ The TriModal Retrieval-Augmented Generation (T-RAG) Project is an advanced AI sy
 
 The primary goal of this system is to enhance traditional information retrieval by integrating cross-modal knowledge, a fusion mechanism enabling the model to retrieve and generate accurate, context-aware responses that span multiple data types. Whether the task involves answering questions based on text, recognizing patterns in images, or interpreting sounds, the TriModal RAG framework is designed to handle and fuse these distinct types of data into a unified response.
 
-<p align="center">
+<!-- <p align="center">
   <img align="center" src="" width="800">
   
-</p>
+</p> -->
 
 ### Architecture
 
@@ -101,7 +101,7 @@ pip install trimodal-rag
 Alternatively, from source:
 
 ```bash
-pip install https://github.com/tph-kds/TriModalRAG_System.git
+git clone https://github.com/tph-kds/TriModalRAG_System.git
 ```
 
 Or using docker container with our image, you can run:
