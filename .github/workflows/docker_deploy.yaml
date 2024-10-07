@@ -1,0 +1,78 @@
+name: pipeline_deplpoy
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - 'README.md'  
+
+  pull_request:
+    branches: ["main"]
+    paths-ignore:
+      - 'README.md'
+
+permissions:
+  contents: read
+
+env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      IMAGE_TAG: latest
+      STREAMLIT_DOCKERHUB: trimrag-streamlit
+      GRADIO_DOCKERHUB: trimrag-gradio
+
+jobs:
+  deploy:
+    name: Build , Push && Deploy Image From Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+    
+      - name: setup docker buildx
+        uses: docker/setup-buildx-action@v2
+    
+      - name: docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      # - name: build and push api
+      #   id: build-push-api
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     context: .
+      #     file: Dockerfile
+      #     push: true
+      #     tags: <your-dockerhub-username>/<your-dockerhub-repo>:<image-tag>
+
+      - name: build and push streamlit
+        id: build-push-streamlit
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: serving/streamlit/Dockerfile.streamlit
+          push: true
+          tags: ${{ env.DOCKERHUB_USERNAME }}/${ env.STREAMLIT_DOCKERHUB }:${ env.IMAGE_TAG }
+          buildargs: BUILDKIT_INLINE_CACHE=1
+      
+      - name: build and push gradio
+        id: build-push-gradio
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: serving/gradio/Dockerfile.gradio
+          push: true
+          tags: ${{ env.DOCKERHUB_USERNAME }}/${ env.GRADIO_DOCKERHUB }:${ env.IMAGE_TAG }
+          buildargs: BUILDKIT_INLINE_CACHE=1
+
+      - name: Run docker-compose
+        id: run-docker-compose
+        uses: hoverkraft-tech/compose-action@v2.0.1
+        with:
+          compose-file: "./docker-compose.yaml"
+          services: |
+            streamlit
+            gradio
+

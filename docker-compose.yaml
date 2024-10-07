@@ -1,0 +1,86 @@
+version: "3.7"
+
+services:
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    environment:
+      - WATCHTOWER_CLEANUP=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 express_starter
+  # qdrant:
+  #   image: qdrant/qdrant:latest
+  #   ports:
+  #     - 6333:6333
+  #   restart: unless-stopped
+  #   environment:
+  #     - QDRANT_API_KEY=${QDRANT_API_KEY}
+  #     - QDRANT_HOST=${QDRANT_HOST}
+  #     - QDRANT_PORT=${QDRANT_PORT}
+  #     - QDRANT_PROTOCOL=${QDRANT_PROTOCOL}
+  #     - QDRANT_TIMEOUT=${QDRANT_TIMEOUT}
+  #     - QDRANT_GRPC_TIMEOUT=${QDRANT_GRPC_TIMEOUT}
+  #     - QDRANT_MAX_CONNECTIONS=${QDRANT_MAX_CONNECTIONS}
+  #     - QDRANT_MAX_IDLE_CONNECTIONS=${QDRANT_MAX_IDLE_CONNECTIONS}
+  #     - QDRANT_MAX_BUFFER_SIZE=${QDRANT_MAX_BUFFER_SIZE}
+  #     - QDRANT_MAX_HEADER_LIST_SIZE=${QDRANT_MAX_HEADER_LIST_SIZE}
+  #     - QDRANT_MAX_INFLIGHT_REQUESTS=${QDRANT_MAX_INFLIGHT_REQUESTS}
+  #     - QDRANT_MAX_INFLIGHT_CONCURRENCY=${QDRANT_MAX_INFLIGHT_CONCURRENCY}
+  #     - QDRANT_MAX_RESPONSE_SIZE=${QDRANT_MAX_RESPONSE_SIZE}  
+  #   volumes:
+  #     - ./data:/qdrant/data
+
+
+  gradio:
+    image: ${ secrets.DOCKERHUB_USERNAME }/trimrag-gradio:latest
+    ports:
+      - 7860:7860
+    restart: unless-stopped
+    environment:
+      - GRADIO_SERVER_NAME=${GRADIO_SERVER_NAME}
+      - GRADIO_PORT=${GRADIO_PORT}
+      - GRADIO_SERVER_PORT=${GRADIO_SERVER_PORT}
+      - GRADIO_AUTH=${GRADIO_AUTH}
+      - GRADIO_AUTH_UID=${GRADIO_AUTH_UID}
+      - GRADIO_AUTH_PW=${GRADIO_AUTH_PW} 
+    expose:
+      - 7860
+    networks:
+      - gradio_network
+    volumes:
+      - ./data:/data
+
+
+  streamlit:
+    image: ${ secrets.DOCKERHUB_USERNAME }/trimrag-streamlit:latest
+    ports:
+      - 8501:8501
+    restart: unless-stopped
+    environment:
+      - STREAMLIT_SERVER_NAME=${STREAMLIT_SERVER_NAME}
+      - STREAMLIT_PORT=${STREAMLIT_PORT}
+      - STREAMLIT_SERVER_PORT=${STREAMLIT_SERVER_PORT}
+      - STREAMLIT_AUTH=${STREAMLIT_AUTH}
+      - STREAMLIT_AUTH_UID=${STREAMLIT_AUTH_UID}
+      - STREAMLIT_AUTH_PW=${STREAMLIT_AUTH_PW} 
+    expose:
+      - 8501
+    networks:
+      - streamlit_network
+
+    volumes:
+      - ./data:/data
+
+
+
+networks:
+  streamlit_network:
+    driver: bridge
+  gradio_network:
+    driver: bridge
+
+
+# Here, we are pulling the watchtower image and running it in our machine. You can specify as many container names you want separated by a space in the command key. This watchtower container will scan the repository of specified container names every 30 seconds pull and replace the running container with a new image if it finds one.
+
+# The WATCHTOWER_CLEANUP environment variables ensures that the unused images will be automatically removed by watchtower, hence freeing up our storage space.
