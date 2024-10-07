@@ -28,15 +28,15 @@ test:
 install:
 	@$(PIP) install -r requirements.txt
 
-# message ?= "fix: test" 
-# status ?= true
-# branch ?= main
+message ?= "fix: test" 
+status ?= true
+branch ?= main
 
-args = $(foreach a,$($(subst -,_,$1)_args),$(if $(value $a),$a="$($a)"))
+# args = $(foreach a,$($(subst -,_,$1)_args),$(if $(value $a),$a="$($a)"))
 
-rule1_args = message
-rule2_args = status
-rule3_args = branch
+# rule1_args = message
+# rule2_args = status
+# rule3_args = branch
 
 .PHONY: git_push
 git_add:
