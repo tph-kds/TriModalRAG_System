@@ -11,7 +11,8 @@ from src.trim_rag.exception import MyException
 from src.trim_rag.generation import MultimodalGeneration
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain.memory import ConversationBufferMemory
-from langchain.vectorstores import Qdrant
+# from langchain.vectorstores import Qdrant
+from langchain_community.vectorstores import Qdrant
 
 
 

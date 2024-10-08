@@ -1,10 +1,15 @@
 import sys
+from typing import Optional
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 from src.trim_rag.config import ConfiguarationManager
-from src.trim_rag.inference import DataInference
+from src.trim_rag.pipeline import InferencePipeline
+from src.config_params import ROOT_PROJECT_DIR
 
-def data_inference(text, image, audio, type_embedding="shared"):
+
+def data_inference(text: Optional[str], 
+                   image: Optional[str], 
+                   audio: Optional[str]): 
 
     try:
         logger.log_message("info", "")
@@ -15,12 +20,16 @@ def data_inference(text, image, audio, type_embedding="shared"):
         
         config_embed = config_manager.get_data_embedding_arguments_config()
 
-        data_trans = DataInference(config, config_embed)
-        text_embeddings, image_embeddings, audio_embeddings = data_trans._embed_data(
-            text_data=text, 
-            image_data=image, 
-            audio_data=audio, 
-            type_embed=type_embedding
+        config_process = config_manager.get_data_processing_arguments_config()
+
+        data_trans = InferencePipeline(config=config, 
+                                        config_embedding=config_embed,
+                                        config_processing=config_process)
+        
+        text_embeddings, image_embeddings, audio_embeddings = data_trans.run_inference(
+            text=text, 
+            image=image, 
+            audio=audio, 
             )
 
 
@@ -40,7 +49,15 @@ def data_inference(text, image, audio, type_embedding="shared"):
         print(my_exception)
 
 
-# if __name__ == "__main__":
-#     data_embedding()
+if __name__ == "__main__":
+    from PyPDF2 import PdfReader
 
+    text = ROOT_PROJECT_DIR /  ("data/test/file.pdf")
+    image = ROOT_PROJECT_DIR / ("data/test/images.jpg")
+    audio = ROOT_PROJECT_DIR / ("data/test/audio_lighting.mp3")
+
+    text_embedding, image_embedding, audio_embedding = data_inference(str(text), str(image), str(audio))
+    print("Text Embedding: ", text_embedding)
+    print("Image Embedding: ", image_embedding)
+    print("Audio Embedding: ", audio_embedding)
 

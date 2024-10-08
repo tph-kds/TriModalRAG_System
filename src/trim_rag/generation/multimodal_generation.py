@@ -30,7 +30,8 @@ from src.trim_rag.models import (
 from langchain.chains.history_aware_retriever import create_history_aware_retriever
 from langchain.chains.combine_documents.stuff import create_stuff_documents_chain
 from langchain.chains.retrieval import create_retrieval_chain
-from langchain.memory import ChatMessageHistory
+# from langchain.memory import ChatMessageHistory
+from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.output_parsers import StrOutputParser

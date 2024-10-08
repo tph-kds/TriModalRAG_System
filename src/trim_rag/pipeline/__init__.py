@@ -4,6 +4,7 @@ from src.trim_rag.pipeline.data_embedding import DataEmbeddingPipeline
 from src.trim_rag.pipeline.qdrant_vectordb import QdrantVectorDBPipeline
 from src.trim_rag.pipeline.data_retrieval import DataRetrievalPipeline
 from src.trim_rag.pipeline.generation import GenerationPipeline
+from src.trim_rag.pipeline.inference import InferencePipeline
 
 __all__ = [
     "DataIngestionPipeline",
@@ -11,5 +12,6 @@ __all__ = [
     "DataEmbeddingPipeline",
     "QdrantVectorDBPipeline",
     "DataRetrievalPipeline",
-    "GenerationPipeline"
+    "GenerationPipeline",
+    "InferencePipeline"
 ]

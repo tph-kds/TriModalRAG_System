@@ -59,6 +59,14 @@ else
 
 endif 
 
+.PHONY: sl_app # Streamlit App
+sl_app:
+	streamlit run serving/streamlit_app.py
+
+.PHONY: gr_app # Gradio App
+gr_app:
+	gradio run serving/gradio.app.py
+
 .PHONY: custom_task
 custom_task:
 	@echo "Custom message: ${message}"
