@@ -73,13 +73,15 @@ class TriModalRetrieval:
 
             if text_embedding_query is not None:
                 # Retrieve text embeddings
+                print(text_embedding_query.shape)
                 text_embedding = tex_retrieval.text_retrieval(text_embedding_query)
                 vector_text = text_embedding[0].vector # get the vector after retrieval from qdrant
                 vector_text = torch.tensor(vector_text) # convert to tensor 
                 logger.log_message("info", "Retrieved text embeddings successfully")
 
             else:
-                text_embedding = None
+                vector_text = None
+
             if image_embedding_query is not None:
                 # Retrieve image embeddings
                 image_embedding = img_retrieval.image_retrieval(image_embedding_query)
@@ -88,7 +90,7 @@ class TriModalRetrieval:
                 logger.log_message("info", "Retrieved image embeddings successfully")
 
             else:
-                image_embedding = None
+                vector_image = None
             if audio_embedding_query is not None:
                 # Retrieve audio embeddings
                 audio_embedding = aud_retrieval.audio_retrieval(audio_embedding_query)
@@ -97,19 +99,25 @@ class TriModalRetrieval:
                 logger.log_message("info", "Retrieved audio embeddings successfully")
 
             else:
-                audio_embedding = None
+                vector_audio = None
 
             # Fusion
             # print(text_embedding[0].vector)
             # print(text_embedding[0].points.vector)
             # print(vector_text)
-            fusion = fusion_mechanism(vector_text, vector_image, vector_audio)
+
+
+            fusion = fusion_mechanism(text_results=vector_text, 
+                                      image_results=vector_image, 
+                                      audio_results=vector_audio)
 
             # chain = SequentialChain(input_variables=["text", "image", "audio"],
             #                         chains = [tex_retrieval, img_retrieval, aud_retrieval, fusion_mechanism],
             #                         output_variables=["fusion_matrix"],)
-            chain = None
-            return chain, fusion, text_embedding, image_embedding, audio_embedding
+            # Change shape of fusion to torch.Size([n_sample, 512])
+            fusion = torch.mean(fusion, dim=1) # =>> torch.Size([3, 512])
+            # print(fusion.shape)
+            return fusion, text_embedding, image_embedding, audio_embedding
 
         except Exception as e:
             logger.log_message("warning", f"Error retrieving embeddings: {e}")

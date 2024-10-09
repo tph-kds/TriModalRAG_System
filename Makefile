@@ -24,6 +24,10 @@ endef
 test: 
 	python tests/integration/main.py
 
+.PHONY: qt
+qt: 
+	python tests/integration/quick_start.py
+
 .PHONY: install
 install:
 	@$(PIP) install -r requirements.txt

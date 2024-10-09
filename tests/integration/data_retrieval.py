@@ -5,7 +5,9 @@ from src.trim_rag.exception import MyException
 from src.trim_rag.config import ConfiguarationManager
 from src.trim_rag.pipeline import DataRetrievalPipeline
 from src.config_params import QDRANT_DB_URL, QDRANT_API_KEY
-from src.trim_rag.retrieval import Retrieval_VectorStore
+from src.trim_rag.retrieval import Retrieval_VectorStore, RetrieverQuery
+from src.trim_rag.components import QdrantVectorDB
+
 
 
 def data_retriever(
@@ -21,28 +23,45 @@ def data_retriever(
         config = config_manager.get_retrieval_config()
         qdrant_config = config_manager.get_qdrant_vectordb_arguments_config()
         embed_config = config_manager.get_data_embedding_arguments_config()
+        client = QdrantVectorDB(qdrant_config,
+                                     QDRANT_API_KEY,
+                                     QDRANT_DB_URL
+                                     )._connect_qdrant()
+        
         pipeline = DataRetrievalPipeline(config, 
                                          qdrant_config,
                                          QDRANT_API_KEY=QDRANT_API_KEY,
                                          QDRANT_DB_URL=QDRANT_DB_URL
                                          )
         
-        chain_retrieval, fusion= pipeline.run_data_retrieval_pipeline(text_embedding_query=text_embedding_query,
+        retrieved_fusion, retriever_text, retriever_image, retriever_audio = pipeline.run_data_retrieval_pipeline(text_embedding_query=text_embedding_query,
                                                                image_embedding_query=image_embedding_query,
                                                                audio_embedding_query=audio_embedding_query
                                                                )
-        print("Hung")
-        vector_store = Retrieval_VectorStore(qdrant_config, embed_config.text_data)
-        print("Hung123")
-    
-        retriever_text = vector_store._get_vector_store(name_collection="retriever_text")
-        retriever = retriever_text.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+        # vector_store = Retrieval_VectorStore(qdrant_config, embed_config.text_data)
+        vector_store = RetrieverQuery(config=config.trimodal_retrieval.text_retrieval, 
+                                      config_qdrant= qdrant_config,
+                                      client=client
+                                      )
+        main_retriever = vector_store.as_retriever(
+            collection_name="text", 
+            query_embedding=retrieved_fusion, 
+            k=5
+        )
+        # retriever_text = vector_store._get_vector_store(name_collection="text")
+        # retriever_text = retriever_text.as_retriever(search_type="similarity", search_kwargs={"k": 5})
 
+        # retriever_image = vector_store._get_vector_store(name_collection="image")
+        # retriever_image = retriever_image.as_retriever(search_type="similarity", search_kwargs={"k": 5})
 
+        # retriever_audio = vector_store._get_vector_store(name_collection="audio")
+        # retriever_audio = retriever_audio.as_retriever(search_type="similarity", search_kwargs={"k": 1})
+        
+        # retriever = retriever_text & retriever_image & retriever_audio
         logger.log_message("info", "Data Retriever pipeline completed successfully.")
         logger.log_message("info", "<<<<<<<<   END DATA RETRIEVER SCENARIO   >>>>>>>>")
         logger.log_message("info", "")
-        return chain_retrieval, fusion, retriever
+        return main_retriever, retriever_text, retriever_image, retriever_audio
 
     except Exception as e:
         logger.log_message("warning", "Failed to run Data Retriever pipeline: " + str(e))

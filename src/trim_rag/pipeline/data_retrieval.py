@@ -39,13 +39,14 @@ class DataRetrievalPipeline:
                                                      QDRANT_API_KEY=self.QDRANT_API_KEY,
                                                      QDRANT_DB_URL=self.QDRANT_DB_URL
                                                     )
-            chain_retrieval, fusion, _, _, _ = tri_modal_retrieval.trimodal_retrieval(text_embedding_query=text_embedding_query,
-                                                                      image_embedding_query=image_embedding_query,
-                                                                      audio_embedding_query=audio_embedding_query
-                                                                      )
+            retrieved_fusion, retrieved_text, retrieved_image, retrieved_audio = tri_modal_retrieval.trimodal_retrieval(
+                text_embedding_query=text_embedding_query,
+                image_embedding_query=image_embedding_query,
+                audio_embedding_query=audio_embedding_query
+            )
             logger.log_message("info", "Data retrieval pipeline completed")
         
-            return chain_retrieval, fusion
+            return retrieved_fusion, retrieved_text, retrieved_image, retrieved_audio
 
         except Exception as e:
             logger.log_message("warning", "Failed to run data retrieval pipeline: " + str(e))

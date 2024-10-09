@@ -32,11 +32,14 @@ class ImageRetrieval:
             #     limit=5  # Get top 5 most similar images,
 
             # )
-            results = self.client.query_points(
+            results = self.client.search(
                 collection_name=self.name_collection,
-                query=query_embedding.tolist(),
-                limit=3,
-            ).points
+                query_vector=query_embedding.tolist()[0],
+                # with_payload=["text"],
+                limit=5,  # Get top 5 most similar texts,
+                with_vectors=True,
+
+            )
             logger.log_message("info", "Retrieved image embeddings successfully")
             return results
         

@@ -34,7 +34,6 @@ class FusionMechanism(nn.Module):
         :param audio_results: List of (id, score) tuples for audio retrieval.
         :return: Fused results as a list of (id, fused_score) tuples.
         """
-        print("test")
         if text_results != None:
             # Perform modality aligner
             text = self.modality_aligner(text_results)
@@ -52,7 +51,7 @@ class FusionMechanism(nn.Module):
 
         if audio_results != None:
             audio = self.modality_aligner(audio_results)
-            audio = self.attention_fusion(audio)
+            audio = self.attention_fusion(audio, audio, audio)
 
         else:   
             audio = audio_results
@@ -65,7 +64,6 @@ class FusionMechanism(nn.Module):
 
         finally_fused_results = self.modality_aligner(fused_results)
         finally_fused_results = nn.Dropout(self.dropout)(finally_fused_results)
-        print("Húngdsdsd")
 
         return finally_fused_results
 

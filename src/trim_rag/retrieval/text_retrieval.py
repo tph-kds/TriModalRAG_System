@@ -56,7 +56,7 @@ class TextRetrieval:
                 collection_name=self.name_collection,
                 query_vector=query_embedding.tolist()[0],
                 # with_payload=["text"],
-                limit=1,  # Get top 5 most similar texts,
+                limit=5,  # Get top 5 most similar texts,
                 with_vectors=True,
 
             )

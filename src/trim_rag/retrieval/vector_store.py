@@ -12,7 +12,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 # from langchain_openai import OpenAIEmbeddings
 # from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from src.config_params import QDRANT_DB_URL, QDRANT_API_KEY
 from src.trim_rag.embedding import TextEmbedding
 from src.trim_rag.config import TextEmbeddingArgumentsConfig
@@ -68,7 +68,6 @@ class Retrieval_VectorStore:
             #     api_key=api_key,
             #     collection_name="my_documents",
             # )
-            print("test")
             logger.log_message("info", "Retrieved vector store successfully")
             return vector_store
 

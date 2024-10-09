@@ -1,4 +1,5 @@
 import sys
+from PyPDF2 import PdfReader
 from typing import Optional
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
@@ -50,7 +51,6 @@ def data_inference(text: Optional[str],
 
 
 if __name__ == "__main__":
-    from PyPDF2 import PdfReader
 
     text = ROOT_PROJECT_DIR /  ("data/test/file.pdf")
     image = ROOT_PROJECT_DIR / ("data/test/images.jpg")
