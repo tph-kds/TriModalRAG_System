@@ -145,6 +145,7 @@ or
 
 ```
 
+
 > [!NOTE]
 > You could also check step by step of this project's workflow such as Data Ingestion, Data Processing, and more... in the `tests/integration` folder .
 
