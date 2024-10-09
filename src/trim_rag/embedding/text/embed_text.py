@@ -76,7 +76,7 @@ class TextEmbedding:
             )
             print(my_exception)
 
-    def get_bert_embeddings(self, text) -> Tuple[Optional[torch.Tensor], Optional[List[torch.Tensor]]] :
+    def get_bert_embeddings(self, text: str) -> Tuple[Optional[torch.Tensor], Optional[List[torch.Tensor]]] :
         try:
             logger.log_message("info", f"Getting {self.pretrained_model_name.split('-')[0].upper()} embeddings ...")
             tokenizer = self._get_tokenizer()

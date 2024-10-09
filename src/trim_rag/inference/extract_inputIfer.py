@@ -21,7 +21,6 @@ class TextDataInference(TextTransform):
         try:
             logger.log_message("info", "Pre-Processing text data in inference phase started.")
             text = self._extract_text_from_pdf(pdf_path=input)
-            print("error")
             text = self._normalize_text(text)
             text = self._remove_stopwords(text)
             text = self._lemmatize_text(text)

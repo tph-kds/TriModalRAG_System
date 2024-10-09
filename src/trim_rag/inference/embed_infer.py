@@ -22,7 +22,7 @@ class EmbeddingTextInference(TextEmbedding):
         try:
             logger.log_message("info", "Embedding text in the Inference Phase started.")
             tokenizer = self._get_tokenizer()
-            embeddings, input_ids = self.get_bert_embeddings(input)
+            embeddings, input_ids = self.get_bert_embeddings(text=input[0])
             logger.log_message("info", "Embedding text in the Inference Phase completed successfully.")
             # Convert input IDs back to tokens (for verification)
             tokens = tokenizer.convert_ids_to_tokens(input_ids[0])

@@ -187,7 +187,7 @@ class Inference:
         try:
             logger.log_message("info", "Data embedding in the Inference phase started.")
 
-            text_embeds = self.text_embedding(text=text)
+            text_embeds, token_ids = self.text_embedding(text=text)
             image_embeds = self.image_embedding(image=image)
             audio_embeds = self.audio_embedding(audio=audio)
             print(f" TEXT EMBEDS:  {text_embeds.shape}", 
@@ -195,10 +195,10 @@ class Inference:
                   f" AUDIO EMBEDS: {audio_embeds.shape}")
 
 
-            text_new_embeddings, image_new_embeddings, audio_new_embeddings = self.shared_embedding_space(text_embeds[0],
+            text_new_embeddings, image_new_embeddings, audio_new_embeddings = self.shared_embedding_space(text_embeds,
                                                                                                           image_embeds,
                                                                                                           audio_embeds)
-            textnew_embed = (text_new_embeddings, text_embeds[1])
+            textnew_embed = (text_new_embeddings, token_ids)
             logger.log_message("info", "Data embedding in the Inference phase completed successfully.")
             return textnew_embed,  image_new_embeddings, audio_new_embeddings
 
@@ -215,11 +215,16 @@ class Inference:
             logger.log_message("info", "Text embedding in the Inference phase started.")
             textEmbedding = EmbeddingTextInference(config=self.text_data)
             tokens = []
-            embedding_text, token_list = textEmbedding.embedding_text(text)
-            tokens.append(token_list)
-            # self.text_embeddings.append(embedding_text)
-            # self.text_embeddings = self.text_embeddings[0]
-            self.text_embeddings = embedding_text
+            for i, tx in enumerate(text):
+                embedding_text, token_list = textEmbedding.text_embedding(input=tx)
+                tokens.append(token_list)
+                if i == 0:
+                    self.text_embeddings.append(embedding_text)
+                else:
+                    # torch.Size([20, 512, 768]) + torch.Size([18, 512, 768]) = torch.Size([38, 512, 768])
+                    self.text_embeddings = torch.cat((self.text_embeddings[0], embedding_text), dim=0)
+                if len(text) == 1:
+                    self.text_embeddings = self.text_embeddings[0]
             logger.log_message("info", "Text embedding in the Inference phase completed successfully.")
             text_tensors_flatten = torch.tensor(self.text_embeddings).squeeze(1) # torch.Size([n_texts, 512, 768])
             pooled_text_tensors = torch.mean(text_tensors_flatten, dim=1) # torch.Size([n_texts, 768])
@@ -239,7 +244,8 @@ class Inference:
         try:
             logger.log_message("info", "Image embedding in the Inference phase started.")
             imageEmbedding = EmbeddingImageInference(config=self.image_data)
-            self.image_embeddings.append(imageEmbedding.embedding_image(image))
+            for ig in image:
+                self.image_embeddings.append(imageEmbedding.image_embedding(ig))
             
             logger.log_message("info", "Image embedding in the Inference phase completed successfully.")  
             image_embed = torch.tensor(self.image_embeddings) # torch.Size([n_images, 1, 512])
@@ -261,11 +267,18 @@ class Inference:
         try:
             logger.log_message("info", "Audio embedding in the Inference phase started.")
             audioEmbedding = EmbeddingAudioInference(config=self.audio_data)
-            embedding_audio = audioEmbedding.embedding_audio(audio)  
-            mean_tensor = torch.mean(torch.tensor(embedding_audio), dim=1) # [1, 768]
-            # self.audio_embeddings.append(mean_tensor)
-            # self.audio_embeddings = self.audio_embeddings[0]
-            self.audio_embeddings = mean_tensor
+            for i, aud in enumerate(audio):
+                embedding_audio = audioEmbedding.audio_embedding(input=aud)  
+                mean_tensor = torch.mean(torch.tensor(embedding_audio), dim=1) # [1, 768]
+                if i == 0:
+                    self.audio_embeddings.append(mean_tensor)
+                    # print(torch.tensor((self.audio_embeddings[0])).shape)
+                else:
+                    # torch.Size([20, 512, 768]) + torch.Size([18, 512, 768]) = torch.Size([38, 512, 768])
+                    self.audio_embeddings = torch.cat((self.audio_embeddings[0], mean_tensor), dim=0)
+                    print(self.audio_embeddings.shape)
+                if len(audio) == 1:
+                    self.audio_embeddings = self.audio_embeddings[0]
 
             logger.log_message("info", "Audio embedding in the Inference phase completed successfully.")
             pooled_audio_embed = self.audio_embeddings.to(self.device)
