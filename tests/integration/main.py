@@ -39,22 +39,22 @@ def main( image_url=None,
         # inform data  ingestion stage of the pipeline
         # data_ingestion()
 
-        # # inform data  processing stage of the pipeline
-        # textprocessing, title_files,  imageprocessing, audioprocessing = data_processing()
+        # inform data  processing stage of the pipeline
+        textprocessing, title_files,  imageprocessing, audioprocessing = data_processing()
         # print(audioprocessing)
-        # # inform data  embedding stage of the pipeline
-        # text_embeddings, image_embeddings, audio_embeddings = data_embeddings(textprocessing, imageprocessing, audioprocessing)
-        # save_list(title_files, ROOT_PROJECT_DIR /  ("src/"  "artifacts/" + "data/" + "title_files.txt"))
+        # inform data  embedding stage of the pipeline
+        text_embeddings, image_embeddings, audio_embeddings = data_embeddings(textprocessing, imageprocessing, audioprocessing)
+        save_list(title_files, ROOT_PROJECT_DIR /  ("src/"  "artifacts/" + "data/" + "title_files.txt"))
 
-        # # save all embeddings data
-        # path = ROOT_PROJECT_DIR /  ("src/"  "artifacts/" + "data/" + "embeddings")
-        # print(path)
-        # save_tensor(text_embeddings[0], path / ( "text/" + "text_embeddings.pt"))
-        # save_tensor(image_embeddings, path / ("image/" + "image_embeddings.pt"))
-        # save_tensor(audio_embeddings, path / ("audio/" + "audio_embeddings.pt"))
+        # save all embeddings data
+        path = ROOT_PROJECT_DIR /  ("src/"  "artifacts/" + "data/" + "embeddings")
+        print(path)
+        save_tensor(text_embeddings[0], path / ( "text/" + "text_embeddings.pt"))
+        save_tensor(image_embeddings, path / ("image/" + "image_embeddings.pt"))
+        save_tensor(audio_embeddings, path / ("audio/" + "audio_embeddings.pt"))
 
-        # # push all embeddings data to drant db
-        # push_drant_db(text_embeddings, title_files, image_embeddings, audio_embeddings)
+        # push all embeddings data to drant db
+        push_drant_db(text_embeddings, image_embeddings, audio_embeddings)
 
         # title_files = load_list(ROOT_PROJECT_DIR /  ("src/"  "artifacts/" + "data/" + "title_files.txt"))
         # text_embeddings = load_tensor(ROOT_PROJECT_DIR /  ("src/"  "artifacts/" + "data/" + "embeddings/text/text_embeddings.pt"))
@@ -67,13 +67,13 @@ def main( image_url=None,
         # print(retriever)
         retriever = ["hello", "world", "how", "are", "you", "today", "My", "name", "is", "John", "Doe"]
         # inform data  generation stage of the pipeline
-        rag_chain, metadata = data_generation(retriever, 
-                                    image_url,
-                                    video_url,
-                                    question_str,
-                                    query
-                                    )
-        print(rag_chain.invoke(metadata))
+        # rag_chain, metadata = data_generation(retriever, 
+        #                             image_url,
+        #                             video_url,
+        #                             question_str,
+        #                             query
+        #                             )
+        # print(rag_chain.invoke(metadata))
         
         logger.log_message("info", "All scenarios completed successfully.")
         logger.log_message("info", "<<<<<<<<   END ALL SCENARIOS   >>>>>>>>")

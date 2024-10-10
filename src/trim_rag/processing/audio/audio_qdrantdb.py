@@ -80,12 +80,12 @@ class AudioQdrantDB:
                 self._types.append(type)
                 self._names.append(extract_name)
             
-            print(self._audio_urls)
-            print(len(self._audio_urls))
-            print(self._types)
-            print(len(self._types))
-            print(self._names)
-            print(len(self._names))
+            # print(self._audio_urls)
+            # print(len(self._audio_urls))
+            # print(self._types)
+            # print(len(self._types))
+            # print(self._names)
+            # print(len(self._names))
             pyloads = pd.DataFrame({"audio_url": self._audio_urls,
                                     "type": self._types,
                                     "base64": self._names})

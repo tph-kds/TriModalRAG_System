@@ -59,7 +59,7 @@ class DataEmbeddingPipeline:
             text_new_embeddings, image_new_embeddings, audio_new_embeddings = self.shared_embedding_space(text_embeds[0],
                                                                                                           image_embeds,
                                                                                                           audio_embeds)
-            textnew_embed = (text_new_embeddings, text_embeds[1])
+            textnew_embed = (text_new_embeddings, text_embeds[1], text_embeds[2], text_embeds[3])
             logger.log_message("info", "Data embedding pipeline completed successfully.")
             return textnew_embed,  image_new_embeddings, audio_new_embeddings
             # return self.text_embeddings
@@ -77,9 +77,13 @@ class DataEmbeddingPipeline:
             logger.log_message("info", "Text embedding pipeline started.")
             textEmbedding = TextEmbedding(self.text_data)
             tokens = []
+            token_ids = []
+            shape_ids = []
             for i, text in enumerate(texts):
-                embedding_text, token_list = textEmbedding.embedding_text(text)
+                embedding_text, token_list, input_ids = textEmbedding.embedding_text(text)
                 tokens.append(token_list)
+                token_ids.append(input_ids)
+                shape_ids.append(embedding_text.shape[0])
                 if i == 0:
                     self.text_embeddings.append(embedding_text)
                 else:
@@ -90,7 +94,7 @@ class DataEmbeddingPipeline:
             logger.log_message("info", "Text embedding pipeline completed successfully.")
             text_tensors_flatten = torch.tensor(self.text_embeddings).squeeze(1) # torch.Size([n_texts, 512, 768])
             pooled_text_tensors = torch.mean(text_tensors_flatten, dim=1) # torch.Size([n_texts, 768])
-            text_tensors = (pooled_text_tensors, tokens) # 0 : pooled_text_tensors, 1: token_list, 2:shape_texts 
+            text_tensors = (pooled_text_tensors, tokens, token_ids, shape_ids) # 0 : pooled_text_tensors, 1: token_list, 2:input_ids , 3:shape_texts
             return text_tensors
 
         except Exception as e:

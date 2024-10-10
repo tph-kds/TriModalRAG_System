@@ -14,6 +14,8 @@ from src.trim_rag.config import TextPrepareDataQdrantArgumentsConfig
 
 from qdrant_client import models
 from src.config_params import ROOT_PROJECT_DIR
+from src.trim_rag.utils import convert_tensor_to_list
+
 
 
 ### Handle on all files of this folder
@@ -27,6 +29,7 @@ class TextQdrantDB:
         self._text_urls: List = []
         self._types: List = []
         self._token: List = []
+        self._titles: List = []
 
 
     def _create_text_url(self, text_p) -> Optional[str]:
@@ -85,29 +88,43 @@ class TextQdrantDB:
     #         print(my_exception)
 
 
-
-    def create_pyload(self, 
-                      titles: Optional[List],
-                      text_embeddings) -> Optional[dict]:
+    def create_pyload(self, text_embeddings) -> Optional[dict]:
         try:
             logger.log_message("info", "Creating pyload started for preparing upload to qdrant.")
             path_text_embeddings = ROOT_PROJECT_DIR / self.text_dir
+            input_ids = text_embeddings[2]
+            input_ids_to_qdrant = convert_tensor_to_list(input=input_ids)
+            flattened = [item for sublist in input_ids_to_qdrant for item in sublist]
+            # print(len(flattened))
 
-            for text_p in path_text_embeddings.glob(self.format):
+            for i, text_p in enumerate(path_text_embeddings.glob(self.format)):
                 # text_url = self._create_text_url(text_p)
-                type = self._create_types()
+                titles = self._create_text_url(text_p)
+                for _ in range(text_embeddings[3][i]):
+                    type = self._create_types()
 
-                self._text_urls.append(text_p)
-                self._types.append(type)
+                    self._text_urls.append(text_p)
+                    self._types.append(type)
+                    self._titles.append(titles)
             
-            print(len(self._text_urls))
-            print(len(self._types))
-            print(len(titles))
-            print(len(text_embeddings[1]))
+            # print(len(self._text_urls))
+            # print(len(self._types))
+            # print(len(self._titles))
+            # print(text_embeddings[1])
+            # print(len(input_ids_to_qdrant))
+            # print(len(input_ids_to_qdrant[0]))
+            # print(len(input_ids_to_qdrant[0][0]))
+            # print(len(flattened))
+            # print(flattened)
+            # print(input_ids_to_qdrant)
+            # print(text_embeddings[1])
+            # print(input_ids)
             pyloads = pd.DataFrame({"text_url": self._text_urls,
                                     "type": self._types,
-                                    "title": titles,
-                                    "token": text_embeddings[1]})
+                                    "title": self._titles,
+                                    # "token": text_embeddings[1],
+                                    "input_ids": flattened
+                                    })
 
             pyload_dicts = pyloads.to_dict(orient="records")
 
@@ -124,11 +141,10 @@ class TextQdrantDB:
     
     def create_records(self,
                        processing_embedding: Optional[List], 
-                       titles: Optional[List]
                        ) -> Optional[dict]:
         try:
             logger.log_message("info", "Creating records started for preparing upload to qdrant.")
-            payloads = self.create_pyload(titles, processing_embedding)
+            payloads = self.create_pyload(processing_embedding)
             # print(payloads)
             # print("Hung")
             records = [

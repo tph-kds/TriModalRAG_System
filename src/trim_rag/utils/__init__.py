@@ -6,6 +6,9 @@ from src.trim_rag.utils.config import (
     save_csv,
     load_csv,
     save_list,
-    load_list
+    load_list,
+    convert_tensor_to_list,
+    convert_list_to_tensor,
 
 )
+

@@ -268,7 +268,8 @@ class MultimodalGeneration:
 
         return {
                     # "chat_history":  chat_history,
-                    "context_str": test_function(retriever) , 
+                    # "context_str": test_function(retriever) , 
+                    "context_str": retriever , 
                     "question_str":  question_str,
                     "system_str": system_str,
                     "type_str":  type_str,

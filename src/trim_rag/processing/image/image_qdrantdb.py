@@ -113,11 +113,11 @@ class ImageQdrantDB:
                 self._types.append(type)
                 self._base64_strings.append(base64_string)
             
-            print(self._image_urls)
-            print(len(self._image_urls))
-            print(self._types)
-            print(len(self._types))
-            print(len(self._base64_strings))
+            # print(self._image_urls)
+            # print(len(self._image_urls))
+            # print(self._types)
+            # print(len(self._types))
+            # print(len(self._base64_strings))
 
             pyloads = pd.DataFrame({"image_url": self._image_urls,
                                     "type": self._types,

@@ -12,7 +12,6 @@ class PrepareDataQdrant:
     def __init__(self,
                  config: PrepareDataQdrantArgumentsConfig,
                  text_embeddings: Optional[List] = None,
-                 titles: Optional[List] = None,
                  image_embeddings: Optional[List] = None,
                  audio_embeddings: Optional[List] = None,
                  ) -> None:
@@ -26,7 +25,7 @@ class PrepareDataQdrant:
         self.image_embeddings = image_embeddings
         self.audio_embeddings = audio_embeddings
 
-        self.titles = titles
+
 
     def run_prepare_data_qdrant_pipeline(self) -> Tuple[Optional[List], Optional[List], Optional[List]]:
         try:
@@ -50,9 +49,9 @@ class PrepareDataQdrant:
     def records_text_to_qdrant(self):
         try:
             textqdrant = TextQdrantDB(self.text_data)
-            text_records = textqdrant.create_records(processing_embedding=self.text_embeddings,
-                                      titles= self.titles
-                                      )
+            text_records = textqdrant.create_records(
+                processing_embedding=self.text_embeddings,
+            )
             return text_records
 
 

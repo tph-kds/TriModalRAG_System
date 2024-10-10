@@ -121,7 +121,7 @@ class TextEmbedding:
 
             # Print tokens and their corresponding embeddings
             tokens_list = [token for token, embedding in zip(tokens, embeddings[0])]
-            return embeddings, tokens_list
+            return embeddings, tokens_list, input_ids
 
         except Exception as e:
             logger.log_message("warning", "Failed to embed text: " + str(e))

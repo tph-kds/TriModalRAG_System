@@ -1,5 +1,6 @@
 import os
 import sys
+import torch
 from typing import Optional, List
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
@@ -8,12 +9,12 @@ from src.trim_rag.config import QdrantVectorDBArgumentsConfig, PrepareDataQdrant
 from src.trim_rag.components.qdrant_db import QdrantVectorDB
 from src.trim_rag.processing import PrepareDataQdrant
 
+
 class QdrantVectorDBPipeline:
     def __init__(self, 
                  config: QdrantVectorDBArgumentsConfig,
                  prepare_config: PrepareDataQdrantArgumentsConfig,
                  text_embeddings: Optional[List] = None,
-                 titles: Optional[List] = None,
                  image_embeddings: Optional[List] = None,
                  audio_embeddings: Optional[List] = None,
                  QDRANT_API_KEY: Optional[str] = None,
@@ -35,7 +36,8 @@ class QdrantVectorDBPipeline:
         self.text_collection = self.config.text_data.collection_text_name
         self.audio_collection = self.config.audio_data.collection_audio_name
 
-        self.titles = titles
+        # self.titles = titles
+        # self.input_ids = input_ids
 
     def run_qdrant_vector_db_pipeline(self) -> None:
         try:
@@ -69,11 +71,26 @@ class QdrantVectorDBPipeline:
             )
             print(my_exception)
 
+    # def _handle_input_ids(self, input: Optional[List[torch.Tensor]]) -> Optional[List[int]]:
+    #     try:
+    #         # convert input_ids to list, avoid an error about the type mismatch
+    #         out_input_ids = convert_tensor_to_list(input)
+
+    #         return out_input_ids
+
+    #     except Exception as e:
+    #         logger.log_message("warning", "Failed to handle input_ids: " + str(e))
+    #         my_exception = MyException(
+    #             error_message = "Failed to handle input_ids: " + str(e),
+    #             error_details = sys,
+    #         )
+    #         print(my_exception)
+
     def records_all_to_qdrant(self):
         try:
+
             prepare_data_qdrant = PrepareDataQdrant(self.prepare_config, 
-                                                    self.text_embeddings, 
-                                                    self.titles,
+                                                    self.text_embeddings,
                                                     self.image_embeddings, 
                                                     self.audio_embeddings
                                                     )

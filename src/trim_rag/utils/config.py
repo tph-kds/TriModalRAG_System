@@ -12,7 +12,7 @@ from box.exceptions import BoxValueError
 from ensure import ensure_annotations # Đảm bảo kiểm tra khi thực hiện sai cú pháp: 1 + "1" == ?
 from box import ConfigBox # truy cập được đối tượng vd: a.ensure thay vì a["ensure"]
 from pathlib import Path
-from typing import Any
+from typing import Any, List, Optional
 
 @ensure_annotations
 def read_yaml(path_to_yaml: Path) -> ConfigBox:
@@ -223,3 +223,30 @@ def load_csv(path: Path) -> pd.DataFrame:
 # def encodeImageIntoBase64(croppedImagePath):
 #     with open(croppedImagePath, "rb") as f:
 #         return base64.b64encode(f.read())
+
+# @ensure_annotations
+def convert_tensor_to_list(input: Optional[List[torch.Tensor]]) -> Optional[List]:
+    """convert tensor to list
+
+    Args:
+        x List[(torch.Tensor)]: List of tensor
+
+    Returns:
+        list: list
+    """
+    output_list = [ i.tolist() for i in input]
+    return output_list
+
+@ensure_annotations
+def convert_list_to_tensor(input: List[int]) -> Optional[List[torch.Tensor]]:
+    """convert list to tensor
+
+    Args:
+        x (List[list]): list
+
+    Returns:
+        torch.Tensor: tensor
+    """
+    output_tensor = [ torch.tensor(i) for i in input]
+    
+    return output_tensor

@@ -24,8 +24,8 @@ endef
 test: 
 	python tests/integration/main.py
 
-.PHONY: qt
-qt: 
+.PHONY: qs
+qs: 
 	python tests/integration/quick_start.py
 
 .PHONY: install
