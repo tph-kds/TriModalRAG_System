@@ -50,6 +50,25 @@ def convert_qdrantdata_tokens(
     retriever_text = "".join([str(f"{i + 1}. ") + token + "\n" for i, token in enumerate(list_texts)]) 
     return retriever_text
 
+def convert_qdrantdata_desc(
+        inputs: List
+    ) -> Optional[List]:
+    """convert qdrant data tokens to list of strings
+
+    Args:
+        input (List): list of tokens
+
+    Returns:
+        List: list of strings
+    """
+
+
+    list_desc = [x.payload["description"] for x in inputs]
+
+    # create a format for top k retriever
+    retriever = "".join([str(f"{i + 1}. ") + des + "\n" for i, des in enumerate(list_desc)]) 
+    return retriever
+
 class UpperCaseRunnable(Runnable):
     def invoke(self, input: str) -> str:
         # Converts input to uppercase
@@ -69,13 +88,19 @@ def main( question_str=None,
         config_manager = ConfiguarationManager()
         embed_config = config_manager.get_data_embedding_arguments_config()
 
-        text_embedding, image_embedding, audio_embedding = data_inference(str(text), str(image), str(audio))
+        text_embedding, image_embedding, audio_embedding = data_inference(
+            text = str(question_str), 
+            image = str(image_url), 
+            audio = str(video_url)
+        )
         main_retriever, retriever_text, retriever_image, retriever_audio = data_retriever(text_embedding[0], image_embedding, audio_embedding)
         # print(main_retriever)
         lir_retriever = convert_qdrantdata_tokens(config=embed_config.text_data, 
                                                   inputs=main_retriever
                                                   )
         print(lir_retriever)
+        lir_retriever_image = convert_qdrantdata_desc(inputs=retriever_image)
+        lir_retriever_audio = convert_qdrantdata_desc(inputs=retriever_audio)
         # print(retriever_text)
         # print("Hung")
         # print(retriever_image)
@@ -85,8 +110,8 @@ def main( question_str=None,
         # retriever = ["hello", "world", "how", "are", "you", "today", "My", "name", "is", "John", "Doe"]
         # inform data  generation stage of the pipeline
         rag_chain, metadata = data_generation(lir_retriever, 
-                                    image_url,
-                                    video_url,
+                                    lir_retriever_image,
+                                    lir_retriever_audio,
                                     question_str,
                                     query
                                     )

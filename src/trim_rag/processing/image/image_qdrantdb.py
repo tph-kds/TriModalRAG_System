@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import sys
 import io
 import base64
@@ -14,6 +15,7 @@ from qdrant_client import models
 # from src.trim_rag.processing.image.image_processing import ImageTransform
 
 from src.config_params import ROOT_PROJECT_DIR
+from src.trim_rag.utils import load_csv
 
 
 ### Handle on all files of this folder
@@ -23,10 +25,12 @@ class ImageQdrantDB:
         self.config = config
         self.image_dir = self.config.image_dir
         self.format = self.config.format # "*.png"
+        self.path_description = self.config.path_description
 
         self._image_urls: List = []
         self._types: List = []
         self._base64_strings: List = []
+        self._descriptions: List = []
 
     def _create_image_url(self, image_p) -> Optional[str]:
         try:
@@ -97,6 +101,29 @@ class ImageQdrantDB:
             )
             print(my_exception)
 
+    def _create_description(self, 
+                            type: str,
+                            url: str) -> Optional[str]:
+        try:
+            logger.log_message("info", "Creating description started.")
+            df_path = ROOT_PROJECT_DIR / self.path_description
+            df = load_csv(Path(df_path))
+            df = df[df["type"] == type]
+            desc = df[df["path"] == url]["describe"]
+            # convert series to string
+            desc = desc.values[0]
+
+            logger.log_message("info", "Creating description completed.")
+
+            return desc
+
+        except Exception as e:
+            logger.log_message("warning", "Failed to create description: " + str(e))
+            my_exception = MyException(
+                error_message = "Failed to create description: " + str(e),
+                error_details = sys,
+            )
+            print(my_exception)
 
     def create_pyload(self, processing_embedding) -> Optional[dict]:
         try:
@@ -105,14 +132,18 @@ class ImageQdrantDB:
 
             for image_p in path_image_embeddings.glob(self.format):
                 # image_url = self._create_image_url(image_p)
+                
                 type = self._create_types()
                 # print(image_p)
                 base64_string = self._create_base64_strings(image_p)
+                path_image = os.path.basename(str(image_p))
+                url = self.image_dir + "/" + path_image
+                desc = self._create_description("image", url)
 
                 self._image_urls.append(image_p)
                 self._types.append(type)
                 self._base64_strings.append(base64_string)
-            
+                self._descriptions.append(desc)
             # print(self._image_urls)
             # print(len(self._image_urls))
             # print(self._types)
@@ -121,7 +152,8 @@ class ImageQdrantDB:
 
             pyloads = pd.DataFrame({"image_url": self._image_urls,
                                     "type": self._types,
-                                    "base64": self._base64_strings})
+                                    "base64": self._base64_strings,
+                                    "description": self._descriptions})
 
             pyload_dicts = pyloads.to_dict(orient="records")
 

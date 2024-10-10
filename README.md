@@ -129,14 +129,14 @@ audio = ROOT_PROJECT_DIR / ("data/audio.mp3")
 # |  Where ROOT_PROJECT_DIR: main folder of this project on your local computer after downloading from my github.  | 
 
 # Using make for running the quick start on "terminal"
-make qs text=text image=image audio=audio
+make qt
 or
 [
     #  adjust in a folder name: "tests/integration/quick_start.py"
     
     # and run: 
     
-    python tests/integration/quick_start.py 
+    python tests/integration/quick_start.py --query==query --text=text --image==image --audio=audio
 ]
 
 # Ultimately, You would receive a result from chatbot's response

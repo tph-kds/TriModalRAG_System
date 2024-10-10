@@ -451,7 +451,9 @@ class ConfiguarationManager:
 
         imagedata_prepare_upload_db_config = ImagePrepareDataQdrantArgumentsConfig(
             image_dir = image_qdrant_config.image_dir,
-            format = image_qdrant_config.format
+            format = image_qdrant_config.format,
+            path_description=image_qdrant_config.path_description
+
         )
 
         return imagedata_prepare_upload_db_config
@@ -461,7 +463,8 @@ class ConfiguarationManager:
 
         audiodata_prepare_upload_db_config = AudioPrepareDataQdrantArgumentsConfig(
             audio_dir = audio_qdrant_config.audio_dir,
-            format = audio_qdrant_config.format
+            format = audio_qdrant_config.format,
+            path_description=audio_qdrant_config.path_description
         )
 
         return audiodata_prepare_upload_db_config
@@ -474,6 +477,7 @@ class ConfiguarationManager:
         init_embedding_qdrant_config = PrepareDataQdrantArgumentsConfig(
             root_dir = qdrant_config.root_dir,
             data_dir = qdrant_config.data_dir,
+            description_dir = qdrant_config.description_dir,
             text_data = self._get_textdata_prepare_upload_db_arguments_config(),
             image_data = self._get_imagedata_prepare_upload_db_arguments_config(),
             audio_data = self._get_audiodata_prepare_upload_db_arguments_config()

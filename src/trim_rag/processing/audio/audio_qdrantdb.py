@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import sys
 import io
 import base64
@@ -12,6 +13,7 @@ from src.config_params import ROOT_PROJECT_DIR
 
 from src.trim_rag.config import AudioPrepareDataQdrantArgumentsConfig
 from qdrant_client import models
+from src.trim_rag.utils import load_csv
 
 
 ### Handle on all files of this folder
@@ -21,11 +23,14 @@ class AudioQdrantDB:
         self.config = config
         self.audio_dir = self.config.audio_dir
 
+        self.path_description = self.config.path_description
+
 
         self._audio_urls: List = []
         self._types: List = []
         self._names: List = []
         self.format = self.config.format # "*.mp3"
+        self._descriptions: List = []
 
 
     def _create_audio_url(self, audio_p) -> Optional[str]:
@@ -65,6 +70,31 @@ class AudioQdrantDB:
             )
             print(my_exception)
 
+    def _create_description(self, 
+                            type: str,
+                            url: str) -> Optional[str]:
+        try:
+            logger.log_message("info", "Creating description started.")
+            df_path = ROOT_PROJECT_DIR / self.path_description
+            
+            df = load_csv(Path(df_path))
+            df = df[df["type"] == type]
+            desc = df[df["path"] == url]["describe"]
+            desc = desc.values[0]
+
+
+            logger.log_message("info", "Creating description completed.")
+
+            return desc
+
+        except Exception as e:
+            logger.log_message("warning", "Failed to create description: " + str(e))
+            my_exception = MyException(
+                error_message = "Failed to create description: " + str(e),
+                error_details = sys,
+            )
+            print(my_exception)
+
     def create_pyload(self, processing_embedding) -> Optional[dict]:
         try:
             logger.log_message("info", "Creating pyload started for preparing upload to qdrant.")
@@ -75,10 +105,14 @@ class AudioQdrantDB:
                 type = self._create_types()
                 extract_name = os.path.basename(str(audio_p).split(".")[0])
                 # extract_name = os.path.basename(audio_p.split(".")[0])
+                path_audio = os.path.basename(str(audio_p))
+                url = self.audio_dir + "/" + path_audio
+                desc = self._create_description("audio", url)
 
                 self._audio_urls.append(audio_p)
                 self._types.append(type)
                 self._names.append(extract_name)
+                self._descriptions.append(desc)
             
             # print(self._audio_urls)
             # print(len(self._audio_urls))
@@ -88,7 +122,8 @@ class AudioQdrantDB:
             # print(len(self._names))
             pyloads = pd.DataFrame({"audio_url": self._audio_urls,
                                     "type": self._types,
-                                    "base64": self._names})
+                                    "name": self._names,
+                                    "description": self._descriptions})
 
             pyload_dicts = pyloads.to_dict(orient="records")
 

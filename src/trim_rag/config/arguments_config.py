@@ -680,6 +680,10 @@ class ImagePrepareDataQdrantArgumentsConfig():
         default="*.png",
         metadata={"help": "Format of the image files."}
     )
+    path_description: str = field(
+        default="data/description/summaries.txt",
+        metadata={"help": "Path to save descriptions."}
+    )
 
 
 @dataclass(frozen=True)
@@ -691,6 +695,10 @@ class AudioPrepareDataQdrantArgumentsConfig():
     format: str = field(
         default="*.wav",
         metadata={"help": "Format of the audio files."}
+    )
+    path_description: str = field(
+        default="data/description/summaries.txt",
+        metadata={"help": "Path to save descriptions."}
     )
 
 @dataclass(frozen=True)
@@ -714,6 +722,10 @@ class PrepareDataQdrantArgumentsConfig():
     data_dir: str = field(
         default="data",
         metadata={"help": "Root directory to save data."}
+    )
+    description_dir: str = field(
+        default="data/description",
+        metadata={"help": "Path to save descriptions."}
     )
     text_data: TextPrepareDataQdrantArgumentsConfig = field(
         default_factory = TextPrepareDataQdrantArgumentsConfig

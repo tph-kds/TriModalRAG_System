@@ -33,13 +33,17 @@ pinecone_vdb:
 init_embedding:
   root_dir: "src/artifacts/data"
   data_dir: "data"
+  description_dir: "data/description"
   text_data:
     text_dir: "data/text"
     format: "*.pdf"
   image_data:
     image_dir: "data/image"
     format: "*.png"
+    path_description: "data/description/summaries.csv"
   audio_data:
     audio_dir: "data/audio"
     format: "*.mp3"
+    path_description: "data/description/summaries.csv"
+
 
