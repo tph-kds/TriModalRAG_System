@@ -48,16 +48,7 @@ def data_retriever(
             query_embedding=retrieved_fusion, 
             k=5
         )
-        # retriever_text = vector_store._get_vector_store(name_collection="text")
-        # retriever_text = retriever_text.as_retriever(search_type="similarity", search_kwargs={"k": 5})
 
-        # retriever_image = vector_store._get_vector_store(name_collection="image")
-        # retriever_image = retriever_image.as_retriever(search_type="similarity", search_kwargs={"k": 5})
-
-        # retriever_audio = vector_store._get_vector_store(name_collection="audio")
-        # retriever_audio = retriever_audio.as_retriever(search_type="similarity", search_kwargs={"k": 1})
-        
-        # retriever = retriever_text & retriever_image & retriever_audio
         logger.log_message("info", "Data Retriever pipeline completed successfully.")
         logger.log_message("info", "<<<<<<<<   END DATA RETRIEVER SCENARIO   >>>>>>>>")
         logger.log_message("info", "")

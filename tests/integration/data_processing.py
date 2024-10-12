@@ -14,11 +14,7 @@ def data_processing():
         pipeline = DataTransformPipeline(config)
         textprocessing, title_files, imageprocessing, audioprocessing = pipeline.run_data_processing_pipeline()
 
-        # print(textprocessing)
-        # print(imageprocessing)
-        # print(audioprocessing)
 
-        # print(config)
         logger.log_message("info", "Data Transformation pipeline completed successfully.")
         logger.log_message("info", "<<<<<<<<   END DATA TRANSFORMATION SCENARIO   >>>>>>>>")
         logger.log_message("info", "")

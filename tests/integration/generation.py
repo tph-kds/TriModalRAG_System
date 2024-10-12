@@ -6,8 +6,8 @@ from src.trim_rag.pipeline import GenerationPipeline
 
 
 def data_generation(retriever=None, 
-                    image_url=None, 
-                    video_url=None, 
+                    image_str=None, 
+                    video_str=None, 
                     question_str=None,
                     query=None
                     ):
@@ -23,12 +23,12 @@ def data_generation(retriever=None,
 
         rag_chain = pipeline.run_generation_pipeline(
             retriever=retriever,
-            image_url=image_url,
-            video_url=video_url,
+            image_url=image_str,
+            video_url=video_str,
             question_str=question_str,
             query_str=query
         )
-        # print(config)
+
         logger.log_message("info", "Data Generation pipeline completed successfully.")
         logger.log_message("info", "<<<<<<<<   END DATA GENERATION SCENARIO   >>>>>>>>")
         logger.log_message("info", "")

@@ -14,7 +14,6 @@ def data_ingestion():
         pipeline = DataIngestionPipeline(config)
         pipeline.run_data_ingestion_pipeline()
 
-        # print(config)
         logger.log_message("info", "Data Ingestion pipeline completed successfully.")
         logger.log_message("info", "<<<<<<<<   END DATA INGESTION SCENARIO   >>>>>>>>")
         logger.log_message("info", "")

@@ -76,7 +76,7 @@ class GenerationPipeline:
             full_message = self._get_multimodal_generation(
                 prompt=prompt,
                 prompt_llm=prompt_llm,
-                question_str=question_str,
+                question_str=query_str,
                 image_url=image_url,
                 video_url=video_url,
                 retriever=retriever,
@@ -99,10 +99,13 @@ class GenerationPipeline:
             ## Get meta data for the question and response
             meta_data_main = self.meta_data(
                 question_str=query_str,
+                # image_str=image_url,
+                # audio_str=video_url,
                 response_retriever=full_message,
                 chat_history=self.chat_history
             ) 
             
+            print("hung")
             # Get RAG CHAIN
             rag_chain = self.post_processing.post_processing(
                 prompt=prompt
@@ -123,7 +126,10 @@ class GenerationPipeline:
             )
             print(my_exception)
 
-    def meta_data(self, question_str: Optional[str],
+    def meta_data(self, 
+                  question_str: Optional[str],
+                #   image_str: Optional[str],
+                #   audio_str: Optional[str],
                   response_retriever: Optional[Dict],
                   chat_history: Optional[List[BaseMessage]]
                   ) -> Dict:
@@ -133,6 +139,8 @@ class GenerationPipeline:
 
             meta_data = self.post_processing.meta_data(
                 question_str=question_str,
+                # image_str=image_str,
+                # audio_str=audio_str,
                 response_retriever=response_retriever,
                 chat_history=chat_history
             )

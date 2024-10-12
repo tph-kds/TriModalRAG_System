@@ -90,8 +90,8 @@ class PostProcessing:
         pre_prompt = RunnableParallel({
             "context_str": RunnablePassthrough(itemgetter("context_str")),   
             "question_str": RunnablePassthrough(itemgetter("question_str")),
-            # "image_url": RunnablePassthrough(itemgetter("image_url")),
-            # "audio_url": RunnablePassthrough(itemgetter("audio_url")),
+            # "image_str": RunnablePassthrough(itemgetter("image_str")),
+            # "audio_str": RunnablePassthrough(itemgetter("audio_str")),
             "chat_history": itemgetter("chat_history"),
         } ) 
 
@@ -99,20 +99,22 @@ class PostProcessing:
     
     def meta_data(self, 
                   question_str: str,
+                #   image_str: str,
+                #   audio_str: str,
                   response_retriever: Dict,
                   chat_history: str) -> Dict:
 
         logger.log_message("info", "Getting meta data in post processing started.")
         def concat_function(docs):
             return " ".join(str(doc) + " : " + str(key + "\n")  for doc, key in docs.items() if key != None)
-        logger.log_message("info", "Getting pre prompt in post processing started.")
+        logger.log_message("info", "Getting pre prompt in post processing completed successfully.")
 
         return {
                     "chat_history":  chat_history,
                     "context_str": concat_function(response_retriever) , 
                     "question_str":  question_str,
-                    # "image_url": image_url,
-                    # "audio_url":  audio_url
+                    # "image_str": image_str,
+                    # "audio_str":  audio_str
                 } 
 
     def post_processing(self, 

@@ -22,14 +22,6 @@ def data_embeddings(text, image, audio, type_embedding="shared"):
             audio=audio, 
             type_embedding=type_embedding
             )
-        # text_embeddings, image_embeddings, audio_embeddings = pipeline.run_data_embedding_pipeline(type="shared")
-
-        # print(text_embeddings)
-        # print("Shape of Text Embeddings: ", text_embeddings.shape)
-        # print(image_embeddings)
-        # print("Shape of Image Embeddings: ", image_embeddings.shape)
-        # print(audio_embeddings)
-        # print("Shape of Audio Embeddings: ", audio_embeddings.shape)
 
 
         # print(config)

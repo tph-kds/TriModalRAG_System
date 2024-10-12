@@ -48,6 +48,7 @@ class PromptFlows:
                        
                         "Context: {context_str}\n"
 
+
                         "---------------------\n"
                         "Let respond a plenty of relevant information with a short and concise answer not to exceed 3 sentences, \
                          only generate roughly 128  tokens.\

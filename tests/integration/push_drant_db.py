@@ -27,7 +27,6 @@ def push_drant_db(text_embeds, image_embeds, audio_embeds):
         ## run upload  the new vector and index embedding data pipeline to QDRANT DATABASE
         pipeline.run_qdrant_vector_db_pipeline()
 
-        # print(config)
         logger.log_message("info", "PUSH QDRANT DATABASE pipeline completed successfully.")
         logger.log_message("info", "<<<<<<<<   END PUSHING QDRANT DATABASE SCENARIO   >>>>>>>>")
         logger.log_message("info", "")

@@ -34,7 +34,6 @@ def data_inference(text: Optional[str],
             )
 
 
-        # print(config)
         logger.log_message("info", "Data Embedding pipeline completed successfully.")
         logger.log_message("info", "<<<<<<<<   END DATA EMBEDDING  FOR SEARCHING DATA ON QDRANT DB  >>>>>>>>")
         logger.log_message("info", "")

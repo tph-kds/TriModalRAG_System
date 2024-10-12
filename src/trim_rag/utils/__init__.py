@@ -11,4 +11,8 @@ from src.trim_rag.utils.config import (
     convert_list_to_tensor,
 
 )
+from src.trim_rag.utils.qdrant_data import (
+    convert_qdrantdata_tokens,
+    convert_qdrantdata_desc
+)
 

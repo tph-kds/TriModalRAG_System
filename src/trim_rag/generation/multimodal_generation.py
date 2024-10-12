@@ -160,9 +160,9 @@ class MultimodalGeneration:
             full_response = {
                 "question": question_str,
                 "text_answer": result_text,
-                "image": image_url,
+                # "image": image_url,
                 "image_answer": result_image,
-                "audio": video_url,
+                # "audio": video_url,
                 "audio_answer": result_audio
             }
             
