@@ -1,0 +1,13 @@
+path,type,describe
+data/image/weather_images_0.png,image,"This is a sunset scene, in the distance there are white clouds and clear blue sky."
+data/image/weather_images_1.png,image,"This is a sunset scene, the sky is covered with clouds, it is getting ready for night."
+data/image/weather_images_2.png,image,"This is a gloomy sky, with signs of an impending thunderstorm."
+data/image/weather_images_3.png,image,"This is a scene where the sky is dark and lightning appears."
+data/image/weather_images_4.png,image,"This is a scene of clear blue sky in the middle of a field, in the middle of the picture surrounded by clouds."
+data/image/weather_images_5.png,image,"This is a scene where the sky is dark, with many white lightning appearing around the sky."
+data/image/weather_images_6.png,image,"This is a scene in the middle of the desert with many rays of light shining down after a rain."
+data/image/weather_images_7.png,image,"This is a scene of dark sky, lightning shining brightly through many layers of clouds."
+data/image/weather_images_8.png,image,"This is a scene in the middle of a country road, in the distance a large yellow lightning bolt appears in the middle of the road."
+data/image/weather_images_9.png,image,"This is a scene of a purple sky filled with lightning and clouds."
+data/audio/weather_heavy_rain.mp3,audio,"This is the sound of showers flowing along with thunder."
+data/audio/weather_hurricane.mp3,audio,"This is the sound of wind blowing loudly in the rain."

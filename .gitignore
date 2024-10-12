@@ -167,7 +167,10 @@ note.md
 rag_env/*
 artifacts/*
 .env
-data/*
+data/audio/*
+data/text/*
+data/image/*
+
 requirements_dev.txt
 serving/multimodalchatbot/*
 serving/gradiochatbot/*
