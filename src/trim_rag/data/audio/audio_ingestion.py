@@ -29,7 +29,6 @@ class AudioIngestion:
         self.access_key = access_key
         self.url = config.url
 
-        # url = 'https://freesound.org/apiv2/search/text/' #https://freesound.org/apiv2/search/text/?query=weather&token=e1uwCSwD9jDuLtzk2p7OnRRVMMzllOw68LtM7oj0
         self.headers = {
             'Authorization': f'Token {self.access_key}'
         }

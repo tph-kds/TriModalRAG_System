@@ -8,6 +8,13 @@ from src.trim_rag.exception import MyException
 
 from src.trim_rag.config import ConfiguarationManager
 from src.config_params import ROOT_PROJECT_DIR
+from src.config_params import (
+    LANGCHAIN_ENDPOINT,
+    LANGCHAIN_PROJECT,
+    LANGCHAIN_TRACING_V2,
+    GOOGLE_API_KEY,
+    LANGCHAIN_API_KEY
+)
 from tests.integration import data_inference
 from tests.integration import (
     data_retriever,
@@ -19,7 +26,6 @@ from src.trim_rag.utils import (
 )
 
 from langchain_core.runnables import Runnable
-
 
 class UpperCaseRunnable(Runnable):
     def invoke(self, input: str) -> str:
@@ -40,6 +46,22 @@ def main( question_str=None,
         config_manager = ConfiguarationManager()
         embed_config = config_manager.get_data_embedding_arguments_config()
 
+        api_config = {
+            "GOOGLE_API_KEY": GOOGLE_API_KEY,
+            "LANGCHAIN_API_KEY" : LANGCHAIN_API_KEY,
+            "LANGCHAIN_ENDPOINT" : LANGCHAIN_ENDPOINT, 
+            "LANGCHAIN_TRACING_V2" : LANGCHAIN_TRACING_V2, 
+            "LANGCHAIN_PROJECT" : LANGCHAIN_PROJECT,
+        }
+        llm_config = {
+            
+            "model_name" : "gemini-1.5-flash-001",
+            "temperature" : 0,
+            "max_tokens" : 128,
+            "max_retries" : 6,
+            "stop" : None,
+        }
+
         text_embedding, image_embedding, audio_embedding = data_inference(
             text = str(question_str), 
             image = str(image_url), 
@@ -59,7 +81,9 @@ def main( question_str=None,
                                     lir_retriever_image,
                                     lir_retriever_audio,
                                     question_str,
-                                    query
+                                    query,
+                                    api_config,
+                                    llm_config
                                     )
         print(rag_chain.invoke(metadata))
         

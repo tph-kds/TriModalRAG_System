@@ -43,4 +43,6 @@ langchain-qdrant==0.1.4
 # langchain_huggingface==0.1.0
 langchain-google-genai==2.0.0
 
+audio-recorder-streamlit==0.0.8
+
 

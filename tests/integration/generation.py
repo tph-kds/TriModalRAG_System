@@ -5,11 +5,14 @@ from src.trim_rag.config import ConfiguarationManager
 from src.trim_rag.pipeline import GenerationPipeline
 
 
+
 def data_generation(retriever=None, 
                     image_str=None, 
                     video_str=None, 
                     question_str=None,
-                    query=None
+                    query=None,
+                    api_config=None,
+                    llm_config=None
                     ):
     try:
         logger.log_message("info", "")
@@ -19,7 +22,8 @@ def data_generation(retriever=None,
         config = config_manager.get_multimodal_generation_config()
         models_config = config_manager.get_model_arguments_config()
         embeddings_config = config_manager.get_data_embedding_arguments_config()
-        pipeline = GenerationPipeline(config, models_config, embeddings_config)
+
+        pipeline = GenerationPipeline(config, models_config, embeddings_config, api_config, llm_config)
 
         rag_chain = pipeline.run_generation_pipeline(
             retriever=retriever,

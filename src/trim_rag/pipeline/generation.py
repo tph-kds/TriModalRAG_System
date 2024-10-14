@@ -33,7 +33,9 @@ class GenerationPipeline:
 
     def __init__(self, config: MultimodalGenerationPipelineArgumentsConfig,
                  model_config: MultiModelsArgumentsConfig,
-                 embed_config: EmbeddingArgumentsConfig) -> None:
+                 embed_config: EmbeddingArgumentsConfig,
+                 api_config: Dict,
+                 llm_config: Dict) -> None:
         super(GenerationPipeline, self).__init__()
 
         self.config = config
@@ -50,7 +52,9 @@ class GenerationPipeline:
         self.prompt_flows = PromptFlows(config=self.prompt_flows_config)
         self.multimodal_generation = MultimodalGeneration(config=self.multimodal_generation_config,
                                                           model_config=model_config,
-                                                          embed_config=self.embed_config
+                                                          embed_config=self.embed_config,
+                                                          api_config=api_config,
+                                                          llm_config=llm_config,
                                                           )
         
         self.post_processing = PostProcessing(config=self.post_processing_config)

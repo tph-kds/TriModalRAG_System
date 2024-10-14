@@ -5,14 +5,8 @@ import getpass
 from operator import itemgetter
 from typing import Dict, List, Optional, Union
 
-from src.config_params import (
-    LANGCHAIN_ENDPOINT,
-    LANGCHAIN_PROJECT,
-    LANGCHAIN_TRACING_V2,
-    GOOGLE_API_KEY,
-    LANGCHAIN_API_KEY
-)
-from src.config_params.constants import COHERE_API_KEY
+
+# from src.config_params.constants import COHERE_API_KEY
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 from src.trim_rag.config import (
@@ -51,6 +45,8 @@ class MultimodalGeneration:
                  config: MultimodalGenerationArgumentsConfig, 
                  model_config: MultiModelsArgumentsConfig,
                  embed_config: EmbeddingArgumentsConfig,
+                 api_config: Dict,
+                 llm_config: Dict
                 ) -> None:
         super(MultimodalGeneration, self).__init__()
 
@@ -78,11 +74,14 @@ class MultimodalGeneration:
                                     embed_config=embed_config.audio_data
                                     )
         
-        self.model = "gemini-1.5-flash-001"
-        self.temperature = 0
-        self.max_tokens = 128
-        self.max_retries = 6
-        self.stop = None
+
+        self.llm_config = llm_config
+        self.model = self.llm_config["model_name"]
+        self.temperature = self.llm_config["temperature"]
+        self.max_tokens = self.llm_config["max_tokens"]
+        self.max_retries = self.llm_config["max_retries"]
+        self.stop = self.llm_config["stop"]
+        self.api_config = api_config
 
 
     def multimodal_generation(self, 
@@ -123,7 +122,7 @@ class MultimodalGeneration:
                                             chat_history=chat_history)
             
             # init
-            self._init_model()
+            self._init_model(api=self.api_config)
             llm_model = self._get_llm(name_model=self.model,
                                       temperature=self.temperature,
                                       max_tokens=self.max_tokens,
@@ -325,16 +324,16 @@ class MultimodalGeneration:
             )
             print(my_exception)
 
-    def _init_model(self):
+    def _init_model(self, api: Dict):
             # init 
         
         if "GOOGLE_API_KEY" not in os.environ:
             # os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
-            os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
-        os.environ["LANGSMITH_API_KEY"] = LANGCHAIN_API_KEY
-        os.environ["LANGSMITH_ENDPOINT"] = LANGCHAIN_ENDPOINT
-        os.environ["LANGSMITH_TRACING"] = LANGCHAIN_TRACING_V2
-        os.environ["LANGSMITH_PROJECT"] = LANGCHAIN_PROJECT
+            os.environ["GOOGLE_API_KEY"] = api["GOOGLE_API_KEY"]
+        os.environ["LANGSMITH_API_KEY"] = api["LANGCHAIN_API_KEY"]
+        os.environ["LANGSMITH_ENDPOINT"] = api["LANGCHAIN_ENDPOINT"]
+        os.environ["LANGSMITH_TRACING"] = api["LANGCHAIN_TRACING_V2"]
+        os.environ["LANGSMITH_PROJECT"] = api["LANGCHAIN_PROJECT"]
                         
     def contextualize_question(self, 
                                llm, 

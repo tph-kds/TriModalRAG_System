@@ -1,0 +1,21 @@
+ollama:
+  embedding_model: "nomic-embed-text"
+  base_url: http://ollama:11434 # with ollama docker container
+
+
+chat_config:
+  chat_memory_length: 2
+  number_of_retrieved_documents: 3
+
+pdf_text_splitter:
+  chunk_size: 1024 # number of characters 1024 roughly equels 256 tokens
+  overlap: 50
+  separators: ["\n", "\n\n"]
+
+whisper_model: "openai/whisper-small" # choose from here https://huggingface.co/collections/openai/whisper-release-6501bba2cf999715fd953013
+
+chromadb:
+  chromadb_path: "chroma_db"
+  collection_name: "pdfs"
+
+chat_sessions_database_path: "./chat_sessions/chat_sessions.db"

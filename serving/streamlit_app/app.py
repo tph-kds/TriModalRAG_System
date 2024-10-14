@@ -1,8 +1,26 @@
+import os
 import streamlit as st
+import dotenv
+from PIL import Image
+from audio_recorder_streamlit import audio_recorder
+import base64
+from io import BytesIO
+import random
+import google.generativeai as genai
+from serving.settings import (
+    result_scenarios, 
+    set_up_api_config, 
+    settup_config_llm
+)
 
-# @st.cache_resource
-# def load_model():
-#     pass
+# dotenv.load_dotenv()
+
+
+google_models = [
+    "gemini-1.5-flash-001",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+]
 
 def get_page_config():
         
@@ -18,199 +36,368 @@ def get_page_config():
         }
     )
 
+# Function to convert the messages format from OpenAI and Streamlit to Gemini
+def messages_to_gemini(messages):
+    gemini_messages = []
+    prev_role = None
+    for message in messages:
+        if prev_role and (prev_role == message["role"]):
+            gemini_message = gemini_messages[-1]
+        else:
+            gemini_message = {
+                "role": "model" if message["role"] == "assistant" else "user",
+                "parts": [],
+            }
+
+        for content in message["content"]:
+            if content["type"] == "text":
+                gemini_message["parts"].append(content["text"])
+            elif content["type"] == "image_url":
+                gemini_message["parts"].append(base64_to_image(content["image_url"]["url"]))
+            elif content["type"] == "audio_file":
+                gemini_message["parts"].append(genai.upload_file(content["audio_file"]))
+
+        if prev_role != message["role"]:
+            gemini_messages.append(gemini_message)
+
+        prev_role = message["role"]
+        
+    return gemini_messages
 
 
-# # st.image("https://huggingface.co/datasets/huggingface-course/documentation-images/resolve/main/chatbot.png", width=200)
-
-# # st.text_input("Enter your message", key="input", placeholder="Enter your message")
+# Function to convert the messages format from OpenAI and Streamlit to Anthropic (the only difference is in the image messages)
 
 
-# def main():
 
-#     get_page_config()
-#     st.title('TriModal Retrieval Augmented  Chatbot Using Streamlit') 
+# Function to query and stream the response from the LLM
+def stream_llm_response(inputs, model_params, model_type="google", api_inputs=None):
 
-#     pass
+    response_message = ""
+    llm_config=settup_config_llm(model_params)
+    api_config = set_up_api_config(api_inputs)
+    
+    if model_type == "google":
+        ai_response, meta_repsonse = result_scenarios(
+            question_str=inputs["text"],
+            image_url=inputs["image"],
+            video_url=inputs["audio"],
+            query=inputs["query"], 
+            serving_format="streamlit", 
+            api_config=api_config, 
+            llm_setup=llm_config
+        )
+        response_message = ai_response
+        gemini_messages = messages_to_gemini(st.session_state.messages)
 
-# if __name__ == "__main__":
-#     main()
 
 
-import streamlit as st
-from chat_api_handler import ChatAPIHandler
-from streamlit_mic_recorder import mic_recorder
-from settings import get_timestamp, load_config, get_avatar
-from audio_handler import transcribe_audio
-from pdf_handler import add_documents_to_db
-from databases import save_text_message, save_image_message, save_audio_message, load_messages, get_all_chat_history_ids, delete_chat_history, load_last_k_text_messages_ollama
-from settings import list_openai_models, list_ollama_models, command
-import sqlite3
-config = load_config()
 
-def toggle_pdf_chat():
-    st.session_state.pdf_chat = True
-    clear_cache()
+    st.session_state.messages.append({
+        "role": "assistant", 
+        "content": [
+            {
+                "type": "text",
+                "text": response_message,
+            }
+        ]})
 
-def detoggle_pdf_chat():
-    st.session_state.pdf_chat = False
 
-def get_session_key():
-    if st.session_state.session_key == "new_session":
-        st.session_state.new_session_key = get_timestamp()
-        return st.session_state.new_session_key
-    return st.session_state.session_key
+# Function to convert file to base64
+def get_image_base64(image_raw):
+    buffered = BytesIO()
+    image_raw.save(buffered, format=image_raw.format)
+    img_byte = buffered.getvalue()
 
-def delete_chat_session_history():
-    delete_chat_history(st.session_state.session_key)
-    st.session_state.session_index_tracker = "new_session"
+    return base64.b64encode(img_byte).decode('utf-8')
 
-def clear_cache():
-    st.cache_resource.clear()
+def file_to_base64(file):
+    with open(file, "rb") as f:
 
-def list_model_options():
-    if st.session_state.endpoint_to_use == "ollama":
-        ollama_options = list_ollama_models()
-        if ollama_options == []:
-            #save_text_message(get_session_key(), "assistant", "No models available, please choose one from https://ollama.com/library and pull with /pull <model_name>")
-            st.warning("No ollama models available, please choose one from https://ollama.com/library and pull with /pull <model_name>")
-        return ollama_options
-    elif st.session_state.endpoint_to_use == "openai":
-        return list_openai_models()
+        return base64.b64encode(f.read())
 
-def update_model_options():
-    st.session_state.model_options = list_model_options()
+def base64_to_image(base64_string):
+    base64_string = base64_string.split(",")[1]
+    
+    return Image.open(BytesIO(base64.b64decode(base64_string)))
+
+
 
 def main():
-    # st.title("Multimodal Local Chat App")
-    get_page_config()
-    st.title('TriModal Retrieval Augmented  Chatbot Using Streamlit') 
-    css ="""
-    <style>
-        /* User Chat Message */
 
-        .st-emotion-cache-janbn0 {
-            background-color: #2b313e;
-        }
+    # --- Page Config ---
+    get_page_config()     
 
-        /* AI Chat Message */
+
+    # --- Header ---
+    st.html("""<h1 style="text-align: center; color : #6ca395">TriModal Retrieval Augmented  Chatbot Using Streamlit</h1>""") 
+
+    # --- Side Bar ---
+    with st.sidebar:
+
+        st.header("> TOKEN API KeEYS")
+        cols_keys = st.columns(2)
+        # with cols_keys[0]:
+        #     default_openai_api_key = os.getenv("OPENAI_API_KEY") if os.getenv("OPENAI_API_KEY") is not None else ""  # only for development environment, otherwise it should return None
+        #     with st.popover("🔐 OpenAI"):
+        #         openai_api_key = st.text_input("Introduce your OpenAI API Key (https://platform.openai.com/)", value=default_openai_api_key, type="password")
+        
+        with cols_keys[0]:
+            default_google_api_key = os.getenv("GOOGLE_API_KEY") if os.getenv("GOOGLE_API_KEY") is not None else ""  # only for development environment, otherwise it should return None
+            with st.popover("🔐 Google"):
+                google_api_key = st.text_input("Introduce your Google API Key (https://aistudio.google.com/app/apikey)", value=default_google_api_key, type="password")
+
+        # default_anthropic_api_key = os.getenv("ANTHROPIC_API_KEY") if os.getenv("ANTHROPIC_API_KEY") is not None else ""
+        # with st.popover("🔐 Anthropic"):
+        #     anthropic_api_key = st.text_input("Introduce your Anthropic API Key (https://console.anthropic.com/)", value=default_anthropic_api_key, type="password")
     
-        .st-emotion-cache-4oy321 {
-            background-color: #475063;
-        }
+    # --- Main Content ---
+    # Checking if the user has introduced the OpenAI API Key, if not, a warning is displayed
+    if google_api_key == "" or google_api_key is None:
+    # if (openai_api_key == "" or openai_api_key is None or "sk-" not in openai_api_key) and (google_api_key == "" or google_api_key is None) and (anthropic_api_key == "" or anthropic_api_key is None):
+        st.write("#")
+        st.warning("⬅️ Please introduce an API Key to continue...")
 
-        section[data-testid="stSidebar"] {
-            width: 380px !important;
-        }
-    </style>
-    """
-    st.write(css, unsafe_allow_html=True)
-    
-    if "db_conn" not in st.session_state:
-        st.session_state.session_key = "new_session"
-        st.session_state.new_session_key = None
-        st.session_state.session_index_tracker = "new_session"
-        st.session_state.db_conn = sqlite3.connect(config["chat_sessions_database_path"], check_same_thread=False)
-        st.session_state.audio_uploader_key = 0
-        st.session_state.pdf_uploader_key = 1
-        st.session_state.endpoint_to_use = "ollama"
-        st.session_state.model_options = list_model_options()
-        st.session_state.model_tracker = None
-    if st.session_state.session_key == "new_session" and st.session_state.new_session_key != None:
-        st.session_state.session_index_tracker = st.session_state.new_session_key
-        st.session_state.new_session_key = None
+        with st.sidebar:
+            st.write("#")
+            st.write("#")
+            st.write(" 📋[How to use this Streamlit App ](https://github.com/tph-kds/TriModalRAG_System/tree/main/serving/guide_application.md)")   
 
-    st.sidebar.title("Chat Sessions")
-    chat_sessions = ["new_session"] + get_all_chat_history_ids()
-    try:
-        index = chat_sessions.index(st.session_state.session_index_tracker)
-    except ValueError:
-        st.session_state.session_index_tracker = "new_session"
-        index = chat_sessions.index(st.session_state.session_index_tracker)
-        clear_cache()
+    else:
+        # client = OpenAI(api_key=openai_api_key)
 
-    st.sidebar.selectbox("Select a chat session", chat_sessions, key="session_key", index=index)
-    api_col, model_col = st.sidebar.columns(2)
-    api_col.selectbox(label="Select an API", options = ["ollama","openai"], key="endpoint_to_use", on_change=update_model_options)
-    model_col.selectbox(label="Select a Model", options = st.session_state.model_options, key="model_to_use")
-    pdf_toggle_col, voice_rec_col = st.sidebar.columns(2)
-    pdf_toggle_col.toggle("PDF Chat", key="pdf_chat", value=False, on_change=clear_cache)
-    with voice_rec_col:
-        voice_recording=mic_recorder(start_prompt="Record Audio",stop_prompt="Stop recording", just_once=True)
-    delete_chat_col, clear_cache_col = st.sidebar.columns(2)
-    delete_chat_col.button("Delete Chat Session", on_click=delete_chat_session_history)
-    #clear_cache_col.button("Clear Cache", on_click=clear_cache)
-    
-    chat_container = st.container()
-    user_input = st.chat_input("Type your message here", key="user_input")
-    
-    uploaded_pdf = st.sidebar.file_uploader("Upload a pdf file", accept_multiple_files=True, 
-                                        key=st.session_state.pdf_uploader_key, type=["pdf"], on_change=toggle_pdf_chat)
-    uploaded_image = st.sidebar.file_uploader("Upload an image file", type=["jpg", "jpeg", "png"], on_change=detoggle_pdf_chat)
-    uploaded_audio = st.sidebar.file_uploader("Upload an audio file", type=["wav", "mp3", "ogg"], key=st.session_state.audio_uploader_key)
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
 
-    if uploaded_pdf:
-        with st.spinner("Processing pdf..."):
-            add_documents_to_db(uploaded_pdf)
-            st.session_state.pdf_uploader_key += 2
-
-    if voice_recording:
-        transcribed_audio = transcribe_audio(voice_recording["bytes"])
-        print(transcribed_audio)
-        #llm_chain = load_chain()
-        llm_answer = ChatAPIHandler.chat(user_input = transcribed_audio, 
-                                   chat_history=load_last_k_text_messages_ollama(get_session_key(), config["chat_config"]["chat_memory_length"]))
-        save_audio_message(get_session_key(), "user", voice_recording["bytes"])
-        save_text_message(get_session_key(), "assistant", llm_answer)
-
-    
-    if user_input:
-        if user_input.startswith("/"):
-            response = command(user_input)
-            save_text_message(get_session_key(), "user", user_input)
-            save_text_message(get_session_key(), "assistant", response)
-            user_input = None
-
-        if uploaded_image:
-            with st.spinner("Processing image..."):
-                llm_answer = ChatAPIHandler.chat(user_input = user_input, chat_history = [], image = uploaded_image.getvalue())
-                save_text_message(get_session_key(), "user", user_input)
-                save_image_message(get_session_key(), "user", uploaded_image.getvalue())
-                save_text_message(get_session_key(), "assistant", llm_answer)
-                user_input = None
-
-        if uploaded_audio:
-            transcribed_audio = transcribe_audio(uploaded_audio.getvalue())
-            print(transcribed_audio)
-            llm_answer = ChatAPIHandler.chat(user_input = user_input + "\n" + transcribed_audio, chat_history=[])
-            save_text_message(get_session_key(), "user", user_input)
-            save_audio_message(get_session_key(), "user", uploaded_audio.getvalue())
-            save_text_message(get_session_key(), "assistant", llm_answer)
-            st.session_state.audio_uploader_key += 2
-            user_input = None
-
-        if user_input:
-            llm_answer = ChatAPIHandler.chat(user_input = user_input, 
-                                       chat_history=load_last_k_text_messages_ollama(get_session_key(), config["chat_config"]["chat_memory_length"]))
-            save_text_message(get_session_key(), "user", user_input)
-            save_text_message(get_session_key(), "assistant", llm_answer)
-            user_input = None
+        # Displaying the previous messages if there are any
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                for content in message["content"]:
+                    if content["type"] == "text":
+                        st.write(content["text"])
+                    elif content["type"] == "image_url":      
+                        st.image(content["image_url"]["url"])
+                    elif content["type"] == "video_file":
+                        st.video(content["video_file"])
+                    elif content["type"] == "audio_file":
+                        st.audio(content["audio_file"])
 
 
-    if (st.session_state.session_key != "new_session") != (st.session_state.new_session_key != None):
-        with chat_container:
-            chat_history_messages = load_messages(get_session_key())
 
-            for message in chat_history_messages:
-                with st.chat_message(name=message["sender_type"], avatar=get_avatar(message["sender_type"])):
-                    if message["message_type"] == "text":
-                        st.write(message["content"])
-                    if message["message_type"] == "image":
-                        st.image(message["content"])
-                    if message["message_type"] == "audio":
-                        st.audio(message["content"], format="audio/wav")
+        # Side bar model options and inputs
+        with st.sidebar:
 
-        if (st.session_state.session_key == "new_session") and (st.session_state.new_session_key != None):
-            st.rerun()
+            st.divider()
+            
+            # available_models = [] + (anthropic_models if anthropic_api_key else []) + (google_models if google_api_key else []) + (openai_models if openai_api_key else [])
+            available_models = [] + (google_models if google_api_key else [])
+            model = st.selectbox("Select a model:", available_models, index=0)
+            model_type = None
+            if model.startswith("gpt"): model_type = "google"
+            # if model.startswith("gpt"): model_type = "openai"
+            # elif model.startswith("gemini"): model_type = "google"
+            # elif model.startswith("claude"): model_type = "anthropic"
+            
+            with st.popover("⚙️ Model parameters"):
+                model_temp = st.slider("Temperature", min_value=0.0, max_value=2.0, value=0.3, step=0.1)
 
-if __name__ == "__main__":
+            audio_response = st.toggle("Audio response", value=False)
+            if audio_response:
+                cols = st.columns(2)
+                with cols[0]:
+                    tts_voice = st.selectbox("Select a voice:", ["alloy", "echo", "fable", "onyx", "nova", "shimmer"])
+                with cols[1]:
+                    tts_model = st.selectbox("Select a model:", ["tts-1", "tts-1-hd"], index=1)
+
+            model_params = {
+                "model": model,
+                "temperature": model_temp,
+            }
+
+            def reset_conversation():
+                if "messages" in st.session_state and len(st.session_state.messages) > 0:
+                    st.session_state.pop("messages", None)
+
+            st.button(
+                "🗑️ Reset conversation", 
+                on_click=reset_conversation,
+            )
+
+            st.divider()
+            # File Upload
+            if model in ["gemini-1.5-flash", "gemini-1.5-pro"]:
+                st.write(f"### **🖼️ Upload a pdf file :**")
+
+            # Image Upload
+            if model in ["gemini-1.5-flash", "gemini-1.5-pro"]:
+                    
+                st.write(f"### **🖼️ Add an image{' or a video file' if model_type=='google' else ''}:**")
+                
+                def add_image_to_messages():
+                    if st.session_state.uploaded_img or ("camera_img" in st.session_state and st.session_state.camera_img):
+                        img_type = st.session_state.uploaded_img.type if st.session_state.uploaded_img else "image/jpeg"
+                        if img_type == "video/mp4":
+                            # save the video file
+                            video_id = random.randint(100000, 999999)
+                            with open(f"video_{video_id}.mp4", "wb") as f:
+                                f.write(st.session_state.uploaded_img.read())
+                            st.session_state.messages.append(
+                                {
+                                    "role": "user", 
+                                    "content": [{
+                                        "type": "video_file",
+                                        "video_file": f"video_{video_id}.mp4",
+                                    }]
+                                }
+                            )
+                        else:
+                            raw_img = Image.open(st.session_state.uploaded_img or st.session_state.camera_img)
+                            img = get_image_base64(raw_img)
+                            st.session_state.messages.append(
+                                {
+                                    "role": "user", 
+                                    "content": [{
+                                        "type": "image_url",
+                                        "image_url": {"url": f"data:{img_type};base64,{img}"}
+                                    }]
+                                }
+                            )
+
+                cols_img = st.columns(2)
+
+                with cols_img[0]:
+                    with st.popover("📁 Upload"):
+                        st.file_uploader(
+                            f"Upload an image{' or a video' if model_type == 'google' else ''}:", 
+                            type=["png", "jpg", "jpeg"] + (["mp4"] if model_type == "google" else []), 
+                            accept_multiple_files=False,
+                            key="uploaded_img",
+                            on_change=add_image_to_messages,
+                        )
+
+                with cols_img[1]:                    
+                    with st.popover("📸 Camera"):
+                        activate_camera = st.checkbox("Activate camera")
+                        if activate_camera:
+                            st.camera_input(
+                                "Take a picture", 
+                                key="camera_img",
+                                on_change=add_image_to_messages,
+                            )
+
+            # Audio Upload
+            st.write("#")
+            st.write(f"### **🎤 Add an audio{' (Speech To Text)' if model_type == 'openai' else ''}:**")
+
+            audio_prompt = None
+            audio_file_added = False
+            if "prev_speech_hash" not in st.session_state:
+                st.session_state.prev_speech_hash = None
+
+            speech_input = audio_recorder("Press to talk:", icon_size="3x", neutral_color="#6ca395", )
+            if speech_input and st.session_state.prev_speech_hash != hash(speech_input):
+                st.session_state.prev_speech_hash = hash(speech_input)
+                if model_type != "google":
+                    transcript = client.audio.transcriptions.create(
+                        model="whisper-1", 
+                        file=("audio.wav", speech_input),
+                    )
+
+                    audio_prompt = transcript.text
+
+                elif model_type == "google":
+                    # save the audio file
+                    audio_id = random.randint(100000, 999999)
+                    with open(f"audio_{audio_id}.wav", "wb") as f:
+                        f.write(speech_input)
+
+                    st.session_state.messages.append(
+                        {
+                            "role": "user", 
+                            "content": [{
+                                "type": "audio_file",
+                                "audio_file": f"audio_{audio_id}.wav",
+                            }]
+                        }
+                    )
+
+                    audio_file_added = True
+
+            st.divider()
+            # --- LLM Response ---
+        # col = st.columns([1, 4])
+        # with col[0]:
+        #     st.image("readme/images/logo.png")
+        # with col[1]:
+            # Chat input
+        # with st.expander("💬 Chat", expanded=True):
+
+        if prompt := st.chat_input("Hi! Ask me anything...") or audio_prompt or audio_file_added:
+            if not audio_file_added:
+                st.session_state.messages.append(
+                    {
+                        "role": "user", 
+                        "content": [{
+                            "type": "text",
+                            "text": prompt or audio_prompt,
+                        }]
+                    }
+                )
+                
+                # Display the new messages
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+
+            else:
+                # Display the audio file
+                with st.chat_message("user"):
+                    st.audio(f"audio_{audio_id}.wav")
+
+            with st.chat_message("assistant"):
+                model2key = {
+                    # "openai": openai_api_key,
+                    "google": google_api_key,
+                    # "anthropic": anthropic_api_key,
+                }
+
+                model_params = {
+                    "model": model,
+                    "temperature": temperature,
+                    "max_tokens": max_tokens,
+                    "top_p": top_p,
+                    "frequency_penalty": frequency_penalty,
+                    "presence_penalty": presence_penalty,
+                }
+                inputs = {
+                    "text": pdf_url,
+                    "image": image_url,
+                    "audio": audio_url,
+                    "query": prompt,
+                }
+                st.write_stream(
+                    stream_llm_response(
+                        inputs = inputs,
+                        model_params=model_params, 
+                        model_type=model_type, 
+                        api_inputs=model2key[model_type]
+                    )
+                )
+
+            # --- Added Audio Response (optional) ---
+            if audio_response:
+                response =  client.audio.speech.create(
+                    model=tts_model,
+                    voice=tts_voice,
+                    input=st.session_state.messages[-1]["content"][0]["text"],
+                )
+                audio_base64 = base64.b64encode(response.content).decode('utf-8')
+                audio_html = f"""
+                <audio controls autoplay>
+                    <source src="data:audio/wav;base64,{audio_base64}" type="audio/mp3">
+                </audio>
+                """
+                st.html(audio_html)
+
+
+
+if __name__=="__main__":
     main()
