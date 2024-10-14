@@ -5,7 +5,7 @@ from src.trim_rag.exception import MyException
 from src.trim_rag.config import ConfiguarationManager
 from src.trim_rag.pipeline import DataRetrievalPipeline
 from src.config_params import QDRANT_DB_URL, QDRANT_API_KEY
-from src.trim_rag.retrieval import Retrieval_VectorStore, RetrieverQuery
+from src.trim_rag.retrieval import  RetrieverQuery
 from src.trim_rag.components import QdrantVectorDB
 
 

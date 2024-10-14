@@ -12,7 +12,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 # from langchain_openai import OpenAIEmbeddings
 # from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_huggingface import HuggingFaceEmbeddings
+# from langchain_huggingface import HuggingFaceEmbeddings
 from src.config_params import QDRANT_DB_URL, QDRANT_API_KEY
 from src.trim_rag.embedding import TextEmbedding
 from src.trim_rag.config import TextEmbeddingArgumentsConfig
@@ -30,12 +30,14 @@ class Retrieval_VectorStore:
         
         # self.embeddings = TextEmbedding(config= embed_config)
 
-    def get_embedding_vector_store(self) -> HuggingFaceEmbeddings:
-        # embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
-        embeddings = HuggingFaceEmbeddings(model_name="distilbert-base-uncased",
-                                           model_kwargs={"device": torch.device("cuda" if torch.cuda.is_available() else "cpu")}
-                                           )
-        return embeddings
+    # def get_embedding_vector_store(self) -> HuggingFaceEmbeddings:
+    #     # embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+    #     embeddings = HuggingFaceEmbeddings(model_name="distilbert-base-uncased",
+    #                                        model_kwargs={"device": torch.device("cuda" if torch.cuda.is_available() else "cpu")}
+    #                                        )
+    #     return embeddings
+    def get_embedding_vector_store(self) -> None:
+        return None
 
     def _get_vector_store(self, 
                           name_collection: str) -> QdrantVectorStore:

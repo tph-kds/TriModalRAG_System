@@ -40,7 +40,7 @@ qdrant-client==1.11.1
 langchain-cohere==0.3.0
 langchain-qdrant==0.1.4
 # langchain-openai==0.2.2
-langchain_huggingface==0.1.0
+# langchain_huggingface==0.1.0
 langchain-google-genai==2.0.0
 
 
