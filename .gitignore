@@ -171,7 +171,7 @@ data/audio/*
 data/text/*
 data/image/*
 
-requirements_dev.txt
+# requirements_dev.txt
 serving/multimodalchatbot/*
 serving/gradiochatbot/*
 serving/note.md

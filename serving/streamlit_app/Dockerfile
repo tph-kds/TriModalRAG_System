@@ -1,20 +1,32 @@
-FROM python:3.9-slim
+ARG PYTHON_VERSION=3.9
+ARG ROOT_NAME=streamlit_app
+ARG EXPOSE_CONTAINER_PORT=8501
+ARG SEVER_STREAMLIT_ADDRESS=0.0.0.0
 
-RUN mdkdir -p /usr/serving/streamlit_app
+
+
+FROM python:${PYTHON_VERSION}-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    ROOT_NAME=${ROOT_NAME} \
+    EXPOSE_CONTAINER_PORT=${EXPOSE_CONTAINER_PORT} \
+    SEVER_STREAMLIT_ADDRESS=${SEVER_STREAMLIT_ADDRESS}
+
+RUN mdkdir -p /usr/serving/${ROOT_NAME}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 build-essential \
 git \
 && rm -rf /var/lib/apt/lists/*
 
-COPY ./app /usr/serving/streamlit_app
+COPY ./app /usr/serving/${ROOT_NAME}
 
-WORKDIR /usr/serving/streamlit_app
+WORKDIR /usr/serving/${ROOT_NAME}
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 8501
+EXPOSE ${EXPOSE_CONTAINER_PORT}
 
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
-ENTRYPOINT ["streamlit", "run", "streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "streamlit_app.py", "--server.port=${EXPOSE_CONTAINER_PORT}", "--server.address=${SEVER_STREAMLIT_ADDRESS}"]
