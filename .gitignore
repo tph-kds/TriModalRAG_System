@@ -175,4 +175,5 @@ data/image/*
 serving/multimodalchatbot/*
 serving/gradiochatbot/*
 serving/note.md
+serving/streamlit_app/data/*
 

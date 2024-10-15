@@ -1,7 +1,10 @@
-import os
-import sys
-from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
+
+
+from src.trim_rag.utils.qdrant_data import (
+    convert_qdrantdata_tokens, 
+    convert_qdrantdata_desc
+)
 
 
 from src.trim_rag.config import ConfiguarationManager
@@ -10,12 +13,8 @@ from tests.integration import (
     data_retriever,
     data_generation,
 )
-from src.trim_rag.utils import (
-    convert_qdrantdata_tokens, 
-    convert_qdrantdata_desc
-)
 
-def settup_config_llm(inputs: Dict) -> Dict:
+def settup_config_llm(inputs: Dict):
     """set up config for llm
 
     Args:
@@ -38,7 +37,7 @@ def settup_config_llm(inputs: Dict) -> Dict:
                 "stop": inputs["stop"] if "stop" in inputs else None
         }
 
-def set_up_api_config(inputs: Dict) -> Dict:
+def set_up_api_config(inputs: Dict):
     """set up api config
 
     Args:
@@ -80,6 +79,7 @@ def result_scenarios( question_str: str = None,
         config_manager = ConfiguarationManager()
         embed_config = config_manager.get_data_embedding_arguments_config()
 
+        print(str(question_str), str(image_url), str(video_url))
         text_embedding, image_embedding, audio_embedding = data_inference(
             text = str(question_str), 
             image = str(image_url), 

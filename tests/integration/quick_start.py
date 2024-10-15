@@ -61,7 +61,7 @@ def main( question_str=None,
             "max_retries" : 6,
             "stop" : None,
         }
-
+        
         text_embedding, image_embedding, audio_embedding = data_inference(
             text = str(question_str), 
             image = str(image_url), 
