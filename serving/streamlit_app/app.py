@@ -20,7 +20,8 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 google_models = [
     "gemini-1.5-flash-001",
     "gemini-1.5-flash",
-    "gemini-1.5-pro",
+    "gemini-1.5-flash-8b-001",
+    "gemini-1.5-flash-8b",
 ]
 
 def get_page_config():
@@ -78,7 +79,7 @@ def stream_llm_response(inputs, model_params, model_type="google", api_inputs=No
     api_config = set_up_api_config(api_inputs)
     
     if model_type == "google":
-        ai_response, meta_repsonse = result_scenarios(
+        ai_response, _, meta_repsonse = result_scenarios(
             question_str=inputs["text"],
             image_url=inputs["image"],
             video_url=inputs["audio"],
@@ -88,8 +89,51 @@ def stream_llm_response(inputs, model_params, model_type="google", api_inputs=No
             llm_setup=llm_config
         )
         response_message = ai_response
-        gemini_messages = messages_to_gemini(st.session_state.messages)
+        # gemini_messages = messages_to_gemini(st.session_state.messages)
+        text_response, text_status = (meta_repsonse["text_answer"], True) if meta_repsonse["text_answer"] else (meta_repsonse["text_answer"], False)
+        image_response, image_status = (meta_repsonse["image_answer"], True) if meta_repsonse["image_answer"] else (meta_repsonse["image_answer"], False)
+        audio_response, audio_status = (meta_repsonse["audio_answer"], True) if meta_repsonse["audio_answer"] else (meta_repsonse["audio_answer"], False) 
+        ## Text streaming 
+        Systems = {
+            "text": {
+                "system": "\n\nResponse Messages from only TEXT FILE of LLMs:\n",
+                "res" : text_response,
+                "status": text_status, # Check this is None or not
+            },
+            "image": {
+                "system": "\n\nResponse Messages from only IMAGE FILE of LLMs:\n",
+                "res": image_response,
+                "status": image_status, # Check this is None or not
+            },
+            "audio": {
+                "system": "\n\nResponse Messages from only AUDIO FILE of LLMs:\n",
+                "res": audio_response,
+                "status": audio_status, # Check this is None or not
+            }
 
+        }
+        ## Image streaming
+
+        ## Audio streaming
+        for key, system in Systems.items():
+            message_response_only = system
+            if message_response_only["status"]:
+                for messs_w in message_response_only["system"].split(" "):
+                    yield messs_w + " "
+                    time.sleep(0.02)
+
+                for sw in message_response_only["res"].split(" "):
+                    yield sw + " "
+                    time.sleep(0.02)
+        
+        for word in "\n\nSummarize all the responses:\n".split(" "):
+            yield word + " "
+            time.sleep(0.02)
+        yield "\n\n\n"
+        ## Summarize streaming
+        for word in ai_response.split(" "):
+            yield word + " "
+            time.sleep(0.02)
 
 
 
@@ -165,10 +209,13 @@ def main():
         with st.popover("🔐 LangChain"):
             langchain_api_key = st.text_input("Introduce your LangChain API Key (https://aistudio.google.com/app/apikey)", value=default_langchain_api_key, type="password")
 
+        default_cohere_api_key = os.getenv("COHERE_API_KEY") if os.getenv("COHERE_API_KEY") is not None else ""  # only for development environment, otherwise it should return None
+        with st.popover("🔐 Cohere"):
+            cohere_api_key = st.text_input("Introduce your COHERE API Key (https://aistudio.google.com/app/apikey)", value=default_cohere_api_key, type="password")
 
     # --- Main Content ---
     # Checking if the user has introduced the OpenAI API Key, if not, a warning is displayed
-    if ((google_api_key == "" or google_api_key is None) or (langchain_api_key == "" or langchain_api_key is None)):
+    if ((google_api_key == "" or google_api_key is None) or (langchain_api_key == "" or langchain_api_key is None) or (cohere_api_key == "" or cohere_api_key is None)):
     # if (openai_api_key == "" or openai_api_key is None or "sk-" not in openai_api_key) and (google_api_key == "" or google_api_key is None) and (anthropic_api_key == "" or anthropic_api_key is None):
         st.write("#")
         st.warning("⬅️ Please introduce an API Key to continue...")
@@ -213,31 +260,13 @@ def main():
             model = st.selectbox("Select a model:", available_models, index=0)
             model_type = None
             if model.startswith("gemini"): model_type = "google"
-            # if model.startswith("gpt"): model_type = "openai"
-            # elif model.startswith("gemini"): model_type = "google"
-            # elif model.startswith("claude"): model_type = "anthropic"
+
             
             with st.popover("⚙️ Model parameters"):
-                model_temp = st.slider("Temperature", min_value=0.0, max_value=2.0, value=0.3, step=0.1)
-                model_tokens = st.slider("Max tokens", min_value=0, max_value=4096, value=1024, step=64)
-                model_retries = st.slider("Max retries", min_value=0, max_value=10, value=3, step=1)
+                model_temp = st.slider("Temperature", min_value=0.0, max_value=2.0, value=0.0, step=0.1)
+                model_tokens = st.slider("Max tokens", min_value=0, max_value=4096, value=128, step=64)
+                model_retries = st.slider("Max retries", min_value=0, max_value=10, value=6, step=1)
                 model_stop = st.text_input("Stop sequence", value="\n")
-
-            # audio_response = st.toggle("Audio response", value=False)
-            # if audio_response:
-            #     cols = st.columns(2)
-            #     with cols[0]:
-            #         tts_voice = st.selectbox("Select a voice:", ["alloy", "echo", "fable", "onyx", "nova", "shimmer"])
-            #     with cols[1]:
-            #         tts_model = st.selectbox("Select a model:", ["tts-1", "tts-1-hd"], index=1)
-
-            model_params = {
-                "model_name": model,
-                "temperature": model_temp,
-                "max_tokens": model_tokens,
-                "max_retries": model_retries,
-                "stop": model_stop,
-            }
 
 
             def reset_conversation():
@@ -250,22 +279,18 @@ def main():
                 "🗑️ Reset conversation", 
                 on_click=reset_conversation,
             )
-            # if reset_conversation_col:
-            #     pdf_upload = None
-            #     image_path = None
-            #     audio_path = None
 
             st.divider()
             # File Upload
 
             # Image Upload
-            if model in ["gemini-1.5-flash-001", "gemini-1.5-flash", "gemini-1.5-pro"]:
+            if model in ["gemini-1.5-flash-001", "gemini-1.5-flash", "gemini-1.5-flash-8b-001", "gemini-1.5-flash-8b"]:
                     
                 # st.write(f"### **🖼️ Add an image{' or a video file' if model_type=='google' else ''}:**")
                 def add_pdf_to_messages():
                     # if st.session_state.uploaded_pdf:
                     #     pdf_type = st.session_state.uploaded_pdf.type if st.session_state.uploaded_pdf else "file/pdf"
-                    if st.session_state.uploaded_pdf:
+                    if st.session_state.uploaded_pdf and ("uploaded_pdf" in st.session_state):
                         # pdf_file_added = True
                         full_path_pdf = ROOT_DIR + f"\\data\\pdf\\pdf_{st.session_state.uploaded_pdf.name}" 
                         # with open(full_path_pdf, "wb") as f:
@@ -303,22 +328,22 @@ def main():
                                 }]
                             }
                         )
-                def add_audio_to_messages():
-                    if st.session_state.uploaded_audio_file:
-                        # audio_file_added = True
-                        full_path_audio = ROOT_DIR +  f"\\data\\audio\\audio_{st.session_state.uploaded_audio_file.name}" 
-                        # with open(full_path_audio, "wb") as f:
-                        #     f.write(st.session_state.uploaded_audio_file.getbuffer())
-                        # time.sleep(1)
-                        st.session_state.messages.append(
-                            {
-                                "role": "user", 
-                                "content": [{
-                                    "type": "audio_url",
-                                    "audio_url": {"url": f"{full_path_audio}"}
-                                }]
-                            }
-                        )
+                # def add_audio_to_messages():
+                #     if st.session_state.uploaded_audio_file or ("uploaded_audio_file" in st.session_state):
+                #         # audio_file_added = True
+                #         full_path_audio = ROOT_DIR +  f"\\data\\audio\\audio_{st.session_state.uploaded_audio_file.name}" 
+                #         # with open(full_path_audio, "wb") as f:
+                #         #     f.write(st.session_state.uploaded_audio_file.getbuffer())
+                #         # time.sleep(1)
+                #         st.session_state.messages.append(
+                #             {
+                #                 "role": "user", 
+                #                 "content": [{
+                #                     "type": "audio_url",
+                #                     "audio_url": {"url": f"{full_path_audio}"}
+                #                 }]
+                #             }
+                #         )
                 # PDF Uploader
                 st.write(f"### **📖 Add a pdf file:**")
                 with st.popover("📁 Upload"):
@@ -335,7 +360,7 @@ def main():
                         full_path_pdf = ROOT_DIR + f"\\data\\pdf\\pdf_{pdf_upload.name}" 
                         with open(full_path_pdf, "wb") as f:
                             f.write(pdf_upload.getbuffer())
-                        time.sleep(1)
+                        time.sleep(0.01)
                     #     st.session_state.messages.append(
                     #         {
                     #             "role": "user", 
@@ -354,7 +379,7 @@ def main():
                 # Image Uploader
                 image_file_added = False
                 image_option = st.toggle("Image option", value=False)
-                if image_option:
+                if image_option == False:
                     st.write(f"### **🖼️ Add an image{' or a video file' if model_type=='google' else ''}:**")
                     image_upload = None
                     with st.popover("📁 Upload"):
@@ -369,14 +394,14 @@ def main():
                             full_path_image = ROOT_DIR +  f"\\data\\image\\image_{image_upload.name}" 
                             with open(full_path_image, "wb") as f:
                                 f.write(image_upload.getbuffer())
-                            time.sleep(1)
+                            time.sleep(0.01)
                         # image_path = image_upload.name if image_upload else None
                             st.session_state.info["image_target_url"] = full_path_image
 
                     if image_upload:
                         image_file_added = True
 
-                    st.write(f"image_upload: {image_path if image_upload else None}")
+                    st.write(f"image_upload: {image_upload.name if image_upload else None}")
 
                 else:
                     st.write(f"### ** Add a video file:**")
@@ -403,6 +428,23 @@ def main():
 
 
             st.divider()
+
+            def add_audio_to_messages():
+                if st.session_state.uploaded_audio_file and ("uploaded_audio_file" in st.session_state):
+                    # audio_file_added = True
+                    full_path_audio = ROOT_DIR +  f"\\data\\audio\\audio_{st.session_state.uploaded_audio_file.name}" 
+                    # with open(full_path_audio, "wb") as f:
+                    #     f.write(st.session_state.uploaded_audio_file.getbuffer())
+                    # time.sleep(1)
+                    st.session_state.messages.append(
+                        {
+                            "role": "user", 
+                            "content": [{
+                                "type": "audio_url",
+                                "audio_url": {"url": f"{full_path_audio}"}
+                            }]
+                        }
+                    )
             # Audio Upload
             st.write("#")
             st.write(f"### **🎤 Add an audio:**")
@@ -439,7 +481,7 @@ def main():
                             with open(audio_path, "wb") as f:
                                 f.write(speech_input)
 
-                            time.sleep(1)
+                            time.sleep(0.01)
                             if audio_path:
                                 st.session_state.messages.append(
                                     {
@@ -485,7 +527,7 @@ def main():
                             full_path_audio = ROOT_DIR +  f"\\data\\audio\\audio_{audio_upload.name}" 
                             with open(full_path_audio, "wb") as f:
                                 f.write(audio_upload.getbuffer())
-                            time.sleep(1)
+                            time.sleep(0.01)
                         # audio_path = audio_upload.name if audio_upload else None
                             st.session_state.info["audio_target_url"] = full_path_audio
 
@@ -504,10 +546,10 @@ def main():
                     "content": [{
                         "type": "prompt",
                         "prompts": {
-                            "prompt" : f"{prompt}:\n\n" ,
-                             "prompt_pdf" : f" PDF: {st.session_state.info['pdf_target_url']} \n ",
-                            "prompt_image" : f" Image: {st.session_state.info['image_target_url']}\n ",
-                            "prompt_audio" : f" Audio: {st.session_state.info['audio_target_url']}\n ", 
+                            "prompt" : f" {prompt}:\n\n" ,
+                             "prompt_pdf" : f" PDF File: {st.session_state.info['pdf_target_url']} \n ",
+                            "prompt_image" : f" Image File: {st.session_state.info['image_target_url']}\n ",
+                            "prompt_audio" : f" Audio File: {st.session_state.info['audio_target_url']}\n ", 
                         }
                     }]
                 }
@@ -520,7 +562,9 @@ def main():
                          "\n\n" + \
                          st.session_state.messages[-1]["content"][0]["prompts"]["prompt_image"] + \
                          "\n\n" + \
-                         st.session_state.messages[-1]["content"][0]["prompts"]["prompt_audio"])
+                         st.session_state.messages[-1]["content"][0]["prompts"]["prompt_audio"] + \
+                         "\n\n" + \
+                         st.session_state.messages[-1]["content"][0]["prompts"]["prompt"])
 
             # else:
             #     # Display the audio file
@@ -530,10 +574,18 @@ def main():
             with st.chat_message("assistant"):
                 model2key = {
                     "GOOGLE_API_KEY": google_api_key, 
+                    "COHERE_API_KEY": cohere_api_key,
                     "LANGCHAIN_API_KEY" : langchain_api_key, 
                     "LANGCHAIN_ENDPOINT" : os.getenv("LANGCHAIN_ENDPOINT"), 
                     "LANGCHAIN_TRACING_V2" : os.getenv("LANGCHAIN_TRACING_V2"),
                     "LANGCHAIN_PROJECT" : os.getenv("LANGCHAIN_PROJECT"),
+                }
+                model_params = {
+                    "model_name": model,
+                    "temperature": model_temp,
+                    "max_tokens": model_tokens,
+                    "max_retries": model_retries,
+                    "stop": model_stop,
                 }
 
                 target_url = st.session_state.info

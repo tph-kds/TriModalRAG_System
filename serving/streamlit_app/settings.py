@@ -30,7 +30,7 @@ def settup_config_llm(inputs: Dict):
         Dict: config for llm
     """
     return {
-                "model_name": inputs["model"] if "model" in inputs else "gemini-1.0",
+                "model_name": inputs["model_name"] if "model_name" in inputs else "gemini-1.5-flash-8b-001",
                 "temperature": inputs["temperature"] if "temperature" in inputs else 0.3,
                 "max_tokens": inputs["max_tokens"] if "max_tokens" in inputs else 128,
                 "max_retries": inputs["max_retries"] if "max_retries" in inputs else 3,
@@ -54,6 +54,7 @@ def set_up_api_config(inputs: Dict):
     """
     return {
         "GOOGLE_API_KEY": inputs["GOOGLE_API_KEY"], 
+        "COHERE_API_KEY": inputs["COHERE_API_KEY"],
         "LANGCHAIN_API_KEY" : inputs["LANGCHAIN_API_KEY"], 
         "LANGCHAIN_ENDPOINT" : inputs["LANGCHAIN_ENDPOINT"], 
         "LANGCHAIN_TRACING_V2" : inputs["LANGCHAIN_TRACING_V2"],
@@ -95,7 +96,7 @@ def result_scenarios( question_str: str = None,
         lir_retriever_audio = convert_qdrantdata_desc(inputs=retriever_audio)
 
         # inform data  generation stage of the pipeline
-        rag_chain, metadata = data_generation(lir_retriever, 
+        rag_chain, metadata, meta_response = data_generation(lir_retriever, 
                                     lir_retriever_image,
                                     lir_retriever_audio,
                                     question_str,
@@ -106,7 +107,7 @@ def result_scenarios( question_str: str = None,
         ai_answer = rag_chain.invoke(metadata)
 
         # logger.log_message("info", "")
-        return ai_answer, metadata
+        return ai_answer, metadata, meta_response
 
     # except Exception as e:
     #     logger.log_message("warning", f"Failed to run an application scenarios by using {serving_format.upper()}: " + str(e))

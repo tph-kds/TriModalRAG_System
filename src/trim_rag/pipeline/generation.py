@@ -57,7 +57,9 @@ class GenerationPipeline:
                                                           llm_config=llm_config,
                                                           )
         
-        self.post_processing = PostProcessing(config=self.post_processing_config)
+        self.post_processing = PostProcessing(config=self.post_processing_config,
+                                              COHERE_API_KEY=api_config["COHERE_API_KEY"]
+                                              )
         self.chat_history: BaseMessage  = [
             HumanMessage(content="Hello, How about you with a weather, today?"),
             AIMessage(content="Hi, I'm doing well, but more colder for the previous day. How about you?"),
@@ -120,7 +122,7 @@ class GenerationPipeline:
             logger.log_message("info", "Generation pipeline completed")
             print(rag_chain.invoke(meta_data_main))
 
-            return rag_chain, meta_data_main
+            return rag_chain, meta_data_main, full_message
 
         except Exception as e:
             logger.log_message("warning", "Failed to run generation pipeline: " + str(e))

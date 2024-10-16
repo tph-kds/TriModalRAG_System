@@ -28,7 +28,8 @@ from src.config_params import (
     LANGCHAIN_PROJECT,
     LANGCHAIN_TRACING_V2,
     GOOGLE_API_KEY,
-    LANGCHAIN_API_KEY
+    LANGCHAIN_API_KEY,
+    COHERE_API_KEY
 )
 from langchain_core.runnables import Runnable
 
@@ -53,6 +54,7 @@ def main( image_url=None,
         embed_config = config_manager.get_data_embedding_arguments_config()
         api_config = {
             "GOOGLE_API_KEY": GOOGLE_API_KEY,
+            "COHERE_API_KEY": COHERE_API_KEY,
             "LANGCHAIN_API_KEY" : LANGCHAIN_API_KEY,
             "LANGCHAIN_ENDPOINT" : LANGCHAIN_ENDPOINT, 
             "LANGCHAIN_TRACING_V2" : LANGCHAIN_TRACING_V2, 
@@ -99,7 +101,7 @@ def main( image_url=None,
 
 
         # inform data  generation stage of the pipeline
-        rag_chain, metadata = data_generation(lir_retriever, 
+        rag_chain, metadata, meta_response = data_generation(lir_retriever, 
                                     lir_retriever_image,
                                     lir_retriever_audio,
                                     question_str,

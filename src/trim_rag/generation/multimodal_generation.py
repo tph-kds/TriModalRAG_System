@@ -303,7 +303,6 @@ class MultimodalGeneration:
         try:
 
             logger.log_message("info", "Getting llm distributed by Google in multimodal generation started.")
-            # gemini-1.0-pro-vision-001
             llm = ChatGoogleGenerativeAI(
                 model = name_model,
                 temperature = temperature,
@@ -330,6 +329,7 @@ class MultimodalGeneration:
         if "GOOGLE_API_KEY" not in os.environ:
             # os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
             os.environ["GOOGLE_API_KEY"] = api["GOOGLE_API_KEY"]
+        os.environ["COHERE_API_KEY"] = api["COHERE_API_KEY"]
         os.environ["LANGSMITH_API_KEY"] = api["LANGCHAIN_API_KEY"]
         os.environ["LANGSMITH_ENDPOINT"] = api["LANGCHAIN_ENDPOINT"]
         os.environ["LANGSMITH_TRACING"] = api["LANGCHAIN_TRACING_V2"]
