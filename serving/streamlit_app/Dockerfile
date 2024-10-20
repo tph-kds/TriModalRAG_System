@@ -27,7 +27,7 @@ WORKDIR /usr/serving/${ROOT_NAME}
 
 # Copy requirements.txt and install dependencies
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Copy the rest of the application code
 COPY . .

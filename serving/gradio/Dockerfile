@@ -23,7 +23,7 @@ COPY ./serving/gradio /usr/serving/${ROOT_NAME}
 
 WORKDIR /usr/serving/${ROOT_NAME}
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 EXPOSE ${EXPOSE_CONTAINER_PORT}
 
