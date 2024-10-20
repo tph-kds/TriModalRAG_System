@@ -17,6 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./serving/gradio /usr/serving/${ROOT_NAME}
+COPY requirements.txt ./
+
 
 WORKDIR /usr/serving/${ROOT_NAME}
 

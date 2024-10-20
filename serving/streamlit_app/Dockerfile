@@ -20,10 +20,16 @@ git \
 && rm -rf /var/lib/apt/lists/*
 
 COPY ./serving/streamlit_app /usr/serving/${ROOT_NAME}
+COPY requirements.txt ./
 
 WORKDIR /usr/serving/${ROOT_NAME}
 
+# Copy requirements.txt and install dependencies
+
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code
+COPY . .
 
 EXPOSE ${EXPOSE_CONTAINER_PORT}
 
