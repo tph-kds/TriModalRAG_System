@@ -11,13 +11,14 @@ ROOT_NAME=${ROOT_NAME}
 
 RUN mkdir -p /usr/serving/${ROOT_NAME}
 
+COPY requirements.txt ./
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     git \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./serving/gradio /usr/serving/${ROOT_NAME}
-COPY requirements.txt ./
 
 
 WORKDIR /usr/serving/${ROOT_NAME}
