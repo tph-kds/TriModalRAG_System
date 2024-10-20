@@ -19,7 +19,7 @@ build-essential \
 git \
 && rm -rf /var/lib/apt/lists/*
 
-COPY ./app /usr/serving/${ROOT_NAME}
+COPY ./serving/streamlit_app /usr/serving/${ROOT_NAME}
 
 WORKDIR /usr/serving/${ROOT_NAME}
 

@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ./app /usr/serving/${ROOT_NAME}
+COPY ./serving/gradio /usr/serving/${ROOT_NAME}
 
 WORKDIR /usr/serving/${ROOT_NAME}
 
