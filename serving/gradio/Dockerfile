@@ -11,7 +11,7 @@ ROOT_NAME=${ROOT_NAME}
 
 RUN mkdir -p /usr/serving/${ROOT_NAME}
 
-COPY requirements.txt ./
+COPY requirements.txt ./usr/serving/${ROOT_NAME}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -23,7 +23,7 @@ COPY ./serving/gradio /usr/serving/${ROOT_NAME}
 
 WORKDIR /usr/serving/${ROOT_NAME}
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE ${EXPOSE_CONTAINER_PORT}
 

@@ -14,7 +14,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 RUN mkdir -p /usr/serving/${ROOT_NAME}
 
-COPY requirements.txt ./
+COPY requirements.txt ./usr/serving/${ROOT_NAME}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 build-essential \
@@ -27,7 +27,7 @@ WORKDIR /usr/serving/${ROOT_NAME}
 
 # Copy requirements.txt and install dependencies
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
 COPY . .
