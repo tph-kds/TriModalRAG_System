@@ -33,6 +33,7 @@
 #                         text_input, 
 #                         image_input,  
 #                         audio_input, 
+#                         prompt,
 #                         **kwargs) -> None:
 #         """Run the query through TriModal RAG with message history."""
 
