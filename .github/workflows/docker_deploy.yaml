@@ -52,7 +52,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: serving/streamlit_app/Dockerfile.streamlit
+          file: serving/streamlit_app/Dockerfile
           push: true
           tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.STREAMLIT_DOCKERHUB }}:${{ env.IMAGE_TAG }}
           buildargs: BUILDKIT_INLINE_CACHE=1
@@ -62,7 +62,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: serving/gradio/Dockerfile.gradio
+          file: serving/gradio/Dockerfile
           push: true
           tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.GRADIO_DOCKERHUB }}:${{ env.IMAGE_TAG }}
           buildargs: BUILDKIT_INLINE_CACHE=1
