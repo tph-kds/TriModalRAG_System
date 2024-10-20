@@ -14,10 +14,13 @@ ENV PYTHONUNBUFFERED=1 \
 
 RUN mkdir -p /usr/serving/${ROOT_NAME}
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-build-essential \
-git \
-&& rm -rf /var/lib/apt/lists/*
+RUN RUN apt-get update && apt-get install -y \
+        build-essential \
+        libpq-dev \
+        libjpeg-dev \
+        libssl-dev \
+        git \
+        && rm -rf /var/lib/apt/lists/*
 
 COPY ./serving/streamlit_app /usr/serving/${ROOT_NAME}
 COPY requirements.txt ./
