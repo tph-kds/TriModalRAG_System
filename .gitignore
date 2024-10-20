@@ -176,4 +176,5 @@ serving/multimodalchatbot/*
 serving/gradiochatbot/*
 serving/note.md
 serving/streamlit_app/data/*
+src/trim_rag/generation/multimodal_withmemories.py
 

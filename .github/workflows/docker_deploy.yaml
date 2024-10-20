@@ -54,7 +54,7 @@ jobs:
           context: .
           file: serving/streamlit/Dockerfile.streamlit
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/${ env.STREAMLIT_DOCKERHUB }:${ env.IMAGE_TAG }
+          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.STREAMLIT_DOCKERHUB }}:${{ env.IMAGE_TAG }}
           buildargs: BUILDKIT_INLINE_CACHE=1
       
       - name: build and push gradio
@@ -64,7 +64,7 @@ jobs:
           context: .
           file: serving/gradio/Dockerfile.gradio
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/${ env.GRADIO_DOCKERHUB }:${ env.IMAGE_TAG }
+          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.GRADIO_DOCKERHUB }}:${{ env.IMAGE_TAG }}
           buildargs: BUILDKIT_INLINE_CACHE=1
 
       - name: Run docker-compose
