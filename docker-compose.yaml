@@ -38,12 +38,12 @@ services:
       - 7860:7860
     restart: unless-stopped
     environment:
-      - GRADIO_SERVER_NAME=${GRADIO_SERVER_NAME}
-      - GRADIO_PORT=${GRADIO_PORT}
-      - GRADIO_SERVER_PORT=${GRADIO_SERVER_PORT}
-      - GRADIO_AUTH=${GRADIO_AUTH}
-      - GRADIO_AUTH_UID=${GRADIO_AUTH_UID}
-      - GRADIO_AUTH_PW=${GRADIO_AUTH_PW} 
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_PORT=7860
+      - GRADIO_SERVER_PORT=7860
+      - GRADIO_AUTH=True
+      - GRADIO_AUTH_UID=gradio_user
+      - GRADIO_AUTH_PW=gradio_password 
     expose:
       - 7860
     networks:
@@ -58,12 +58,12 @@ services:
       - 8501:8501
     restart: unless-stopped
     environment:
-      - STREAMLIT_SERVER_NAME=${STREAMLIT_SERVER_NAME}
-      - STREAMLIT_PORT=${STREAMLIT_PORT}
-      - STREAMLIT_SERVER_PORT=${STREAMLIT_SERVER_PORT}
-      - STREAMLIT_AUTH=${STREAMLIT_AUTH}
-      - STREAMLIT_AUTH_UID=${STREAMLIT_AUTH_UID}
-      - STREAMLIT_AUTH_PW=${STREAMLIT_AUTH_PW} 
+      - STREAMLIT_SERVER_NAME=0.0.0.0
+      - STREAMLIT_PORT=8501
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_AUTH=True
+      - STREAMLIT_AUTH_UID=streamlit_user
+      - STREAMLIT_AUTH_PW=streamlit_password 
     expose:
       - 8501
     networks:
