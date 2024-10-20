@@ -9,7 +9,7 @@ FROM python:${PYTHON_VERSION}-slim
 ENV PYTHONUNBUFFERED=${PYTHONUNBUFFERED} \
 ROOT_NAME=${ROOT_NAME}
 
-RUN mdkdir -p /usr/serving/${ROOT_NAME}
+RUN mkdir -p /usr/serving/${ROOT_NAME}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \

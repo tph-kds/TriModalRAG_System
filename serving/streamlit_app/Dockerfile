@@ -12,7 +12,7 @@ ENV PYTHONUNBUFFERED=1 \
     EXPOSE_CONTAINER_PORT=${EXPOSE_CONTAINER_PORT} \
     SEVER_STREAMLIT_ADDRESS=${SEVER_STREAMLIT_ADDRESS}
 
-RUN mdkdir -p /usr/serving/${ROOT_NAME}
+RUN mkdir -p /usr/serving/${ROOT_NAME}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 build-essential \
