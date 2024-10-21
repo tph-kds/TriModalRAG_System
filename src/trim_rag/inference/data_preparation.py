@@ -7,8 +7,8 @@ import torch
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 from src.trim_rag.config import (
-    DataTransformationArgumentsConfig, 
-    MultimodalEmbeddingArgumentsConfig
+    DataTransformationArgumentsConfig,
+    MultimodalEmbeddingArgumentsConfig,
 )
 from src.trim_rag.pipeline import DataEmbeddingPipeline
 
@@ -17,15 +17,14 @@ from langchain_core.pydantic_v1 import BaseModel
 
 
 class DataInference(Embeddings):
-    def __init__(self,
-                 multi_embed_config: MultimodalEmbeddingArgumentsConfig, 
-                 embed_config: DataTransformationArgumentsConfig,
-                ) -> None:
+    def __init__(
+        self,
+        multi_embed_config: MultimodalEmbeddingArgumentsConfig,
+        embed_config: DataTransformationArgumentsConfig,
+    ) -> None:
         self.embed_config = embed_config
-        self.multi_embed_config = multi_embed_config 
-        self.embed = DataEmbeddingPipeline(multi_embed_config, 
-                                           embed_config
-                                           )
+        self.multi_embed_config = multi_embed_config
+        self.embed = DataEmbeddingPipeline(multi_embed_config, embed_config)
         # self.data = self.config.data
 
         # self.text_data = self.data.text_data
@@ -39,16 +38,17 @@ class DataInference(Embeddings):
         # self.collection_text_name = self.text_data.collection_text_name
         # self.collection_image_name = self.image_data.collection_image_name
         # self.collection_audio_name = self.audio_data.collection_audio_name
-    def data_inference(self):   
+
+    def data_inference(self):
         pass
 
-    def _embed_data(self, 
-                    text_data: Optional[List[str]],
-                    image_data: Optional[List[str]],
-                    audio_data: Optional[List[str]],
-                    type_embed: Optional[str],
-                    ) -> Union[Tuple[torch.Tensor, torch.Tensor, torch.Tensor], torch.Tensor]:
-        
+    def _embed_data(
+        self,
+        text_data: Optional[List[str]],
+        image_data: Optional[List[str]],
+        audio_data: Optional[List[str]],
+        type_embed: Optional[str],
+    ) -> Union[Tuple[torch.Tensor, torch.Tensor, torch.Tensor], torch.Tensor]:
         try:
             logger.log_message("info", "Embedding data...")
 
@@ -65,25 +65,32 @@ class DataInference(Embeddings):
                 audio_embeds = self.embed.audio_embedding(audios=audio_data)
             else:
                 audio_embeds = None
-            
+
             if type_embed == "all":
                 embeddings = self.embed._multimodal_embedding()
                 return embeddings
 
-            text_new_embeddings, image_new_embeddings, audio_new_embeddings = self.embed.shared_embedding_space(text_embeds[0],
-                                                                                                          image_embeds,
-                                                                                                          audio_embeds)
+            (
+                text_new_embeddings,
+                image_new_embeddings,
+                audio_new_embeddings,
+            ) = self.embed.shared_embedding_space(
+                text_embeds[0], image_embeds, audio_embeds
+            )
 
-            logger.log_message("info", "Data embedding pipeline completed successfully.")
+            logger.log_message(
+                "info", "Data embedding pipeline completed successfully."
+            )
             return text_new_embeddings, image_new_embeddings, audio_new_embeddings
 
-
         except Exception as e:
-        
-            logger.log_message("warning", "Data type not supported. Please select 'text', 'image', or 'audio'")
+            logger.log_message(
+                "warning",
+                "Data type not supported. Please select 'text', 'image', or 'audio'",
+            )
             my_exception = MyException(
                 error_message="Data type not supported. Please select 'text', 'image', or 'audio'",
-                error_details=sys
+                error_details=sys,
             )
             print(my_exception)
 
@@ -97,7 +104,6 @@ class DataInference(Embeddings):
             List of embeddings, one for each text.
         """
         pass
-
 
     def embed_query(self, text: str) -> List[float]:
         """Compute query embeddings using a HuggingFace transformer model.

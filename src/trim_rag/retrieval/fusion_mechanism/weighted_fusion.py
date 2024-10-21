@@ -17,11 +17,9 @@ class WeightedFusion(nn.Module):
 
         self.weights = self._weights_fusion()
 
-    def forward(self, 
-                text: torch.Tensor, 
-                image: torch.Tensor, 
-                audio: torch.Tensor
-                ) -> torch.Tensor:
+    def forward(
+        self, text: torch.Tensor, image: torch.Tensor, audio: torch.Tensor
+    ) -> torch.Tensor:
         print("Hung")
         none_count = 0
         if text is None:
@@ -33,11 +31,19 @@ class WeightedFusion(nn.Module):
         if audio is None:
             none_count += 1
             audio = 0
-        
-        weighted_sum = (self.weights[0] * text) + (self.weights[1] * image) + (self.weights[2] * audio)
-        
-        return weighted_sum / (torch.sum(self.weights) - none_count) if torch.sum(self.weights) - none_count > 0 else 0
-    
+
+        weighted_sum = (
+            (self.weights[0] * text)
+            + (self.weights[1] * image)
+            + (self.weights[2] * audio)
+        )
+
+        return (
+            weighted_sum / (torch.sum(self.weights) - none_count)
+            if torch.sum(self.weights) - none_count > 0
+            else 0
+        )
+
     def _weights_fusion(self) -> nn.Parameter:
         try:
             weights = nn.Parameter(torch.tensor([1.0, 1.0, 1.0], dtype=torch.float32))
@@ -48,8 +54,6 @@ class WeightedFusion(nn.Module):
             logger.log_message("warning", f"Error creating weighted fusion: {e}")
             my_exception = MyException(
                 error_message=f"Error creating weighted fusion: {e}",
-                error_details= sys,
+                error_details=sys,
             )
             print(my_exception)
-            
-

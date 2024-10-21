@@ -12,6 +12,7 @@ from src.trim_rag.exception import MyException
 
 from src.trim_rag.config import ImagePrepareDataQdrantArgumentsConfig
 from qdrant_client import models
+
 # from src.trim_rag.processing.image.image_processing import ImageTransform
 
 from src.config_params import ROOT_PROJECT_DIR
@@ -24,7 +25,7 @@ class ImageQdrantDB:
         super(ImageQdrantDB, self).__init__()
         self.config = config
         self.image_dir = self.config.image_dir
-        self.format = self.config.format # "*.png"
+        self.format = self.config.format  # "*.png"
         self.path_description = self.config.path_description
 
         self._image_urls: List = []
@@ -45,8 +46,8 @@ class ImageQdrantDB:
         except Exception as e:
             logger.log_message("warning", "Failed to create image url: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to create image url: " + str(e),
-                error_details = sys,
+                error_message="Failed to create image url: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
@@ -55,12 +56,12 @@ class ImageQdrantDB:
         def open_image(image_path: str) -> Image.Image:
             img = Image.open(image_path)
             return img
-            
+
         def convert_to_base64(image: Image.Image) -> str:
             image_bytes = io.BytesIO()
-            image.save(image_bytes, format=self.format.split('.')[-1])
+            image.save(image_bytes, format=self.format.split(".")[-1])
             image_bytes.seek(0)
-            return base64.b64encode(image_bytes.getvalue()).decode('utf-8')
+            return base64.b64encode(image_bytes.getvalue()).decode("utf-8")
 
         try:
             logger.log_message("info", "Creating base64 string started.")
@@ -78,8 +79,8 @@ class ImageQdrantDB:
         except Exception as e:
             logger.log_message("warning", "Failed to create base64 string: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to create base64 string: " + str(e),
-                error_details = sys,
+                error_message="Failed to create base64 string: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
@@ -96,14 +97,12 @@ class ImageQdrantDB:
         except Exception as e:
             logger.log_message("warning", "Failed to create type: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to create type: " + str(e),
-                error_details = sys,
+                error_message="Failed to create type: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
-    def _create_description(self, 
-                            type: str,
-                            url: str) -> Optional[str]:
+    def _create_description(self, type: str, url: str) -> Optional[str]:
         try:
             logger.log_message("info", "Creating description started.")
             df_path = ROOT_PROJECT_DIR / self.path_description
@@ -120,19 +119,21 @@ class ImageQdrantDB:
         except Exception as e:
             logger.log_message("warning", "Failed to create description: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to create description: " + str(e),
-                error_details = sys,
+                error_message="Failed to create description: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
     def create_pyload(self, processing_embedding) -> Optional[dict]:
         try:
-            logger.log_message("info", "Creating pyload started for preparing upload to qdrant.")
+            logger.log_message(
+                "info", "Creating pyload started for preparing upload to qdrant."
+            )
             path_image_embeddings = ROOT_PROJECT_DIR / self.image_dir
 
             for image_p in path_image_embeddings.glob(self.format):
                 # image_url = self._create_image_url(image_p)
-                
+
                 type = self._create_types()
                 # print(image_p)
                 base64_string = self._create_base64_strings(image_p)
@@ -150,45 +151,52 @@ class ImageQdrantDB:
             # print(len(self._types))
             # print(len(self._base64_strings))
 
-            pyloads = pd.DataFrame({"image_url": self._image_urls,
-                                    "type": self._types,
-                                    "base64": self._base64_strings,
-                                    "description": self._descriptions})
+            pyloads = pd.DataFrame(
+                {
+                    "image_url": self._image_urls,
+                    "type": self._types,
+                    "base64": self._base64_strings,
+                    "description": self._descriptions,
+                }
+            )
 
             pyload_dicts = pyloads.to_dict(orient="records")
 
-            logger.log_message("info", "Creating pyload completed for preparing upload to qdrant.")
+            logger.log_message(
+                "info", "Creating pyload completed for preparing upload to qdrant."
+            )
             return pyload_dicts
 
         except Exception as e:
             logger.log_message("warning", "Failed to create pyload: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to create pyload: " + str(e),
-                error_details = sys,
+                error_message="Failed to create pyload: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
-    
     def create_records(self, processing_embedding) -> Optional[dict]:
         try:
-            logger.log_message("info", "Creating records started for preparing upload to qdrant.")
+            logger.log_message(
+                "info", "Creating records started for preparing upload to qdrant."
+            )
             payloads = self.create_pyload(processing_embedding)
             records = [
                 models.Record(
-                    id = idx,
-                    payload = payloads[idx],
-                    vector = processing_embedding[idx]
+                    id=idx, payload=payloads[idx], vector=processing_embedding[idx]
                 )
                 for idx in range(len(payloads))
             ]
 
-            logger.log_message("info", "Creating records completed for preparing upload to qdrant.")
+            logger.log_message(
+                "info", "Creating records completed for preparing upload to qdrant."
+            )
             return records
 
         except Exception as e:
             logger.log_message("warning", "Failed to create records: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to create records: " + str(e),
-                error_details = sys,
+                error_message="Failed to create records: " + str(e),
+                error_details=sys,
             )
             print(my_exception)

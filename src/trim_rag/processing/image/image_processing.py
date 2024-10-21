@@ -1,4 +1,3 @@
-
 import os
 import sys
 import io
@@ -18,17 +17,14 @@ from torchvision.transforms import (
     RandomRotation,
     RandomResizedCrop,
     ColorJitter,
-    Compose, 
-
+    Compose,
 )
 
 
 class ImageTransform:
-    def __init__(self, 
-                 config: ImageDataTransformArgumentsConfig, 
-                 image_path: str= None
-                 ):
-        
+    def __init__(
+        self, config: ImageDataTransformArgumentsConfig, image_path: str = None
+    ):
         super(ImageTransform, self).__init__()
         self.config = config
         self.image_data = self.config
@@ -45,9 +41,6 @@ class ImageTransform:
         self.hue = self.image_data.hue
         self.format = self.image_data.format
 
-
-
-
     def _resize_image(self) -> Optional[Image.Image]:
         try:
             image = Image.open(self.image_path)
@@ -57,8 +50,8 @@ class ImageTransform:
         except Exception as e:
             logger.log_message("warning", "Failed to resize image: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to resize image: " + str(e),
-                error_details = sys,
+                error_message="Failed to resize image: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
@@ -71,39 +64,44 @@ class ImageTransform:
         except Exception as e:
             logger.log_message("warning", "Failed to normalize image: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to normalize image: " + str(e),
-                error_details = sys,
+                error_message="Failed to normalize image: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
     def _augment_image(self, image) -> Optional[Image.Image]:
         try:
-            augmentation = Compose([
-                RandomHorizontalFlip(),
-                RandomRotation(self.rotation),
-                RandomResizedCrop(self.size, 
-                                  scale=(self.scale, self.scale+ 0.2), 
-                                  ratio=(self.ratio, self.ratio)),
-                ColorJitter(brightness=self.brightness, 
-                            contrast=self.contrast, 
-                            saturation=self.saturation, 
-                            hue=self.hue
-                            ),
-            ])
+            augmentation = Compose(
+                [
+                    RandomHorizontalFlip(),
+                    RandomRotation(self.rotation),
+                    RandomResizedCrop(
+                        self.size,
+                        scale=(self.scale, self.scale + 0.2),
+                        ratio=(self.ratio, self.ratio),
+                    ),
+                    ColorJitter(
+                        brightness=self.brightness,
+                        contrast=self.contrast,
+                        saturation=self.saturation,
+                        hue=self.hue,
+                    ),
+                ]
+            )
             augmented_image = augmentation(image)
             return augmented_image
 
         except Exception as e:
             logger.log_message("warning", "Failed to augment image: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to augment image: " + str(e),
-                error_details = sys,
+                error_message="Failed to augment image: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
     def _convert_format(self, image) -> Optional[Image.Image]:
         try:
-            converted_image = image.convert('RGB')  # Ensure RGB format
+            converted_image = image.convert("RGB")  # Ensure RGB format
             image_bytes = io.BytesIO()
             converted_image.save(image_bytes, format=self.format)
             image_bytes.seek(0)
@@ -112,18 +110,17 @@ class ImageTransform:
         except Exception as e:
             logger.log_message("warning", "Failed to convert image format: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to convert image format: " + str(e),
-                error_details = sys,
+                error_message="Failed to convert image format: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
     def image_processing(self) -> None:
-        try: 
+        try:
             resized_image = self._resize_image()
             augmented_image = self._augment_image(resized_image)
             converted_image = self._convert_format(augmented_image)
             # normalized_image = self._normalize_image(converted_image)
-
 
             # return normalized_image
 
@@ -132,14 +129,7 @@ class ImageTransform:
         except Exception as e:
             logger.log_message("warning", "Failed to process image: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to process image: " + str(e),
-                error_details = sys,
+                error_message="Failed to process image: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
-
-
-
-
-
-
-        

@@ -4,7 +4,7 @@ from src.config_params.constants import (
     image_access_key,
     audio_access_key,
     QDRANT_DB_URL,
-    QDRANT_API_KEY, 
+    QDRANT_API_KEY,
     ROOT_PROJECT_DIR,
     COHERE_API_KEY,
     GOOGLE_API_KEY,
@@ -12,6 +12,5 @@ from src.config_params.constants import (
     LANGCHAIN_ENDPOINT,
     LANGCHAIN_PROJECT,
     LANGCHAIN_API_KEY,
-    OPENAI_API_KEY
+    OPENAI_API_KEY,
 )
-

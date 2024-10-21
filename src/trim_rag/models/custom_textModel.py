@@ -1,4 +1,3 @@
-
 import os
 import sys
 from typing import Optional
@@ -17,10 +16,11 @@ from src.trim_rag.embedding import TextEmbedding
 
 
 class TextModelRunnable(Runnable):
-    def __init__(self, 
-                 config: TextModelArgumentsConfig,
-                 embed_config: TextEmbeddingArgumentsConfig) -> None:
-
+    def __init__(
+        self,
+        config: TextModelArgumentsConfig,
+        embed_config: TextEmbeddingArgumentsConfig,
+    ) -> None:
         super(TextModelRunnable, self).__init__()
 
         # self.model = model
@@ -31,33 +31,33 @@ class TextModelRunnable(Runnable):
 
     def __call__(self, input: str) -> torch.Tensor:
         return self.invoke(input)
-    
+
     def invoke(self, input: str) -> torch.Tensor:
         try:
             logger.log_message("info", "Initializing text model and tokenizer ...")
             embed_text, _ = self.text_model_main.embedding_text(input)
             logger.log_message("info", "Embedding text successfully.")
             return embed_text
-        
+
         except Exception as e:
             logger.log_message("warning", "Failed to initialize text model: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to initialize text model: " + str(e),
-                error_details = sys,
+                error_message="Failed to initialize text model: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
-    
+
     def text_model_runnable(self) -> Optional[BertModel]:
         try:
             logger.log_message("info", "Initializing text model...")
             models = self.text_model_main.text_model()
             logger.log_message("info", "Text model initialized successfully.")
             return models
-        
+
         except Exception as e:
             logger.log_message("warning", "Failed to initialize text model: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to initialize text model: " + str(e),
-                error_details = sys,
+                error_message="Failed to initialize text model: " + str(e),
+                error_details=sys,
             )
             print(my_exception)

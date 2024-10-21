@@ -1,4 +1,3 @@
-
 import os
 import sys
 from typing import Optional
@@ -7,10 +6,7 @@ import torch
 
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
-from src.trim_rag.config import (
-    ImageEmbeddingArgumentsConfig, 
-    ImageModelArgumentsConfig
-)
+from src.trim_rag.config import ImageEmbeddingArgumentsConfig, ImageModelArgumentsConfig
 from src.trim_rag.models.image_model import ImageModel
 from transformers import CLIPModel
 from langchain_core.runnables import Runnable
@@ -19,10 +15,11 @@ from src.trim_rag.embedding import ImageEmbedding
 
 
 class ImageModelRunnable(Runnable):
-    def __init__(self, 
-                 config: ImageModelArgumentsConfig,
-                 embed_config: ImageEmbeddingArgumentsConfig) -> None:
-
+    def __init__(
+        self,
+        config: ImageModelArgumentsConfig,
+        embed_config: ImageEmbeddingArgumentsConfig,
+    ) -> None:
         super(ImageModelRunnable, self).__init__()
 
         # self.model = model
@@ -38,26 +35,26 @@ class ImageModelRunnable(Runnable):
 
             logger.log_message("info", "image model initialized successfully.")
             return embed_image
-        
+
         except Exception as e:
             logger.log_message("warning", "Failed to initialize image model: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to initialize image model: " + str(e),
-                error_details = sys,
+                error_message="Failed to initialize image model: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
-    
+
     def image_model_runnable(self) -> Optional[CLIPModel]:
         try:
             logger.log_message("info", "Initializing image model...")
             models = self.image_model_main.image_model()
             logger.log_message("info", "image model initialized successfully.")
             return models
-        
+
         except Exception as e:
             logger.log_message("warning", "Failed to initialize image model: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to initialize image model: " + str(e),
-                error_details = sys,
+                error_message="Failed to initialize image model: " + str(e),
+                error_details=sys,
             )
             print(my_exception)

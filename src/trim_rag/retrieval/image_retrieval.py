@@ -4,15 +4,21 @@ import sys
 from src.trim_rag.logger import logger
 from src.trim_rag.exception import MyException
 
-from src.trim_rag.config import ImageRetrievalArgumentsConfig, QdrantVectorDBArgumentsConfig
+from src.trim_rag.config import (
+    ImageRetrievalArgumentsConfig,
+    QdrantVectorDBArgumentsConfig,
+)
 
 from src.trim_rag.components import QdrantVectorDB
 
+
 class ImageRetrieval:
-    def __init__(self, 
-                 config: ImageRetrievalArgumentsConfig,
-                 config_qdrant: QdrantVectorDBArgumentsConfig,
-                 client: QdrantVectorDB) -> None:
+    def __init__(
+        self,
+        config: ImageRetrievalArgumentsConfig,
+        config_qdrant: QdrantVectorDBArgumentsConfig,
+        client: QdrantVectorDB,
+    ) -> None:
         super(ImageRetrieval, self).__init__()
 
         self.config = config
@@ -20,9 +26,8 @@ class ImageRetrieval:
         self.config_qdrant = config_qdrant
         self.name_collection = self.config_qdrant.image_data.collection_image_name
 
-
     def image_retrieval(self, query_embedding) -> None:
-        try: 
+        try:
             logger.log_message("info", "Starting to retrieve image embeddings...")
 
             # Retrieve image embeddings
@@ -38,30 +43,26 @@ class ImageRetrieval:
                 # with_payload=["text"],
                 limit=5,  # Get top 5 most similar texts,
                 with_vectors=True,
-
             )
             logger.log_message("info", "Retrieved image embeddings successfully")
             return results
-        
+
         except Exception as e:
             logger.log_message("warning", f"Error retrieving image embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error retrieving image embeddings: {e}",
-                error_details= sys,
+                error_details=sys,
             )
             print(my_exception)
 
     def delete_image_embeddings(self, ids) -> None:
-        try: 
+        try:
             logger.log_message("info", "Starting to delete image embeddings...")
 
             # Delete image embeddings
             self.client.delete(
                 collection_name=self.config_qdrant.name_image_collection,
-                points_selector= {
-                    "ids": ids
-                }
-                
+                points_selector={"ids": ids},
             )
             logger.log_message("info", "Deleted image embeddings successfully")
 
@@ -69,29 +70,28 @@ class ImageRetrieval:
             logger.log_message("warning", f"Error deleting image embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error deleting image embeddings: {e}",
-                error_details= sys,
+                error_details=sys,
             )
             print(my_exception)
 
     def delete_all_image_embeddings(self) -> None:
-        try: 
+        try:
             logger.log_message("info", "Starting to delete all image embeddings...")
 
             # Delete all image embeddings
-            self.client.delete(
-                collection_name=self.config_qdrant.name_image_collection
-            )
+            self.client.delete(collection_name=self.config_qdrant.name_image_collection)
             logger.log_message("info", "Deleted all image embeddings successfully")
 
         except Exception as e:
             logger.log_message("warning", f"Error deleting all image embeddings: {e}")
             my_exception = MyException(
                 error_message=f"Error deleting all image embeddings: {e}",
-                error_details= sys,
+                error_details=sys,
             )
             print(my_exception)
+
     def recreate_image_collection(self) -> None:
-        try: 
+        try:
             logger.log_message("info", "Starting to recreate image collection...")
 
             # Recreate image collection
@@ -104,7 +104,7 @@ class ImageRetrieval:
             logger.log_message("warning", f"Error recreating image collection: {e}")
             my_exception = MyException(
                 error_message=f"Error recreating image collection: {e}",
-                error_details= sys,
+                error_details=sys,
             )
             print(my_exception)
 
@@ -125,10 +125,7 @@ class ImageRetrieval:
                     raise AssertionError
                 if not isinstance(match["score"], float):
                     raise AssertionError
-        
+
         logger.log_message("info", "Assert image retrieval successfully")
 
         return None
-
-
-        

@@ -12,5 +12,5 @@ __all__ = [
     "TextEmbedding",
     "SharedEmbeddingSpace",
     "CrossModalEmbedding",
-    "MultimodalEmbedding"
+    "MultimodalEmbedding",
 ]

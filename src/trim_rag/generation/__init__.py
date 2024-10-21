@@ -10,5 +10,5 @@ __all__ = [
     "MultimodalWithMemories",
     "PromptFlows",
     "PostProcessing",
-    "StringFormatterRunnable"
+    "StringFormatterRunnable",
 ]

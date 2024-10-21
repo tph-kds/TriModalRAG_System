@@ -9,27 +9,30 @@ import pandas as pd
 from src.trim_rag.exception import MyException
 
 from box.exceptions import BoxValueError
-from ensure import ensure_annotations # Đảm bảo kiểm tra khi thực hiện sai cú pháp: 1 + "1" == ?
-from box import ConfigBox # truy cập được đối tượng vd: a.ensure thay vì a["ensure"]
+from ensure import (
+    ensure_annotations,
+)  # Đảm bảo kiểm tra khi thực hiện sai cú pháp: 1 + "1" == ?
+from box import ConfigBox  # truy cập được đối tượng vd: a.ensure thay vì a["ensure"]
 from pathlib import Path
 from typing import Any, List, Optional
+
 
 @ensure_annotations
 def read_yaml(path_to_yaml: Path) -> ConfigBox:
     """
-        Target: 
-            read yaml file and return
+    Target:
+        read yaml file and return
 
-        With Args:
-            path_to_yaml (str) : path like input
-        
-        Raises:
-            ValueError: if yaml file is empty
-            e: empty file
-        Returns:
-            ConfigBox: ConfigBox type
+    With Args:
+        path_to_yaml (str) : path like input
+
+    Raises:
+        ValueError: if yaml file is empty
+        e: empty file
+    Returns:
+        ConfigBox: ConfigBox type
     """
-    
+
     try:
         with open(path_to_yaml, "r") as f:
             content = yaml.safe_load(f)
@@ -43,21 +46,23 @@ def read_yaml(path_to_yaml: Path) -> ConfigBox:
         # my_exception = MyException("Error reading yaml file", sys)
         # print(my_exception)
         raise e
-    
-@ensure_annotations
-def create_directories(path_to_directories: list, verbose = True):
-    """
-        Target: Create list of the directories
 
-        With Args:
-            path_to_directories (list): list of path of the directories
-            verbose (boolean, optional): ignore if multiple dirs is to be created. Defaults to False.
+
+@ensure_annotations
+def create_directories(path_to_directories: list, verbose=True):
+    """
+    Target: Create list of the directories
+
+    With Args:
+        path_to_directories (list): list of path of the directories
+        verbose (boolean, optional): ignore if multiple dirs is to be created. Defaults to False.
 
     """
     for path in path_to_directories:
         os.makedirs(path, exist_ok=True)
         # if verbose:
         #     logger.log_message("info", f"created directory at: {path}")
+
 
 @ensure_annotations
 def save_tensor(data: torch.Tensor, path: Path):
@@ -98,6 +103,7 @@ def save_list(data: list, path: Path):
     # Save the list as a .json file
     with open(path, "w") as f:
         json.dump(data, f, indent=4)
+
 
 @ensure_annotations
 def load_list(path: Path) -> list:
@@ -141,6 +147,7 @@ def load_csv(path: Path) -> pd.DataFrame:
 
     return data
 
+
 # @ensure_annotations
 # def load_json(path: Path) -> ConfigBox:
 #     """
@@ -148,7 +155,7 @@ def load_csv(path: Path) -> pd.DataFrame:
 
 #         With Args:
 #             path (Path): path to json file
-        
+
 #         Returns:
 #             ConfigBox: data as class attributes instead of dict
 #     """
@@ -170,7 +177,7 @@ def load_csv(path: Path) -> pd.DataFrame:
 #     """
 #     with open(path, "w") as f:
 #         json.dump(data, f, indent=4)
-    
+
 #     logger.info(f"Json file saved at: {path}")
 
 # @ensure_annotations
@@ -224,6 +231,7 @@ def load_csv(path: Path) -> pd.DataFrame:
 #     with open(croppedImagePath, "rb") as f:
 #         return base64.b64encode(f.read())
 
+
 # @ensure_annotations
 def convert_tensor_to_list(input: Optional[List[torch.Tensor]]) -> Optional[List]:
     """convert tensor to list
@@ -234,8 +242,9 @@ def convert_tensor_to_list(input: Optional[List[torch.Tensor]]) -> Optional[List
     Returns:
         list: list
     """
-    output_list = [ i.tolist() for i in input]
+    output_list = [i.tolist() for i in input]
     return output_list
+
 
 @ensure_annotations
 def convert_list_to_tensor(input: List[int]) -> Optional[List[torch.Tensor]]:
@@ -247,6 +256,6 @@ def convert_list_to_tensor(input: List[int]) -> Optional[List[torch.Tensor]]:
     Returns:
         torch.Tensor: tensor
     """
-    output_tensor = [ torch.tensor(i) for i in input]
-    
+    output_tensor = [torch.tensor(i) for i in input]
+
     return output_tensor

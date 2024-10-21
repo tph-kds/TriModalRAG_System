@@ -14,9 +14,8 @@ class VectorDB:
 
         self.config = config
 
-
     def store_vector_db(self, embed_vector) -> None:
-        # try: 
+        # try:
         #     logger.log_message("info", "Starting to store vectors to Qdrant server...")
 
         #     # Store embedding

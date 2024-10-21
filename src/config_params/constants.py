@@ -1,6 +1,7 @@
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 
 CONFIG_FILE_PATH = Path("src/config_params/params.yaml")
@@ -25,10 +26,3 @@ LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-
-
-
-
-
-

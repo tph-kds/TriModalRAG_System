@@ -7,11 +7,10 @@ from src.trim_rag.models.custom_audioModel import AudioModelRunnable
 
 
 __all__ = [
-    "TextModel", 
-    "ImageModel", 
+    "TextModel",
+    "ImageModel",
     "AudioModel",
     "TextModelRunnable",
     "ImageModelRunnable",
     "AudioModelRunnable",
-
 ]

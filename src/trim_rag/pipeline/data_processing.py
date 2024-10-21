@@ -3,7 +3,7 @@ import sys
 from typing import List, Optional, Union
 from src.trim_rag.exception import MyException
 from src.trim_rag.logger import logger
-from src.trim_rag.config  import DataTransformationArgumentsConfig
+from src.trim_rag.config import DataTransformationArgumentsConfig
 from src.trim_rag.processing import TextTransform, ImageTransform, AudioTransform
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
@@ -17,19 +17,22 @@ class DataTransformPipeline:
         self.text_data = self.config.text_data
         self.image_data = self.config.image_data
         self.audio_data = self.config.audio_data
-        self.chunk_size = self.config.chunk_size # 512
-        self.chunk_overlap = self.config.chunk_overlap # 64
+        self.chunk_size = self.config.chunk_size  # 512
+        self.chunk_overlap = self.config.chunk_overlap  # 64
 
         self.list_text_processeds: List[int] = []
         self.list_image_processeds: List[int] = []
         self.list_audio_processeds: List[int] = []
         self.titles_file: List[str] = []
 
-
-    def run_data_processing_pipeline(self) -> Union[Optional[List[float]], 
-                                                    Optional[List[str]],
-                                                    Optional[List[float]],
-                                                    Optional[List[float]]]:
+    def run_data_processing_pipeline(
+        self,
+    ) -> Union[
+        Optional[List[float]],
+        Optional[List[str]],
+        Optional[List[float]],
+        Optional[List[float]],
+    ]:
         try:
             logger.log_message("info", "Data processing pipeline started.")
 
@@ -41,20 +44,25 @@ class DataTransformPipeline:
             audioprocessing = self.audio_processing()
             # self.data_processing()
 
-            logger.log_message("info", "Data Processing pipeline completed successfully.")
+            logger.log_message(
+                "info", "Data Processing pipeline completed successfully."
+            )
             return textprocessing, title_files, imageprocessing, audioprocessing
 
         except Exception as e:
-            logger.log_message("warning", "Failed to run Data Processing pipeline: " + str(e))
+            logger.log_message(
+                "warning", "Failed to run Data Processing pipeline: " + str(e)
+            )
             my_exception = MyException(
-                error_message = "Failed to run Data Processing pipeline: " + str(e),
-                error_details = sys,
+                error_message="Failed to run Data Processing pipeline: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
-
-    def text_processing(self, ) -> Union[Optional[List[float]], Optional[List[str]]]:
-       try:
+    def text_processing(
+        self,
+    ) -> Union[Optional[List[float]], Optional[List[str]]]:
+        try:
             logger.log_message("info", "Text processing pipeline started.")
             # access data folder before transforming
             dir_textdata = os.getcwd() + "/" + self.text_data.text_dir
@@ -67,31 +75,31 @@ class DataTransformPipeline:
                 # print(link_textdata)
                 # print(self.text_data.text_path +  "hi")
                 # self.text_data.text_path = link_textdata
-                textprocessing = TextTransform(self.text_data, 
-                                               text_path = link_textdata
-                                               )
+                textprocessing = TextTransform(self.text_data, text_path=link_textdata)
                 text_data_prcessed = textprocessing.text_processing()
                 ## create small chunk text from big text
                 # Example for word-based splitting (Recursive splitting)
-                word_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size, 
-                                                               chunk_overlap=self.chunk_overlap)
+                word_splitter = RecursiveCharacterTextSplitter(
+                    chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
+                )
                 text_data_chunks = word_splitter.split_text(text_data_prcessed)
 
                 self.list_text_processeds.append(text_data_chunks)
 
-            
-            
-            logger.log_message("info", "Text processing pipeline completed successfully.")
+            logger.log_message(
+                "info", "Text processing pipeline completed successfully."
+            )
             return self.list_text_processeds, self.titles_file
 
-       except Exception as e:
-            logger.log_message("warning", "Failed to run text processing pipeline: " + str(e))
+        except Exception as e:
+            logger.log_message(
+                "warning", "Failed to run text processing pipeline: " + str(e)
+            )
             my_exception = MyException(
-                error_message = "Failed to run text processing pipeline: " + str(e),
-                error_details = sys,
+                error_message="Failed to run text processing pipeline: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
-
 
     def image_processing(self) -> List[str]:
         try:
@@ -102,22 +110,25 @@ class DataTransformPipeline:
             for listr_imagedata in list_imagedata:
                 link_imagedata = dir_imagedata + "/" + listr_imagedata
                 # self.image_data.image_path = link_imagedata
-                imageprocessing = ImageTransform(self.image_data, 
-                                                 image_path=link_imagedata
-                                                 )
+                imageprocessing = ImageTransform(
+                    self.image_data, image_path=link_imagedata
+                )
                 image_data_prcessed = imageprocessing.image_processing()
 
                 self.list_image_processeds.append(image_data_prcessed)
-            
-            logger.log_message("info", "Image Processing pipeline completed successfully.")
+
+            logger.log_message(
+                "info", "Image Processing pipeline completed successfully."
+            )
             return self.list_image_processeds
 
-
         except Exception as e:
-            logger.log_message("warning", "Failed to run Image Processing pipeline: " + str(e))
+            logger.log_message(
+                "warning", "Failed to run Image Processing pipeline: " + str(e)
+            )
             my_exception = MyException(
-                error_message = "Failed to run Image Processing pipeline: " + str(e),
-                error_details = sys,
+                error_message="Failed to run Image Processing pipeline: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
@@ -130,23 +141,26 @@ class DataTransformPipeline:
             for listr_audiodata in list_audiodata:
                 link_audiodata = dir_audiodata + "/" + listr_audiodata
                 # self.audio_data.audio_path = link_audiodata
-                audioprocessing = AudioTransform(self.audio_data, 
-                                                 audio_path=link_audiodata
-                                                 )
+                audioprocessing = AudioTransform(
+                    self.audio_data, audio_path=link_audiodata
+                )
                 audio_data_prcessed = audioprocessing.audio_processing()
 
                 self.list_audio_processeds.append(audio_data_prcessed)
-            
-            logger.log_message("info", "Audio Processing pipeline completed successfully.")
+
+            logger.log_message(
+                "info", "Audio Processing pipeline completed successfully."
+            )
             return self.list_audio_processeds
 
             # logger.log_message("info", "Audio processing pipeline completed successfully.")
 
         except Exception as e:
-            logger.log_message("warning", "Failed to run Audio Processing pipeline: " + str(e))
+            logger.log_message(
+                "warning", "Failed to run Audio Processing pipeline: " + str(e)
+            )
             my_exception = MyException(
-                error_message = "Failed to run Audio Processing pipeline: " + str(e),
-                error_details = sys,
+                error_message="Failed to run Audio Processing pipeline: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
-

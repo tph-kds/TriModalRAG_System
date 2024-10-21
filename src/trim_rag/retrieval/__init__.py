@@ -5,6 +5,7 @@ from src.trim_rag.retrieval.trimodal_retrieval import TriModalRetrieval
 from src.trim_rag.retrieval.fusion_mechanism.fusion_machine import FusionMechanism
 from src.trim_rag.retrieval.vector_store import Retrieval_VectorStore
 from src.trim_rag.retrieval.retriever_query import RetrieverQuery
+
 __all__ = [
     "TextRetrieval",
     "AudioRetrieval",
@@ -12,5 +13,5 @@ __all__ = [
     "TriModalRetrieval",
     "FusionMechanism",
     "Retrieval_VectorStore",
-    "RetrieverQuery"
+    "RetrieverQuery",
 ]

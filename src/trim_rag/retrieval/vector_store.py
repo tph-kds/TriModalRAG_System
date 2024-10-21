@@ -10,6 +10,7 @@ from src.trim_rag.components import QdrantVectorDB
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
+
 # from langchain_openai import OpenAIEmbeddings
 # from langchain_huggingface import HuggingFaceEmbeddings
 # from langchain_huggingface import HuggingFaceEmbeddings
@@ -20,14 +21,16 @@ from qdrant_client import models
 
 
 class Retrieval_VectorStore:
-    def __init__(self, config: QdrantVectorDBArgumentsConfig,
-                 embed_config: TextEmbeddingArgumentsConfig) -> None:
+    def __init__(
+        self,
+        config: QdrantVectorDBArgumentsConfig,
+        embed_config: TextEmbeddingArgumentsConfig,
+    ) -> None:
         self.config = config
-        self.client = QdrantVectorDB(config,
-                                     QDRANT_API_KEY,
-                                     QDRANT_DB_URL
-                                     )._connect_qdrant()
-        
+        self.client = QdrantVectorDB(
+            config, QDRANT_API_KEY, QDRANT_DB_URL
+        )._connect_qdrant()
+
         # self.embeddings = TextEmbedding(config= embed_config)
 
     # def get_embedding_vector_store(self) -> HuggingFaceEmbeddings:
@@ -39,8 +42,7 @@ class Retrieval_VectorStore:
     def get_embedding_vector_store(self) -> None:
         return None
 
-    def _get_vector_store(self, 
-                          name_collection: str) -> QdrantVectorStore:
+    def _get_vector_store(self, name_collection: str) -> QdrantVectorStore:
         try:
             logger.log_message("info", "Starting to get vector store...")
             # self.client = self.client._connect_qdrant()
@@ -48,8 +50,7 @@ class Retrieval_VectorStore:
             # embeddings = self.embeddings()
             self.client.create_collection(
                 collection_name=name_collection,
-                vectors_config=VectorParams(size=768,
-                                            distance=Distance.COSINE),
+                vectors_config=VectorParams(size=768, distance=Distance.COSINE),
                 optimizers_config=models.OptimizersConfigDiff(
                     indexing_threshold=0,
                 ),
@@ -57,10 +58,8 @@ class Retrieval_VectorStore:
             )
             vector_store = QdrantVectorStore(
                 client=self.client,
-                collection_name= name_collection,
+                collection_name=name_collection,
                 embedding=embeddings,
-                
-
             )
             # Qdrant = QdrantVectorStore.from_documents(
             #     docs,
@@ -77,6 +76,6 @@ class Retrieval_VectorStore:
             logger.log_message("warning", f"Error retrieving vector store: {e}")
             my_exception = MyException(
                 error_message=f"Error retrieving vector store: {e}",
-                error_details= sys,
+                error_details=sys,
             )
             print(my_exception)

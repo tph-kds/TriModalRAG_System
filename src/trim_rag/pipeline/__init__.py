@@ -13,5 +13,5 @@ __all__ = [
     "QdrantVectorDBPipeline",
     "DataRetrievalPipeline",
     "GenerationPipeline",
-    "InferencePipeline"
+    "InferencePipeline",
 ]

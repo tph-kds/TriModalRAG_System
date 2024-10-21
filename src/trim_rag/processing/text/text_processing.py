@@ -1,4 +1,3 @@
-
 import os
 import re
 import sys
@@ -21,69 +20,67 @@ from src.trim_rag.config import TextDataTransformArgumentsConfig
 
 
 class TextTransform:
-    def __init__(self, 
-                 config: TextDataTransformArgumentsConfig, 
-                 text_path: str= None
-                 ):
-        
+    def __init__(self, config: TextDataTransformArgumentsConfig, text_path: str = None):
         super(TextTransform, self).__init__()
         self.config = config
         self.text_data = self.config
         # self.text_path = self.text_data.text_path
         self.text_path = text_path
 
-        self.stop_words = set(stopwords.words('english'))
+        self.stop_words = set(stopwords.words("english"))
         self.lemmatizer = WordNetLemmatizer()
 
     def _extract_text_from_pdf(self, pdf_path) -> Optional[str]:
         try:
-            with open(pdf_path, 'rb') as file:
+            with open(pdf_path, "rb") as file:
                 reader = PdfReader(file)
-                text = ''
+                text = ""
                 for page_num in range(len(reader.pages)):
                     page = reader.pages[page_num]
                     text += page.extract_text()
             return text
-        
+
         except Exception as e:
             logger.log_message("warning", "Failed to extract text from PDF: " + str(e))
             my_exception = MyException(
-                
-                error_message = "Failed to extract text from PDF: " + str(e),
-                error_details = sys,
+                error_message="Failed to extract text from PDF: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
-    ## Normalization 
+    ## Normalization
     def _normalize_text(self, text) -> Optional[str]:
-        try: 
+        try:
             text = text.lower()  # Convert to lowercase
-            text = re.sub(r'[^\w\s]', '', text)  # Remove punctuation
-            text = re.sub(r'\s+', ' ', text)  # Replace multiple spaces with single space
+            text = re.sub(r"[^\w\s]", "", text)  # Remove punctuation
+            text = re.sub(
+                r"\s+", " ", text
+            )  # Replace multiple spaces with single space
             text = text.strip()  # Remove leading/trailing spaces
             return text
 
         except Exception as e:
             logger.log_message("warning", "Failed to normalize text: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to normalize text: " + str(e),
-                error_details = sys,
+                error_message="Failed to normalize text: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
-    
 
     def _remove_stopwords(self, text) -> Optional[str]:
         try:
             tokens = text.split()
-            filtered_tokens = [token for token in tokens if token not in self.stop_words]
-            return ' '.join(filtered_tokens)
+            filtered_tokens = [
+                token for token in tokens if token not in self.stop_words
+            ]
+            return " ".join(filtered_tokens)
 
         except Exception as e:
             logger.log_message("warning", "Failed to remove stopwords: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to remove stopwords: " + str(e),
-                error_details = sys,
-            )    
+                error_message="Failed to remove stopwords: " + str(e),
+                error_details=sys,
+            )
             print(my_exception)
 
     ## Stemming Lemmatization
@@ -91,12 +88,12 @@ class TextTransform:
         try:
             tokens = text.split()
             lemmatized_tokens = [self.lemmatizer.lemmatize(token) for token in tokens]
-            return ' '.join(lemmatized_tokens)
+            return " ".join(lemmatized_tokens)
         except Exception as e:
             logger.log_message("warning", "Failed to lemmatize text: " + str(e))
             my_exception = MyException(
-                error_message = "Failed to lemmatize text: " + str(e),
-                error_details = sys,
+                error_message="Failed to lemmatize text: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
 
@@ -107,20 +104,18 @@ class TextTransform:
             text = self._normalize_text(text)
             text = self._remove_stopwords(text)
             text = self._lemmatize_text(text)
-            
-            logger.log_message("info", "Data processing pipeline completed successfully.")
+
+            logger.log_message(
+                "info", "Data processing pipeline completed successfully."
+            )
             return text
 
-
         except Exception as e:
-            logger.log_message("warning", "Failed to run data processing pipeline: " + str(e))
+            logger.log_message(
+                "warning", "Failed to run data processing pipeline: " + str(e)
+            )
             my_exception = MyException(
-                error_message = "Failed to run data processing pipeline: " + str(e),
-                error_details = sys,
+                error_message="Failed to run data processing pipeline: " + str(e),
+                error_details=sys,
             )
             print(my_exception)
-
-
-
-
-        
